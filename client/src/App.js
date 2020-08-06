@@ -3,6 +3,8 @@ import logo from "./logo.svg";
 import "./App.css";
 
 function App() {
+  const [data, setData] = React.useState(null);
+  const [isFetching, setIsFetching] = React.useState(false);
   const fetchData = () => {
     fetch("/api")
       .then((response) => {
@@ -13,12 +15,18 @@ function App() {
       })
       .then((json) => {
         setData(json.message);
+        setIsFetching(false);
       })
       .catch((e) => {
+        setIsFetching(false);
         setData(`API call failed: ${e}`);
       });
   };
-  const [data, setData] = React.useState(fetchData);
+
+  React.useEffect(() => {
+    setIsFetching(true);
+    fetchData();
+  }, []);
 
   return (
     <div className="App">
@@ -35,7 +43,7 @@ function App() {
         >
           Learn React
         </a>
-        <p>{data}</p>
+        <p>{isFetching ? "Fetching..." : data}</p>
       </header>
     </div>
   );
