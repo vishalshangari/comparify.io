@@ -7,7 +7,9 @@ function App() {
   const [isFetching, setIsFetching] = React.useState(false);
   let DEV_URL = "";
   if (process.env.NODE_ENV === `development`) {
-    DEV_URL = "FLASE";
+    DEV_URL = "TRUE";
+  } else {
+    DEV_URL = "IT WASN'T TRUE";
   }
   const fetchData = () => {
     fetch("/api")
