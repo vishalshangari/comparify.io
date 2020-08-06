@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const cluster = require("cluster");
 const numCPUs = require("os").cpus().length;
+require("dotenv").config();
 
 const isDev = process.env.NODE_ENV !== "production";
 const port = process.env.PORT || 3001;
@@ -25,6 +26,12 @@ if (!isDev && cluster.isMaster) {
 
   // Priority serve any static files.
   app.use(express.static(path.resolve(__dirname, "../client/build")));
+
+  if (process.env.NODE_ENV === "development") {
+    const cors = require("cors");
+    app.use(cors());
+    console.log("dev server");
+  }
 
   // Answer API requests.
   app.get("/api", (req, res) => {

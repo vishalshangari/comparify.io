@@ -7,12 +7,11 @@ function App() {
   const [isFetching, setIsFetching] = React.useState(false);
   let DEV_URL = "";
   if (process.env.NODE_ENV === `development`) {
-    DEV_URL = "TRUE";
-  } else {
-    DEV_URL = "IT WASN'T TRUE";
+    DEV_URL = "http://localhost:3001";
   }
-  const fetchData = () => {
-    fetch("/api")
+
+  const fetchData = React.useCallback(() => {
+    fetch(`${DEV_URL}/api`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`status ${response.status}`);
@@ -27,12 +26,12 @@ function App() {
         setIsFetching(false);
         setData(`API call failed: ${e}`);
       });
-  };
+  }, [DEV_URL]);
 
   React.useEffect(() => {
     setIsFetching(true);
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   return (
     <div className="App">
@@ -50,7 +49,7 @@ function App() {
           Learn React
         </a>
         <p>{isFetching ? "Fetching..." : data}</p>
-        <a href="/api/login">Login</a>
+        {<a href={`${DEV_URL}/api/login`}>Login</a>}
         <p>{DEV_URL}</p>
       </header>
     </div>
