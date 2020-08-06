@@ -1,0 +1,33 @@
+{
+  "name": "spotify-mainstream",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server",
+  "scripts": {
+    "start": "node server",
+    "build": "cd client/ && npm install && npm run build",
+    "dev": "concurrently \"nodemon server\" \"cd client/ && yarn start\""
+  },
+  "cacheDirectories": [
+    "node_modules",
+    "react-ui/node_modules"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vishalshangari/spotify-mainstream.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vishalshangari/spotify-mainstream/issues"
+  },
+  "homepage": "https://github.com/vishalshangari/spotify-mainstream#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "concurrently": "^5.2.0",
+    "nodemon": "^2.0.4"
+  }
+}
