@@ -5,6 +5,10 @@ import "./App.css";
 function App() {
   const [data, setData] = React.useState(null);
   const [isFetching, setIsFetching] = React.useState(false);
+  let DEV_URL = "";
+  if (process.env.NODE_ENV === `development`) {
+    DEV_URL = "FLASE";
+  }
   const fetchData = () => {
     fetch("/api")
       .then((response) => {
@@ -44,6 +48,8 @@ function App() {
           Learn React
         </a>
         <p>{isFetching ? "Fetching..." : data}</p>
+        <a href="/api/login">Login</a>
+        <p>{DEV_URL}</p>
       </header>
     </div>
   );

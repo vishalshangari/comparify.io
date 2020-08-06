@@ -32,6 +32,10 @@ if (!isDev && cluster.isMaster) {
     res.send('{"message":"Hello from my API you bitch!"}');
   });
 
+  app.get("/api/login", (req, res) => {
+    res.redirect("http://www.google.ca");
+  });
+
   // All remaining requests return the React app, so it can handle routing.
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../rclient/build", "index.html"));
