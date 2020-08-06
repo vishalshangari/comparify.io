@@ -12,7 +12,10 @@ const port = process.env.PORT || 3001;
 // Spotify API config
 const client_id = "70f7c0f3f8a04350b0957f010488e475";
 const client_secret = "a832c80320fc4450a0fa1dbc1465d3c0";
-const redirect_uri = "http://localhost:3001/api/callback";
+
+const redirect_uri = isDev
+  ? "http://localhost:3001/api/callback"
+  : "https://spotify-compare-app.herokuapp.com/api/callback";
 const spotify_auth_url = "https://accounts.spotify.com/authorize?";
 
 /**
