@@ -142,7 +142,7 @@ if (!isDev && cluster.isMaster) {
             domain: "",
             maxAge: 3600000,
           });
-          res.redirect(home_redirect_uri);
+          res.redirect(home_redirect_uri + "/");
 
           // we can also pass the token to the browser to make requests from there
           // res.redirect(
