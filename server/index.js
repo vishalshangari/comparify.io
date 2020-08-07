@@ -1,9 +1,11 @@
 const express = require("express");
 const path = require("path");
+const request = require("request");
 const cluster = require("cluster");
 const queryString = require("query-string");
 const cookieParser = require("cookie-parser");
 const numCPUs = require("os").cpus().length;
+const axios = require("axios");
 require("dotenv").config();
 
 const isDev = process.env.NODE_ENV !== "production";
@@ -16,6 +18,7 @@ const client_secret = "a832c80320fc4450a0fa1dbc1465d3c0";
 const redirect_uri = isDev
   ? "http://localhost:3001/api/callback"
   : "https://spotify-compare-app.herokuapp.com/api/callback";
+const home_redirect_uri = isDev ? "http://localhost:3000" : "";
 const spotify_auth_url = "https://accounts.spotify.com/authorize?";
 
 /**
@@ -93,8 +96,103 @@ if (!isDev && cluster.isMaster) {
     const state = req.query.state || null;
     const storedState = req.cookies ? req.cookies[stateKey] : null;
 
-    res.set("Content-Type", "application/json");
-    res.send({ state: state, code: code, storedState: storedState });
+    if (state === null || state !== storedState) {
+      res.redirect(
+        home_redirect_uri +
+          queryString.stringify({
+            error: "state_mismatch",
+          })
+      );
+    } else {
+      res.clearCookie(stateKey);
+      const authOptions = {
+        url: "https://accounts.spotify.com/api/token",
+        form: {
+          code: code,
+          redirect_uri: redirect_uri,
+          grant_type: "authorization_code",
+        },
+        headers: {
+          Authorization:
+            "Basic " +
+            new Buffer.from(client_id + ":" + client_secret).toString("base64"),
+        },
+        json: true,
+      };
+
+      request.post(authOptions, (error, response, body) => {
+        if (!error && response.statusCode === 200) {
+          const access_token = body.access_token,
+            refresh_token = body.refresh_token;
+
+          const options = {
+            url: "https://api.spotify.com/v1/me",
+            headers: { Authorization: "Bearer " + access_token },
+            json: true,
+          };
+
+          // use the access token to access the Spotify Web API
+          request.get(options, (error, response, body) => {
+            console.log(body);
+          });
+
+          console.log(access_token);
+
+          res.cookie("accessToken", access_token, {
+            domain: "",
+            maxAge: 3600000,
+          });
+          res.redirect(home_redirect_uri);
+
+          // we can also pass the token to the browser to make requests from there
+          // res.redirect(
+          //   home_redirect_uri +
+          //     queryString.stringify({
+          //       access_token: access_token,
+          //       refresh_token: refresh_token,
+          //     })
+          // );
+        } else {
+          res.redirect(
+            home_redirect_uri +
+              "/" +
+              queryString.stringify({
+                error: "invalid_token",
+              })
+          );
+        }
+      });
+    }
+
+    // res.set("Content-Type", "application/json");
+    // res.send({ state: state, code: code, storedState: storedState });
+  });
+
+  app.get("/api/profile", (req, res) => {
+    console.log("profile request");
+    console.log(req.headers);
+
+    const options = {
+      headers: { Authorization: req.headers.authorization },
+      json: true,
+    };
+    // request.get(options, (error, response, body) => {
+    //   res.send(body);
+    // });
+
+    const getProfile = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.spotify.com/v1/me",
+          options
+        );
+        console.log(response);
+        res.json(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getProfile();
   });
 
   // All remaining requests return the React app, so it can handle routing.
