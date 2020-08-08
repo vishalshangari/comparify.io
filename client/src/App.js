@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { useCookies } from "react-cookie";
 import axios from "axios";
+import { Switch, Route, BrowserRouter } from "react-router-dom";
 
 let DEV_URL = "";
 if (process.env.NODE_ENV === `development`) {
@@ -47,6 +48,11 @@ function App() {
 
   return (
     <div className="App">
+      <BrowserRouter>
+        <Switch>
+          <Route path="/compare/:compareId" component={CompareComponent} />
+        </Switch>
+      </BrowserRouter>
       <header className="App-header">
         <p>{isFetching ? "Fetching..." : data}</p>
 
@@ -74,7 +80,11 @@ function App() {
 
 const Profile = () => {
   const [cookies, setCookie, removeCookie] = useCookies();
+  const [response, setResponse] = React.useState("");
+  const [result, setResult] = React.useState(null);
   const [profile, setProfile] = React.useState({});
+  const [name, setName] = React.useState("");
+  const [profileImageUrl, setProfileImageUrl] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   React.useEffect(() => {
     const fetchProfile = async () => {
@@ -88,25 +98,61 @@ const Profile = () => {
           },
         });
         const jsonresponse = await response.json();
-        console.log(jsonresponse);
-        setProfile(jsonresponse);
+        setName(jsonresponse.display_name);
+        setProfileImageUrl(jsonresponse.images[0].url);
+        setProfile(response);
         setLoading(false);
       } catch (error) {
         console.error(error);
       }
     };
     fetchProfile();
-  }, []);
+  }, [cookies.accessToken]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = { name: "vishal" };
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + cookies.accessToken,
+    };
+    const result = await axios.post(`${DEV_URL}/api/generate`, data, {
+      headers,
+    });
+    setResult(result);
+  };
+
   return (
     <div>
       <p>my profile</p>
       {loading ? (
         <p>loading...</p>
       ) : (
-        <div>
-          <p>Hello, {profile.display_name}</p>
-        </div>
+        <>
+          <div>
+            <p>Hello, {name}</p>
+            <img src={profileImageUrl} />
+          </div>
+          <form onSubmit={handleSubmit}>
+            <input type="submit" value="Generate my data!" />
+          </form>
+          <div>{result ? JSON.stringify(result) : null}</div>
+        </>
       )}
+    </div>
+  );
+};
+
+const CompareComponent = ({ match, location }) => {
+  const {
+    params: { compareId },
+  } = match;
+  return (
+    <div>
+      <p>
+        <strong>Compare name: {compareId} </strong>
+        {}
+      </p>
     </div>
   );
 };
