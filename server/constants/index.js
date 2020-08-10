@@ -8,6 +8,8 @@ module.exports = Object.freeze({
 
   // Spotify URLs
   SPOTIFY_AUTH_URL: "https://accounts.spotify.com/authorize?",
+  SPOTIFY_GET_AUTH_TOKEN: "https://accounts.spotify.com/api/token",
+  GET_ACTIVE_USER_PROFILE_URL: "https://api.spotify.com/v1/me",
   GET_ACTIVE_USER_TRACKS_URL: "https://api.spotify.com/v1/me/tracks",
 
   // Server config

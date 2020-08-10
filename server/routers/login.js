@@ -3,13 +3,17 @@ const request = require("request");
 const {
   STATE_KEY,
   SPOTIFY_AUTH_URL,
+  SPOTIFY_GET_AUTH_TOKEN,
   CLIENT_ID,
   CLIENT_SECRET,
   HOME_REDIRECT_URI,
   AUTH_REDIRECT_URI,
+  GET_ACTIVE_USER_PROFILE_URL,
 } = require("../constants");
 const router = express.Router();
 const queryString = require("query-string");
+const axios = require("axios");
+const jwt = require("jsonwebtoken");
 
 /**
  * Generates a random string containing numbers and letters
@@ -62,7 +66,7 @@ router.get("/callback", (req, res) => {
   } else {
     res.clearCookie(STATE_KEY);
     const authOptions = {
-      url: "https://accounts.spotify.com/api/token",
+      url: SPOTIFY_GET_AUTH_TOKEN,
       form: {
         code: code,
         redirect_uri: AUTH_REDIRECT_URI,
@@ -76,27 +80,41 @@ router.get("/callback", (req, res) => {
       json: true,
     };
 
-    request.post(authOptions, (error, response, body) => {
+    request.post(authOptions, async (error, response, body) => {
       if (!error && response.statusCode === 200) {
         const access_token = body.access_token,
           refresh_token = body.refresh_token;
 
-        const options = {
-          url: "https://api.spotify.com/v1/me",
+        const config = {
           headers: { Authorization: "Bearer " + access_token },
           json: true,
         };
 
-        // // use the access token to access the Spotify Web API
-        // request.get(options, (error, response, body) => {
-        //   // console.log(body);
-        // });
+        try {
+          const { data } = await axios.get(GET_ACTIVE_USER_PROFILE_URL, config);
+          const userId = data.id;
 
-        res.cookie("accessToken", access_token, {
-          domain: "",
-          maxAge: 3600000,
-        });
-        res.redirect(HOME_REDIRECT_URI + "/");
+          // Sign jwt token
+          const comparifyToken = jwt.sign(
+            userId.toString(),
+            process.env.JWT_SECRET
+          );
+
+          res.cookie("comparifyToken", comparifyToken, {
+            domain: "",
+            maxAge: 3600000, // One hour expiration
+          });
+          res.redirect(HOME_REDIRECT_URI + "/");
+        } catch (error) {
+          console.log(error);
+          res.redirect(
+            HOME_REDIRECT_URI +
+              "/" +
+              queryString.stringify({
+                error: "There was a problem getting user data.",
+              })
+          );
+        }
       } else {
         res.redirect(
           HOME_REDIRECT_URI +
