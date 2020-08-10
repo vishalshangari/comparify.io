@@ -108,7 +108,7 @@ router.get("/callback", (req, res) => {
             { expiresIn: "1h" }
           );
           res.cookie("comparifyToken", comparifyToken, {
-            domain: COOKIE_DOMAIN,
+            domain: "",
             maxAge: 3600000, // One hour expiration
             httpOnly: true,
           });
