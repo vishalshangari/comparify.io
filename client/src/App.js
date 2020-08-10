@@ -47,12 +47,16 @@ const AuthProvider = ({ reducer, initialState, children }) => {
 export const useStateValue = () => useContext(AuthContext);
 
 const reducer = async (state, action) => {
-  switch (action.type) {
-    case "LOGOUT":
-      const result = await axios.post(`${DEV_URL}/api/logout`);
-      return false;
-    default:
-      return state;
+  try {
+    switch (action.type) {
+      case "LOGOUT":
+        const result = await axios.post(`/api/logout`);
+        return false;
+      default:
+        return state;
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
 

@@ -77,20 +77,10 @@ if (!isDev && cluster.isMaster) {
   const app = express();
   app.use(cookieParser()).use(express.json());
 
-  // Priority serve any static files.
-  app.use(express.static(path.resolve(__dirname, "../client/build")));
-
-  // Enable CORS for dev
-  if (IS_DEV) {
-    const cors = require("cors");
-    app.use(cors({ credentials: true, origin: "localhost" }));
-    console.log("cors");
-  }
-
   //Add headers
   app.use(function (req, res, next) {
     // Website you wish to allow to connect
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+    // res.setHeader("Access-Control-Allow-Origin", "localhost");
 
     // Request methods you wish to allow
     res.setHeader(
@@ -111,6 +101,16 @@ if (!isDev && cluster.isMaster) {
     // Pass to next layer of middleware
     next();
   });
+
+  // Priority serve any static files.
+  app.use(express.static(path.resolve(__dirname, "../client/build")));
+
+  // Enable CORS for dev
+  if (IS_DEV) {
+    const cors = require("cors");
+    app.use(cors({ credentials: true, origin: true }));
+    console.log("cors");
+  }
 
   // Answer API requests.
   app.get("/api", (req, res) => {
@@ -146,7 +146,6 @@ if (!isDev && cluster.isMaster) {
 
   // All remaining requests return the React app, so React Router can handle forwarding.
   app.get("*", (req, res) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
     res.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
   });
 
