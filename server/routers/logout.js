@@ -8,7 +8,7 @@ const { HOME_REDIRECT_URI } = require("../constants");
 router.post("/", (req, res) => {
   console.log("logging out...");
   res.clearCookie("comparifyToken");
-  res.redirect(HOME_REDIRECT_URI);
+  res.redirect(HOME_REDIRECT_URI + "/");
 });
 
 module.exports = router;

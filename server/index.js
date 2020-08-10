@@ -108,7 +108,12 @@ if (!isDev && cluster.isMaster) {
   // Enable CORS for dev
   if (IS_DEV) {
     const cors = require("cors");
-    app.use(cors({ credentials: true, origin: true }));
+    app.use(
+      cors({
+        credentials: true,
+        origin: true,
+      })
+    );
     console.log("cors");
   }
 
