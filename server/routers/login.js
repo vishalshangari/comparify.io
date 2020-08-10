@@ -10,11 +10,17 @@ const {
   AUTH_REDIRECT_URI,
   GET_ACTIVE_USER_PROFILE_URL,
   COOKIE_DOMAIN,
+  USERS,
+  STATS,
 } = require("../constants");
 const router = express.Router();
 const queryString = require("query-string");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
+
+// Firebase db
+const db = require("../db/firebase");
+const firebase = require("firebase");
 
 /**
  * Generates a random string containing numbers and letters
@@ -93,19 +99,48 @@ router.get("/callback", (req, res) => {
 
         try {
           const { data } = await axios.get(GET_ACTIVE_USER_PROFILE_URL, config);
-          const userId = data.id;
+          const spotifyUserId = data.id;
 
-          // Sign jwt token
+          // Sign and set jwt token
           const comparifyToken = jwt.sign(
-            userId.toString(),
-            process.env.JWT_SECRET
+            { _id: spotifyUserId.toString() },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
           );
-
           res.cookie("comparifyToken", comparifyToken, {
             domain: COOKIE_DOMAIN,
             maxAge: 3600000, // One hour expiration
+            httpOnly: true,
           });
+          // res.clearCookie("comparifyToken");
 
+          // Http-only cookie
+
+          // Store user id and token
+          const userRef = db.collection(USERS).doc(spotifyUserId);
+          const userDoc = await userRef.get();
+          if (!userDoc.exists) {
+            // New user
+            console.log(
+              `no such user detected..adding new user with id: ${spotifyUserId}`
+            );
+            userRef.set({ tokens: [comparifyToken] });
+            // Add one to user count
+            await db
+              .collection(STATS)
+              .doc(USERS)
+              .update({ count: firebase.firestore.FieldValue.increment(1) });
+          } else {
+            // Existing user
+            console.log(
+              `User ${spotifyUserId} already exists... adding token.`
+            );
+            await userRef.update({
+              tokens: firebase.firestore.FieldValue.arrayUnion(comparifyToken),
+            });
+          }
+
+          // Redirect
           res.redirect(HOME_REDIRECT_URI + "/");
         } catch (error) {
           console.log(error);
@@ -128,6 +163,15 @@ router.get("/callback", (req, res) => {
       }
     });
   }
+});
+
+router.get("/verifyToken", (req, res) => {
+  console.log("ping");
+  res.send("done");
+});
+
+router.get("/clearSession", (req, res) => {
+  console.log("clearing session...");
 });
 
 module.exports = router;

@@ -23,4 +23,8 @@ module.exports = Object.freeze({
 
   // Others
   STATE_KEY: "spotify_auth_state",
+
+  // DB config
+  USERS: "users",
+  STATS: "stats",
 });

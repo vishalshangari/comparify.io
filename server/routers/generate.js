@@ -92,9 +92,9 @@ router.post("/", async (req, res) => {
     // });
 
     // Write test data
-    console.log("writing...");
-    await db.collection("users").doc("1").set({ list: fullTrackList });
-    console.log("finished writing");
+    // console.log("writing...");
+    // await db.collection("users").doc("1").set({ list: fullTrackList });
+    // console.log("finished writing");
 
     // Display stats
     console.log(sizeof(fullTrackList), "bytes");
@@ -106,10 +106,10 @@ router.post("/", async (req, res) => {
     // );
 
     // Read test data
-    console.log("reading...");
-    const doc = await db.collection("users").doc("1").get();
-    const data = doc.data();
-    console.log("finished reading");
+    // console.log("reading...");
+    // const doc = await db.collection("users").doc("1").get();
+    // const data = doc.data();
+    // console.log("finished reading");
 
     // Send test data
     console.log("sending...");

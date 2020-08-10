@@ -3,6 +3,7 @@ import "./App.css";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { Switch, Route, BrowserRouter } from "react-router-dom";
+import { useStateValue } from "./App";
 
 let DEV_URL = "";
 if (process.env.NODE_ENV === `development`) {
@@ -37,13 +38,28 @@ const Home = () => {
   }, [fetchData]);
 
   const [cookies, setCookie, removeCookie] = useCookies();
-  const [isLoggedIn, setIsLoggedIn] = React.useState(
-    cookies.accessToken ? true : false
-  );
+
+  const [isLoggedIn, dispatch] = useStateValue();
+
+  // const checkLoggedInStatus = async () => {
+  //   console.log(`call`);
+  //   const result = await fetch(`${DEV_URL}/api/login/verifyToken`);
+  //   console.log(result);
+  //   if (result.data === "done") {
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // };
+
+  // const initialStatusLog = checkLoggedInStatus();
+
+  // const [isLoggedIn, setIsLoggedIn] = React.useState(initialStatusLog);
 
   const handleLogOut = () => {
-    removeCookie("accessToken");
-    setIsLoggedIn(false);
+    removeCookie("comparifyToken");
+    console.log("dispatch");
+    dispatch({ type: "LOGOUT" });
   };
 
   return (
