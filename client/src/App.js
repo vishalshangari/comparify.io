@@ -1,68 +1,45 @@
-import React, { useReducer, useContext } from "react";
+import React, { useContext, useState, createContext } from "react";
 import "./App.css";
-import { useCookies } from "react-cookie";
 import axios from "axios";
 import { Switch, Route, BrowserRouter } from "react-router-dom";
 import Home from "./Home";
+import { useAsync } from "react-use";
 
 let DEV_URL = "";
 if (process.env.NODE_ENV === `development`) {
   DEV_URL = "http://localhost:3001";
 }
 
-// const checkLoggedInStatus = async () => {
-//   console.log(`call`);
-//   const result = await fetch(`${DEV_URL}/api/login/verifyToken`);
-//   console.log(result);
-//   if (result.data === "done") {
-//     return false;
-//   } else {
-//     return true;
-//   }
-// };
+export const AuthContext = React.createContext();
 
-const initialStatusLog = (async () => {
-  console.log(`call`);
-  const result = await fetch(`${DEV_URL}/api/login/verifyToken`);
-  console.log(result);
-  if (result.data === "done") {
-    return false;
-  } else {
-    return true;
-  }
-})();
+const AuthProvider = ({ children }) => {
+  const [state, setState] = useState({
+    status: "loading",
+    error: null,
+  });
 
-// const [isLoggedIn, setIsLoggedIn] = React.useState(initialStatusLog);
+  useAsync(async () => {
+    const response = await fetch(`${DEV_URL}/api/login/verifyToken`, {
+      credentials: "include",
+    });
+    console.log(response);
+    if (response.status === 200) {
+      setState({ status: "success" });
+    } else {
+      setState({ status: "error", error: response.text });
+    }
+  }, [DEV_URL]);
 
-const AuthContext = React.createContext();
-
-const AuthProvider = ({ reducer, initialState, children }) => {
   return (
-    <AuthContext.Provider value={useReducer(reducer, initialState)}>
-      {children}
+    <AuthContext.Provider value={state}>
+      {state.status === "loading" ? <h1>Loading...</h1> : children}
     </AuthContext.Provider>
   );
 };
 
-export const useStateValue = () => useContext(AuthContext);
-
-const reducer = async (state, action) => {
-  try {
-    switch (action.type) {
-      case "LOGOUT":
-        const result = await axios.post(`/api/logout`);
-        return false;
-      default:
-        return state;
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 const App = () => {
   return (
-    <AuthProvider initialState={initialStatusLog} reducer={reducer}>
+    <AuthProvider>
       <BrowserRouter>
         <Switch>
           <Route path="/create" exact component={Create} />

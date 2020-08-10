@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./App.css";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { Switch, Route, BrowserRouter } from "react-router-dom";
-import { useStateValue } from "./App";
+import { AuthContext } from "./App";
 
 let DEV_URL = "";
 if (process.env.NODE_ENV === `development`) {
@@ -37,29 +37,13 @@ const Home = () => {
     fetchData();
   }, [fetchData]);
 
-  const [cookies, setCookie, removeCookie] = useCookies();
+  const isLoggedIn = useContext(AuthContext);
 
-  const [isLoggedIn, dispatch] = useStateValue();
-
-  // const checkLoggedInStatus = async () => {
-  //   console.log(`call`);
-  //   const result = await fetch(`${DEV_URL}/api/login/verifyToken`);
-  //   console.log(result);
-  //   if (result.data === "done") {
-  //     return false;
-  //   } else {
-  //     return true;
-  //   }
-  // };
-
-  // const initialStatusLog = checkLoggedInStatus();
-
-  // const [isLoggedIn, setIsLoggedIn] = React.useState(initialStatusLog);
+  console.log(isLoggedIn);
 
   const handleLogOut = () => {
-    removeCookie("comparifyToken");
     console.log("dispatch");
-    dispatch({ type: "LOGOUT" });
+    // setIsLoggedIn(false);
   };
 
   return (
@@ -86,7 +70,7 @@ const Home = () => {
         </a>
         <br />
         <button onClick={() => handleLogOut()}>Logout</button>
-        <p>Logged in: {isLoggedIn ? `true` : `false`}</p>
+        <p>Logged in: {isLoggedIn.status === "success" ? `true` : `false`}</p>
         <br />
         {/* {isLoggedIn ? <Profile /> : null} */}
       </header>

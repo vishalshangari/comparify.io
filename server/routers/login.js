@@ -117,28 +117,28 @@ router.get("/callback", (req, res) => {
           // Http-only cookie
 
           // Store user id and token
-          const userRef = db.collection(USERS).doc(spotifyUserId);
-          const userDoc = await userRef.get();
-          if (!userDoc.exists) {
-            // New user
-            console.log(
-              `no such user detected..adding new user with id: ${spotifyUserId}`
-            );
-            userRef.set({ tokens: [comparifyToken] });
-            // Add one to user count
-            await db
-              .collection(STATS)
-              .doc(USERS)
-              .update({ count: firebase.firestore.FieldValue.increment(1) });
-          } else {
-            // Existing user
-            console.log(
-              `User ${spotifyUserId} already exists... adding token.`
-            );
-            await userRef.update({
-              tokens: firebase.firestore.FieldValue.arrayUnion(comparifyToken),
-            });
-          }
+          // const userRef = db.collection(USERS).doc(spotifyUserId);
+          // const userDoc = await userRef.get();
+          // if (!userDoc.exists) {
+          //   // New user
+          //   console.log(
+          //     `no such user detected..adding new user with id: ${spotifyUserId}`
+          //   );
+          //   // userRef.set({ tokens: [comparifyToken] });
+          //   // Add one to user count
+          //   // await db
+          //   //   .collection(STATS)
+          //   //   .doc(USERS)
+          //   //   .update({ count: firebase.firestore.FieldValue.increment(1) });
+          // } else {
+          //   // Existing user
+          //   console.log(
+          //     `User ${spotifyUserId} already exists... adding token.`
+          //   );
+          //   // await userRef.update({
+          //   //   tokens: firebase.firestore.FieldValue.arrayUnion(comparifyToken),
+          //   // });
+          // }
 
           // Redirect
           res.redirect(HOME_REDIRECT_URI + "/");
@@ -167,7 +167,18 @@ router.get("/callback", (req, res) => {
 
 router.get("/verifyToken", (req, res) => {
   console.log("ping");
-  res.send("done");
+  console.log(JSON.stringify(req.cookies));
+
+  try {
+    const jwtresult = jwt.verify(
+      req.cookies["comparifyToken"],
+      process.env.JWT_SECRET
+    );
+    console.log(jwtresult);
+    res.status(200).json({ status: "success" });
+  } catch (error) {
+    res.status(401).json({ status: "error", error: "User not authenticated" });
+  }
 });
 
 router.get("/clearSession", (req, res) => {
