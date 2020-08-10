@@ -19,6 +19,7 @@ module.exports = Object.freeze({
     ? "http://localhost:3001/api/login/callback"
     : "https://spotify-compare-app.herokuapp.com/api/login/callback",
   HOME_REDIRECT_URI: isDev ? "http://localhost:3000" : "",
+  COOKIE_DOMAIN: isDev ? "" : "spotify-compare-app.herokuapp.com",
 
   // Others
   STATE_KEY: "spotify_auth_state",
