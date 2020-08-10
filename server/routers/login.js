@@ -101,9 +101,9 @@ router.get("/callback", (req, res) => {
           );
 
           res.cookie("comparifyToken", comparifyToken, {
-            domain: "",
             maxAge: 3600000, // One hour expiration
           });
+
           res.redirect(HOME_REDIRECT_URI + "/");
         } catch (error) {
           console.log(error);
