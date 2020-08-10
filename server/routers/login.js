@@ -9,6 +9,7 @@ const {
   HOME_REDIRECT_URI,
   AUTH_REDIRECT_URI,
   GET_ACTIVE_USER_PROFILE_URL,
+  IS_DEV,
 } = require("../constants");
 const router = express.Router();
 const queryString = require("query-string");
@@ -101,6 +102,7 @@ router.get("/callback", (req, res) => {
           );
 
           res.cookie("comparifyToken", comparifyToken, {
+            domain: "",
             maxAge: 3600000, // One hour expiration
           });
 
@@ -109,7 +111,7 @@ router.get("/callback", (req, res) => {
           console.log(error);
           res.redirect(
             HOME_REDIRECT_URI +
-              "/" +
+              (IS_DEV ? "" : "/") +
               queryString.stringify({
                 error: "There was a problem getting user data.",
               })
