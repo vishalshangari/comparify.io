@@ -9,8 +9,7 @@
     "dev": "concurrently \"nodemon server\" \"cd client/ && yarn start\""
   },
   "cacheDirectories": [
-    "node_modules",
-    "react-ui/node_modules"
+    "node_modules"
   ],
   "repository": {
     "type": "git",
