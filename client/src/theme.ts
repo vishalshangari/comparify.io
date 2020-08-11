@@ -6,7 +6,10 @@ interface Colors {
 // Colors list
 const colors: Colors = {
   white: "rgb(255, 255, 255)",
-  offWhite: "rgb(242, 242, 242)",
+  grey1: "rgb(235, 235, 235)",
+  grey2: "rgb(220, 220, 220)",
+  grey3: "rgb(205, 205, 205)",
+  grey4: "rgb(175, 175, 175)",
   spotifyGreen: "#1DB954",
   spotifyGreenDim: "#199F48",
 };
@@ -19,8 +22,9 @@ interface ThemeColors {
 // Color assignment object
 const themeColors: ThemeColors = {
   // Text
-  textPrimary: colors.white,
-  textSecondary: colors.offWhite,
+  textPrimary: colors.grey1,
+  textSecondary: colors.grey3,
+  textTertiary: colors.grey4,
   spotifyGreen: colors.spotifyGreen,
   spotifyGreenDim: colors.spotifyGreenDim,
 };

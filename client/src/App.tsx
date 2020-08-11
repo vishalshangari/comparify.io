@@ -5,8 +5,9 @@ import Home from "./Home";
 import { useAsync } from "react-use";
 
 import bg from "./bg.jpg";
-import Splash from "./components/Splash";
+import Splash from "./components/Splash/";
 import { theme } from "./theme";
+import GlobalStyle from "./components/GlobalStyle";
 import styled, { ThemeProvider } from "styled-components";
 
 let DEV_URL = "";
@@ -63,6 +64,7 @@ const App = () => {
   return (
     <AuthProvider>
       <ThemeProvider theme={theme}>
+        <GlobalStyle />
         <BrowserRouter>
           <Switch>
             <Route path="/create" exact component={Create} />
