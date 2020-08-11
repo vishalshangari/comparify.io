@@ -284,6 +284,9 @@ const SplashWrap = styled.div`
     }
   `}
   ${media.lessThan("small")`
+    ${FrontTitle} {
+      top: 30%;
+    }
     h1 {
       font-size: 3.75rem;
       letter-spacing: -3px;
