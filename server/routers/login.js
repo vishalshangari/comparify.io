@@ -166,7 +166,6 @@ router.get("/callback", (req, res) => {
 });
 
 router.get("/verifyToken", (req, res) => {
-  console.log("ping");
   console.log(JSON.stringify(req.cookies));
   if (req.cookies["comparifyToken"]) {
     try {

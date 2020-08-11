@@ -2,13 +2,7 @@ import React, { useContext } from "react";
 import "./App.css";
 import { useCookies } from "react-cookie";
 import axios from "axios";
-import {
-  Switch,
-  Route,
-  BrowserRouter,
-  Redirect,
-  useHistory,
-} from "react-router-dom";
+import { Switch, Route, BrowserRouter, useHistory } from "react-router-dom";
 import { AuthContext } from "./App";
 
 let DEV_URL = "";
@@ -17,31 +11,31 @@ if (process.env.NODE_ENV === `development`) {
 }
 
 const Home = () => {
-  const [data, setData] = React.useState(null);
-  const [isFetching, setIsFetching] = React.useState(false);
+  // const [data, setData] = React.useState(null);
+  // const [isFetching, setIsFetching] = React.useState(false);
 
-  const fetchData = React.useCallback(() => {
-    fetch(`${DEV_URL}/api`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`status ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((json) => {
-        setData(json.message);
-        setIsFetching(false);
-      })
-      .catch((e) => {
-        setIsFetching(false);
-        setData(`API call failed: ${e}`);
-      });
-  }, []);
+  // const fetchData = React.useCallback(() => {
+  //   fetch(`${DEV_URL}/api`)
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error(`status ${response.status}`);
+  //       }
+  //       return response.json();
+  //     })
+  //     .then((json) => {
+  //       setData(json.message);
+  //       setIsFetching(false);
+  //     })
+  //     .catch((e) => {
+  //       setIsFetching(false);
+  //       setData(`API call failed: ${e}`);
+  //     });
+  // }, []);
 
-  React.useEffect(() => {
-    setIsFetching(true);
-    fetchData();
-  }, [fetchData]);
+  // React.useEffect(() => {
+  //   setIsFetching(true);
+  //   fetchData();
+  // }, [fetchData]);
 
   const { state: authState, setState: setAuthState } = useContext(AuthContext);
 
@@ -55,9 +49,8 @@ const Home = () => {
     });
     console.log(response);
     if (response.status === 200) {
-      console.log("YES");
       setAuthState({ status: "no-user" });
-      history.replace("/n");
+      history.replace("/");
     } else {
       console.log(response);
     }
@@ -73,7 +66,7 @@ const Home = () => {
         </Switch>
       </BrowserRouter>
       <header className="App-header">
-        <p>{isFetching ? "Fetching..." : data}</p>
+        {/* <p>{isFetching ? "Fetching..." : data}</p> */}
 
         <a
           style={{
@@ -89,7 +82,9 @@ const Home = () => {
         </a>
         <br />
         <button onClick={() => handleLogOut()}>Logout</button>
-        <p>Logged in: {authState.status === "success" ? `true` : `false`}</p>
+        <p>
+          Logged in: {authState.status === "authenticated" ? `true` : `false`}
+        </p>
         <br />
         {/* {isLoggedIn ? <Profile /> : null} */}
       </header>
@@ -99,7 +94,6 @@ const Home = () => {
 
 const Profile = () => {
   const [cookies, setCookie, removeCookie] = useCookies();
-  const [response, setResponse] = React.useState("");
   const [result, setResult] = React.useState(null);
   const [profile, setProfile] = React.useState({});
   const [name, setName] = React.useState("");

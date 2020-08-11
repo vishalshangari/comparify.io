@@ -24,10 +24,8 @@ const AuthProvider = ({ children }) => {
     });
     if (response.status === 200) {
       const responseBody = await response.json();
-      if (responseBody.status === "authenticated") {
-        setState({ status: "success" });
-      } else {
-        setState({ status: "no-user" });
+      if (responseBody.status) {
+        setState({ status: responseBody.status });
       }
     } else {
       setState({ status: "error", error: response.text });

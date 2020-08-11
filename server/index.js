@@ -103,6 +103,8 @@ if (!isDev && cluster.isMaster) {
   // });
 
   // Priority serve any static files.
+  app.use(express.static(path.resolve(__dirname, "../client/build")));
+
   const cors = require("cors");
   app.use(
     cors({
@@ -110,7 +112,6 @@ if (!isDev && cluster.isMaster) {
       origin: "http://localhost:3000",
     })
   );
-  app.use(express.static(path.resolve(__dirname, "../client/build")));
 
   // Enable CORS for dev
   if (IS_DEV) {
