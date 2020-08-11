@@ -1,7 +1,7 @@
 import React, { useContext, useState, createContext } from "react";
 import "./App.css";
 import axios from "axios";
-import { Switch, Route, BrowserRouter } from "react-router-dom";
+import { Switch, Route, BrowserRouter, useHistory } from "react-router-dom";
 import Home from "./Home";
 import { useAsync } from "react-use";
 
@@ -22,16 +22,20 @@ const AuthProvider = ({ children }) => {
     const response = await fetch(`${DEV_URL}/api/login/verifyToken`, {
       credentials: "include",
     });
-    console.log(response);
     if (response.status === 200) {
-      setState({ status: "success" });
+      const responseBody = await response.json();
+      if (responseBody.status === "authenticated") {
+        setState({ status: "success" });
+      } else {
+        setState({ status: "no-user" });
+      }
     } else {
       setState({ status: "error", error: response.text });
     }
   }, [DEV_URL]);
 
   return (
-    <AuthContext.Provider value={state}>
+    <AuthContext.Provider value={{ state: state, setState: setState }}>
       {state.status === "loading" ? <h1>Loading...</h1> : children}
     </AuthContext.Provider>
   );

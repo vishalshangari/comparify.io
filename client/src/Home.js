@@ -2,7 +2,13 @@ import React, { useContext } from "react";
 import "./App.css";
 import { useCookies } from "react-cookie";
 import axios from "axios";
-import { Switch, Route, BrowserRouter } from "react-router-dom";
+import {
+  Switch,
+  Route,
+  BrowserRouter,
+  Redirect,
+  useHistory,
+} from "react-router-dom";
 import { AuthContext } from "./App";
 
 let DEV_URL = "";
@@ -37,12 +43,25 @@ const Home = () => {
     fetchData();
   }, [fetchData]);
 
-  const isLoggedIn = useContext(AuthContext);
+  const { state: authState, setState: setAuthState } = useContext(AuthContext);
 
-  console.log(isLoggedIn);
+  console.log(authState);
 
-  const handleLogOut = () => {
-    console.log("dispatch");
+  let history = useHistory();
+
+  const handleLogOut = async () => {
+    const response = await axios.post(`${DEV_URL}/api/logout`, "logout", {
+      withCredentials: true,
+    });
+    console.log(response);
+    if (response.status === 200) {
+      console.log("YES");
+      setAuthState({ status: "no-user" });
+      history.replace("/n");
+    } else {
+      console.log(response);
+    }
+
     // setIsLoggedIn(false);
   };
 
@@ -70,7 +89,7 @@ const Home = () => {
         </a>
         <br />
         <button onClick={() => handleLogOut()}>Logout</button>
-        <p>Logged in: {isLoggedIn.status === "success" ? `true` : `false`}</p>
+        <p>Logged in: {authState.status === "success" ? `true` : `false`}</p>
         <br />
         {/* {isLoggedIn ? <Profile /> : null} */}
       </header>
