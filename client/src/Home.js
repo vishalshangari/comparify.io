@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import "./App.css";
 import { useCookies } from "react-cookie";
 import axios from "axios";
 import { Switch, Route, BrowserRouter, useHistory } from "react-router-dom";
@@ -65,7 +64,10 @@ const Home = () => {
           <Route path="/compare/:compareId" component={CompareComponent} />
         </Switch>
       </BrowserRouter>
-      <header className="App-header">
+      <header
+        className="App-header"
+        style={{ textAlign: "center", padding: "100px" }}
+      >
         {/* <p>{isFetching ? "Fetching..." : data}</p> */}
 
         <a
@@ -75,13 +77,16 @@ const Home = () => {
             color: "#333",
             borderRadius: "5px",
             textDecoration: "none",
+            margin: "20px",
           }}
           href={`${DEV_URL}/api/login`}
         >
           Login
         </a>
         <br />
-        <button onClick={() => handleLogOut()}>Logout</button>
+        <button onClick={() => handleLogOut()} style={{ margin: "100px" }}>
+          Logout
+        </button>
         <p>
           Logged in: {authState.status === "authenticated" ? `true` : `false`}
         </p>
