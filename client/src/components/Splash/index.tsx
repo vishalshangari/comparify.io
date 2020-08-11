@@ -104,6 +104,7 @@ const FrontActionButtonLabel = styled.div`
   font-size: 1rem;
   color: ${({ theme }) => theme.colors.textTertiary};
   opacity: 0.8;
+  width: 100%;
   line-height: 2rem;
   a {
     border-bottom: 1px solid ${({ theme }) => theme.colors.textTertiary};
@@ -119,6 +120,7 @@ const FrontActionButtonLabel = styled.div`
 const ActionButton = styled.button`
   border: 0;
   outline: 0;
+  z-index: 3;
   padding: 1.25rem 1.5rem;
   font-size: 1.25rem;
   margin: 0 auto;
@@ -141,10 +143,12 @@ const ActionButton = styled.button`
 `;
 
 const FrontActionButtonWrap = styled.div<{ state: string }>`
-  position: absolute;
   bottom: 3em;
   text-align: center;
   width: 100%;
+  flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
   ${({ state }) =>
     state === "entered" || state === `entering` ? `opacity: 1;` : `opacity: 0;`}
   transition: 0.5s ease opacity;
@@ -173,36 +177,31 @@ const FrontSubtitle = styled.div<{ state: string }>`
 `;
 
 const FrontSubtitleWrap = styled.div`
-  position: absolute;
   width: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  top: calc(45% + 7em);
+  margin: 3em 0 5em;
 `;
 
 const FrontTitle = styled.div<{ state: string }>`
-  position: absolute;
-  left: 50%;
-  top: 45%;
-  transition: 1s ease all;
+  margin-top: 40vh;
+  transition: 1s ease opacity, 1s ease transform;
   h1 {
     text-shadow: 2px 2px 8px rgb(0, 0, 0, 0.5);
     font-weight: 700;
     color: white;
     margin: 0;
+    text-align: center;
+    line-height: 1;
   }
   display: flex;
   justify-content: center;
   ${({ state }) =>
     state === "entered" || state === `entering`
-      ? `opacity: 1; transform: translate(-50%, -50%);`
-      : `opacity: 0; transform: translate(-50%, -35%);`}
+      ? `opacity: 1; transform: translate(0, -50%);`
+      : `opacity: 0; transform: translate(0, -35%);`}
 `;
 
 const SplashInner = styled.div`
-  max-width: 960px;
   height: 100%;
-  position: relative;
   margin: 0 auto;
 `;
 
@@ -228,8 +227,10 @@ const SplashBackgroundLabel = styled.div`
 `;
 
 const SplashBackground = styled.div<{ state: string }>`
+  height: 100%;
   img {
-    max-height: 100vh;
+    max-height: 100%;
+    width: auto;
     z-index: -1;
     opacity: 0;
     transition: 3s ease opacity;
@@ -253,12 +254,12 @@ const SplashBackground = styled.div<{ state: string }>`
 const SplashWrap = styled.div`
   width: 100vw;
   height: 100vh;
-  min-height: 600px;
+  min-height: 800px;
   overflow: hidden;
   position: relative;
   /* All splash page media queries */
   h1 {
-    font-size: 8rem;
+    font-size: 9rem;
     letter-spacing: -2px;
   }
   h2 {
@@ -270,8 +271,8 @@ const SplashWrap = styled.div`
   `}
   ${media.lessThan("medium")`
     h1 {
-      font-size: 6rem;
-      letter-spacing: -4px;
+      font-size: 5.75rem;
+      letter-spacing: -1px;
     }
     h2 {
       font-size: 1.5rem;
@@ -284,12 +285,13 @@ const SplashWrap = styled.div`
     }
   `}
   ${media.lessThan("small")`
+    min-height: 650px;
     ${FrontTitle} {
-      top: 30%;
-    }
+      margin-top: 30vh;
+    };
     h1 {
-      font-size: 3.75rem;
-      letter-spacing: -3px;
+      font-size: 4rem;
+      letter-spacing: -1px;
     }
     h2 {
       font-size: 1.25rem;
