@@ -1,7 +1,8 @@
 const express = require("express");
 const request = require("request");
 const {
-  STATE_KEY,
+  SPOTIFY_AUTH_STATE_KEY,
+  SPOTIFY_API_SCOPES,
   SPOTIFY_AUTH_URL,
   SPOTIFY_GET_AUTH_TOKEN,
   CLIENT_ID,
@@ -9,14 +10,18 @@ const {
   HOME_REDIRECT_URI,
   AUTH_REDIRECT_URI,
   GET_ACTIVE_USER_PROFILE_URL,
+  RESPONSE_CODES,
+  ERROR_CODES,
   COOKIE_DOMAIN,
   USERS,
   STATS,
+  ALPHANUMERIC,
 } = require("../constants");
 const router = express.Router();
 const queryString = require("query-string");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
+const createNewUserWithData = require("../services/createNewUserWithData");
 
 // Firebase db
 const db = require("../db/firebase");
@@ -28,12 +33,12 @@ const firebase = require("firebase");
  * @return {string} The generated string
  */
 const generateRandomString = (length) => {
-  var text = "";
-  const possible =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let text = "";
 
   for (let i = 0; i < length; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
+    text += ALPHANUMERIC.charAt(
+      Math.floor(Math.random() * ALPHANUMERIC.length)
+    );
   }
   return text;
 };
@@ -41,17 +46,17 @@ const generateRandomString = (length) => {
 router.get("/", (req, res) => {
   // Set auth request state cookie
   const state = generateRandomString(16);
-  res.cookie(STATE_KEY, state);
+  res.cookie(SPOTIFY_AUTH_STATE_KEY, state);
 
   // Request authorization
-  const scope = "user-read-private user-read-email user-library-read";
+  const scopes = SPOTIFY_API_SCOPES;
 
   res.redirect(
     SPOTIFY_AUTH_URL +
       queryString.stringify({
         response_type: "code",
         client_id: CLIENT_ID,
-        scope: scope,
+        scope: scopes,
         redirect_uri: AUTH_REDIRECT_URI,
         state: state,
       })
@@ -61,7 +66,7 @@ router.get("/", (req, res) => {
 router.get("/callback", (req, res) => {
   const code = req.query.code || null;
   const state = req.query.state || null;
-  const storedState = req.cookies ? req.cookies[STATE_KEY] : null;
+  const storedState = req.cookies ? req.cookies[SPOTIFY_AUTH_STATE_KEY] : null;
 
   if (state === null || state !== storedState) {
     res.redirect(
@@ -71,7 +76,7 @@ router.get("/callback", (req, res) => {
         })
     );
   } else {
-    res.clearCookie(STATE_KEY);
+    res.clearCookie(SPOTIFY_AUTH_STATE_KEY);
     const authOptions = {
       url: SPOTIFY_GET_AUTH_TOKEN,
       form: {
@@ -87,14 +92,15 @@ router.get("/callback", (req, res) => {
       json: true,
     };
 
+    // TODO: change to axios
     request.post(authOptions, async (error, response, body) => {
       if (!error && response.statusCode === 200) {
         const access_token = body.access_token,
           refresh_token = body.refresh_token;
-
+        console.log("access:", access_token);
+        console.log("refresh:", refresh_token);
         const config = {
           headers: { Authorization: "Bearer " + access_token },
-          json: true,
         };
 
         try {
@@ -105,7 +111,7 @@ router.get("/callback", (req, res) => {
           const comparifyToken = jwt.sign(
             { _id: spotifyUserId.toString() },
             process.env.JWT_SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: "7d" }
           );
           res.cookie("comparifyToken", comparifyToken, {
             domain: "",
@@ -166,22 +172,36 @@ router.get("/callback", (req, res) => {
 });
 
 router.get("/verifyToken", (req, res) => {
-  console.log(JSON.stringify(req.cookies));
+  console.log(`Cookies in request:`, JSON.stringify(req.cookies));
   if (req.cookies["comparifyToken"]) {
     try {
       const jwtresult = jwt.verify(
         req.cookies["comparifyToken"],
         process.env.JWT_SECRET
       );
-      console.log(jwtresult);
-      res.status(200).json({ status: "authenticated" });
-    } catch (error) {
+      console.log(`Validated token:`, jwtresult);
       res
-        .status(401)
-        .json({ status: "error", error: "User not authenticated" });
+        .status(200)
+        .json({ status: RESPONSE_CODES.AUTHENTICATED, errorType: null });
+    } catch (error) {
+      console.log(`Error in jwt verification:`, error);
+      const errorType = error.name;
+      if (errorType === `TokenExpiredError`) {
+        res.status(401).json({
+          status: RESPONSE_CODES.AUTHENTICATION_ERROR,
+          errorType: ERROR_CODES.EXPIRED_TOKEN,
+        });
+      } else {
+        res.status(401).json({
+          status: RESPONSE_CODES.AUTHENTICATION_ERROR,
+          errorType: ERROR_CODES.INVALID_TOKEN,
+        });
+      }
     }
   } else {
-    res.status(200).json({ status: "no-user" });
+    res
+      .status(200)
+      .json({ status: RESPONSE_CODES.NO_ACTIVE_SESSION, errorType: null });
   }
 });
 

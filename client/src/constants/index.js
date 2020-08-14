@@ -27,8 +27,6 @@ module.exports = Object.freeze({
   SPOTIFY_GET_AUTH_TOKEN: "https://accounts.spotify.com/api/token",
   GET_ACTIVE_USER_PROFILE_URL: "https://api.spotify.com/v1/me",
   GET_ACTIVE_USER_TRACKS_URL: "https://api.spotify.com/v1/me/tracks",
-  GET_ACTIVE_USER_TOP_TRACKS_URL: "https://api.spotify.com/v1/me/top/tracks",
-  GET_ACTIVE_USER_TOP_ARTISTS_URL: "https://api.spotify.com/v1/me/top/artists",
 
   // Server config
   PORT: port,

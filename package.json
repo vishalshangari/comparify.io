@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server",
     "build": "cd client/ && npm install && npm run build",
-    "dev": "concurrently \"nodemon server\" \"cd client/ && yarn start\""
+    "dev": "cp server/constants/index.js client/src/constants && concurrently \"nodemon server\" \"cd client/ && yarn start\""
   },
   "cacheDirectories": [
     "node_modules"

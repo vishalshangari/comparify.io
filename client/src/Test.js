@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
-import { useCookies } from "react-cookie";
 import axios from "axios";
 import { Switch, Route, BrowserRouter, useHistory } from "react-router-dom";
 import { AuthContext } from "./App";
+import { RESPONSE_CODES } from "./constants";
 
-let DEV_URL = "";
+export let DEV_URL = "";
 if (process.env.NODE_ENV === `development`) {
   DEV_URL = "http://localhost:3001";
 }
@@ -43,22 +43,25 @@ const Home = () => {
   let history = useHistory();
 
   const handleLogOut = async () => {
-    const response = await axios.post(`${DEV_URL}/api/logout`, "logout", {
-      withCredentials: true,
-    });
-    console.log(response);
-    if (response.status === 200) {
-      setAuthState({ status: "no-user" });
-      history.replace("/");
-    } else {
+    try {
+      const response = await axios.post(`${DEV_URL}/api/logout`, "logout", {
+        withCredentials: true,
+      });
       console.log(response);
+      setAuthState({
+        status: response.data.status,
+        errorType: response.data.errorType,
+      });
+      // TODO: better handler for logout redirect
+      history.replace("/");
+    } catch (error) {
+      console.log(error);
+      // TODO: generic error handler -> redirect to error page with query string
     }
-
-    // setIsLoggedIn(false);
   };
 
   return (
-    <div className="App">
+    <div className="App" style={{ background: "#999" }}>
       <BrowserRouter>
         <Switch>
           <Route path="/compare/:compareId" component={CompareComponent} />
@@ -93,70 +96,6 @@ const Home = () => {
         <br />
         {/* {isLoggedIn ? <Profile /> : null} */}
       </header>
-    </div>
-  );
-};
-
-const Profile = () => {
-  const [cookies, setCookie, removeCookie] = useCookies();
-  const [result, setResult] = React.useState(null);
-  const [profile, setProfile] = React.useState({});
-  const [name, setName] = React.useState("");
-  const [profileImageUrl, setProfileImageUrl] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
-  React.useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${DEV_URL}/api/profile`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${cookies.accessToken}`,
-          },
-        });
-        const jsonresponse = await response.json();
-        setName(jsonresponse.display_name);
-        setProfileImageUrl(jsonresponse.images[0].url);
-        setProfile(response);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchProfile();
-  }, [cookies.accessToken]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const data = { name: "vishal" };
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + cookies.accessToken,
-    };
-    const result = await axios.post(`${DEV_URL}/api/generate`, data, {
-      headers,
-    });
-    setResult(result);
-  };
-
-  return (
-    <div>
-      <p>my profile</p>
-      {loading ? (
-        <p>loading...</p>
-      ) : (
-        <>
-          <div>
-            <p>Hello, {name}</p>
-            <img src={profileImageUrl} />
-          </div>
-          <form onSubmit={handleSubmit}>
-            <input type="submit" value="Generate my data!" />
-          </form>
-          <div>{result ? JSON.stringify(result) : null}</div>
-        </>
-      )}
     </div>
   );
 };

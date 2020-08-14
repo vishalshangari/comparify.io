@@ -1,0 +1,49 @@
+const { GET_ACTIVE_USER_TRACKS_URL } = require("../constants");
+const axios = require("axios");
+
+module.exports = (authHeader) => {
+  // Get 50 tracks from provided URL
+  const getTracksFromUrl = async (url) => {
+    const requestConfig = {
+      headers: authHeader,
+      params: {
+        limit: 50,
+      },
+    };
+
+    try {
+      const {
+        data: { items: userSavedTracksResponseData, next },
+      } = await axios.get(url, requestConfig);
+
+      const userSavedTrackIDs = [];
+
+      // Re-shape tracks into format to be saved
+      userSavedTracksResponseData.forEach((track) => {
+        userSavedTrackIDs.push(track.track.id);
+      });
+
+      // Return tracks to be saved and next fetch URL
+      return { tracks: userSavedTrackIDs, next: next };
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Recursive function to get all of the current user's saved tracks
+  const getAllTracks = async (url = GET_ACTIVE_USER_TRACKS_URL) => {
+    const { tracks, next } = await getTracksFromUrl(url);
+
+    while (next) {
+      try {
+        const nextTracks = await getAllTracks(next);
+        return tracks.concat(...nextTracks);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    return tracks;
+  };
+
+  return getAllTracks();
+};

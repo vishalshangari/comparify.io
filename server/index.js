@@ -21,6 +21,12 @@ const logout = require("./routers/logout");
 
 // Constants
 const { PORT, IS_DEV, USERS } = require("./constants");
+const createNewUserWithData = require("./services/createNewUserWithData");
+const getUserSavedTrackIDs = require("./services/getUserSavedTrackIDs");
+const getUserTopTracks = require("./services/getUserTopTracks");
+const getUserTopArtistsAndGenres = require("./services/getUserTopArtistsAndGenres");
+
+const sizeof = require("object-sizeof");
 
 // Firestore initial script
 // const songRef = db.collection("songs").doc("jKVoXZPJm0g8aRwarEv2");
@@ -131,6 +137,42 @@ if (!isDev && cluster.isMaster) {
   app.use("/api/profile", profile);
 
   app.use("/api/generate", generate);
+
+  app.use("/api/apitest", async (req, res) => {
+    const accessT =
+      "BQDrmPk0gKQjUuxoDhsjbo30ZT98PcTb9ODZveL0zZcz7nWym-CPrJl01ncNpx5O09OV_uPtSuFQcRYQ6lyQhqaMIco4D2yzhAPHFSImSXsdjhPZO5LseMrGuFdlIVKzz8MWiJFVvIMJtl3MMOrzFL1ZcpBu7C6MKsKaLQbnUosJF-Su8pxnD1Y01AXFDz0JcS25NA";
+    const authHeader = {
+      Authorization: "Bearer " + accessT,
+    };
+    console.log("started generating...");
+    const userinfo = await createNewUserWithData(authHeader);
+    const tracks = await getUserSavedTrackIDs(authHeader);
+    const tracksst = await getUserTopTracks(authHeader, "short_term");
+    const tracksmt = await getUserTopTracks(authHeader, "medium_term");
+    const trackslt = await getUserTopTracks(authHeader, "long_term");
+    const artistslt = await getUserTopArtistsAndGenres(authHeader, "long_term");
+    const artistsmt = await getUserTopArtistsAndGenres(
+      authHeader,
+      "medium_term"
+    );
+    const artistsst = await getUserTopArtistsAndGenres(
+      authHeader,
+      "short_term"
+    );
+    const user = {
+      profile: userinfo,
+      tracks: tracks,
+      tracksst: tracksst,
+      tracksmt: tracksmt,
+      trackslt: trackslt,
+      artistsst: artistsst,
+      artistsmt: artistsmt,
+      artistslt: artistslt,
+    };
+    console.log("done generating.");
+    console.log(sizeof(user));
+    res.send(user);
+  });
 
   app.get("/api/dbtest", async (req, res) => {
     try {

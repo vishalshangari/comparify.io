@@ -1,14 +1,25 @@
 import React, { useContext, useState, createContext } from "react";
-import axios from "axios";
-import { Switch, Route, BrowserRouter, useHistory } from "react-router-dom";
-import Home from "./Home";
+import {
+  Switch,
+  Route,
+  BrowserRouter,
+  useHistory,
+  useLocation,
+} from "react-router-dom";
+import Test from "./Test";
+import Home from "./components/Home";
 import { useAsync } from "react-use";
+import Router from "./components/Router";
 
 import bg from "./bg.jpg";
 import Splash from "./components/Splash/";
 import { theme } from "./theme";
 import GlobalStyle from "./components/GlobalStyle";
-import styled, { ThemeProvider } from "styled-components";
+import { ThemeProvider } from "styled-components";
+import FullPageLoader from "./components/FullPageLoader";
+
+import { ERROR_CODES, RESPONSE_CODES } from "./constants";
+import Login from "./components/Login";
 
 let DEV_URL = "";
 if (process.env.NODE_ENV === `development`) {
@@ -16,18 +27,26 @@ if (process.env.NODE_ENV === `development`) {
 }
 
 type AuthStateType = {
-  status: "loading" | "error" | "authenticated" | "no-user";
-  error: string | null;
+  status: "loading" | typeof RESPONSE_CODES;
+  errorType: typeof ERROR_CODES | null;
 };
 
-type AuthContexType = {
+type AuthContextType = {
   state: AuthStateType;
   setState: React.Dispatch<React.SetStateAction<AuthStateType>>;
 };
 
-export const AuthContext = React.createContext<AuthContexType | undefined>(
+export const AuthContext = React.createContext<AuthContextType | undefined>(
   undefined
 );
+
+export function useAuthState() {
+  const context = React.useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuthState must be used within a AuthProvider");
+  }
+  return context;
+}
 
 type AuthProviderProps = {
   children: React.ReactNode;
@@ -36,44 +55,43 @@ type AuthProviderProps = {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [state, setState] = useState<AuthStateType>({
     status: "loading",
-    error: null,
+    errorType: null,
   });
 
   useAsync(async () => {
-    const response = await fetch(`${DEV_URL}/api/login/verifyToken`, {
-      credentials: "include",
-    });
-    const responseBody = await response.json();
-    if (response.status === 200) {
-      if (responseBody.status) {
-        setState({ status: responseBody.status, error: null });
-      }
-    } else {
-      setState({ status: "error", error: responseBody.text });
+    try {
+      const response = await fetch(`${DEV_URL}/api/login/verifyToken`, {
+        credentials: "include",
+      });
+      const responseBody = await response.json();
+      console.log(responseBody);
+      setState({
+        status: responseBody.status,
+        errorType: responseBody.errorType,
+      });
+    } catch (error) {
+      console.log(error);
+      // TODO: generic error handler -> redirect to error page with query string
     }
   }, [DEV_URL]);
 
   return (
     <AuthContext.Provider value={{ state: state, setState: setState }}>
-      {state.status === "loading" ? <h1>Loading...</h1> : children}
+      {state.status === "loading" ? <FullPageLoader /> : children}
     </AuthContext.Provider>
   );
 };
 
 const App = () => {
   return (
-    <AuthProvider>
+    <>
       <ThemeProvider theme={theme}>
         <GlobalStyle />
-        <BrowserRouter>
-          <Switch>
-            <Route path="/create" exact component={Create} />
-            <Route path="/splash" exact component={Splash} />
-            <Route path="*" component={Home} />
-          </Switch>
-        </BrowserRouter>
+        <AuthProvider>
+          <Router />
+        </AuthProvider>
       </ThemeProvider>
-    </AuthProvider>
+    </>
   );
 };
 

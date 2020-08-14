@@ -1,12 +1,24 @@
 import React, { useState } from "react";
 import { useMedia } from "react-use";
-import { splash, splash2x, artist, artistLink } from "./constants";
-import styled from "styled-components";
+import {
+  splash,
+  splash2x,
+  artist,
+  artistLink,
+  unsplash,
+  unsplashLink,
+} from "./constants";
+import styled, { createGlobalStyle } from "styled-components";
 import media from "styled-media-query";
 import { Transition } from "react-transition-group";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
+import { Theme } from "../../theme";
 
-const Splash = () => {
+type SplashProps = {
+  img: HTMLImageElement;
+};
+
+const Splash = ({ img }: SplashProps) => {
   const isHighPixelDensity = useMedia(
     "(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)"
   );
@@ -18,22 +30,27 @@ const Splash = () => {
 
   return (
     <SplashWrap>
+      <SplashGlobalStyle />
       <Transition
         in={!splashLoading}
         timeout={1500}
         onEntered={() => setSplashEntered(true)}
       >
         {(state) => (
-          <SplashBackground state={state}>
-            <img
-              onLoad={() => setSplashLoading(false)}
-              src={isHighPixelDensity ? splash2x : splash}
-            />
-            <SplashBackgroundLabel>
+          <>
+            <SplashBackgroundLabel state={state}>
               <a href={artistLink}>{artist}</a>
-              via Unsplash
+              {` / `}
+              <a href={unsplashLink}>{unsplash}</a>
             </SplashBackgroundLabel>
-          </SplashBackground>
+            <SplashBackground state={state}>
+              <img
+                onLoad={() => setSplashLoading(false)}
+                // src={isHighPixelDensity ? splash3x : splash}
+                src={splash2x}
+              />
+            </SplashBackground>
+          </>
         )}
       </Transition>
       <SplashInner>
@@ -56,10 +73,10 @@ const Splash = () => {
           >
             {(state) => (
               <FrontSubtitle state={state}>
-                <h2>
+                <h3>
                   Compare your taste with{" "}
                   <span className="brandUnderline">friends and the world</span>.
-                </h2>
+                </h3>
               </FrontSubtitle>
             )}
           </Transition>
@@ -70,9 +87,9 @@ const Splash = () => {
           >
             {(state) => (
               <FrontSubtitle state={state}>
-                <h2>
+                <h3>
                   <span className="brandUnderline">Discover</span> new music.
-                </h2>
+                </h3>
               </FrontSubtitle>
             )}
           </Transition>
@@ -160,8 +177,8 @@ const FrontSubtitle = styled.div<{ state: string }>`
   transition: 0.5s ease all;
   margin-bottom: 1em;
   padding: 0 1em;
-  h2 {
-    text-shadow: 2px 2px 2px rgb(0, 0, 0, 0.5);
+  h3 {
+    text-shadow: 2px 2px 2px rgb(0, 0, 0, 0.2);
     font-weight: 500;
     color: ${({ theme }) => theme.colors.textPrimary};
     margin: 0;
@@ -185,7 +202,7 @@ const FrontTitle = styled.div<{ state: string }>`
   margin-top: 40vh;
   transition: 1s ease opacity, 1s ease transform;
   h1 {
-    text-shadow: 2px 2px 8px rgb(0, 0, 0, 0.5);
+    text-shadow: 2px 2px 8px rgb(0, 0, 0, 0.2);
     font-weight: 700;
     color: white;
     margin: 0;
@@ -205,29 +222,30 @@ const SplashInner = styled.div`
   margin: 0 auto;
 `;
 
-const SplashBackgroundLabel = styled.div`
+const SplashBackgroundLabel = styled.div<{ state: string }>`
   position: absolute;
   right: 0;
   bottom: 0;
   text-align: right;
-  font-size: 0.75rem;
+  /* font-size: 1rem; */
   padding: 1em;
   transition: 3s ease opacity;
   color: ${({ theme }) => theme.colors.textTertiary};
   a {
-    display: block;
-    font-size: 1rem;
-    margin-bottom: 0.25em;
-    border-bottom: 1px solid ${({ theme }) => theme.colors.textTertiary};
     &:hover {
       color: ${({ theme }) => theme.colors.textPrimary};
       border-bottom: 1px solid ${({ theme }) => theme.colors.textPrimary};
     }
   }
+  ${({ state }) =>
+    state === "entered" || state === `entering` ? `opacity: 1;` : `opacity: 0;`}
 `;
 
 const SplashBackground = styled.div<{ state: string }>`
   height: 100%;
+  -webkit-user-select: none; /* Chrome all / Safari all */
+  -moz-user-select: none; /* Firefox all */
+  -ms-user-select: none; /* IE 10+ */
   img {
     max-height: 100%;
     width: auto;
@@ -239,16 +257,11 @@ const SplashBackground = styled.div<{ state: string }>`
         ? `opacity: 0.5;`
         : `opacity: 0;`}
   }
-  ${SplashBackgroundLabel} {
-    ${({ state }) =>
-      state === "entered" || state === `entering`
-        ? `opacity: 0.5;`
-        : `opacity: 0;`}
-  }
   display: flex;
   width: 100%;
   position: absolute;
   justify-content: center;
+  z-index: -3;
 `;
 
 const SplashWrap = styled.div`
@@ -262,11 +275,11 @@ const SplashWrap = styled.div`
     font-size: 9rem;
     letter-spacing: -2px;
   }
-  h2 {
+  h3 {
     font-size: 1.75rem;
   }
   ${media.lessThan("large")`
-    h2 {
+    h3 {
     }
   `}
   ${media.lessThan("medium")`
@@ -274,7 +287,7 @@ const SplashWrap = styled.div`
       font-size: 5.75rem;
       letter-spacing: -1px;
     }
-    h2 {
+    h3 {
       font-size: 1.5rem;
     }
     ${FrontSubtitle} {
@@ -285,6 +298,7 @@ const SplashWrap = styled.div`
     }
   `}
   ${media.lessThan("small")`
+    height: auto;
     min-height: 650px;
     ${FrontTitle} {
       margin-top: 30vh;
@@ -293,7 +307,7 @@ const SplashWrap = styled.div`
       font-size: 4rem;
       letter-spacing: -1px;
     }
-    h2 {
+    h3 {
       font-size: 1.25rem;
     }
     ${SplashBackgroundLabel} {
@@ -303,6 +317,12 @@ const SplashWrap = styled.div`
       font-size: 0.75rem;
     }
   `}
+`;
+
+const SplashGlobalStyle = createGlobalStyle<{ theme: Theme }>`
+  body {
+    background: #000;
+  }
 `;
 
 export default Splash;
