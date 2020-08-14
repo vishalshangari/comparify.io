@@ -46,7 +46,7 @@ const generateRandomString = (length) => {
   return text;
 };
 
-router.get("/", (req, res) => {
+router.get("/login", (req, res) => {
   // Set auth request state cookie
   const state = generateRandomString(16);
   res.cookie(SPOTIFY_AUTH_STATE_KEY, state);
@@ -66,7 +66,7 @@ router.get("/", (req, res) => {
   );
 });
 
-router.get("/callback", async (req, res) => {
+router.get("/login/callback", async (req, res) => {
   const code = req.query.code || null;
   const state = req.query.state || null;
   const storedState = req.cookies ? req.cookies[SPOTIFY_AUTH_STATE_KEY] : null;
@@ -149,6 +149,7 @@ router.get("/callback", async (req, res) => {
         domain: "",
         maxAge: MAX_COOKIE_AGE, // One week
         httpOnly: true,
+        secure: true,
       });
 
       // Check if user exists in firebase
@@ -190,6 +191,7 @@ router.get("/callback", async (req, res) => {
       // TODO: redirect back to URL from state
       res.redirect(HOME_REDIRECT_URI + "/");
     } catch (error) {
+      // TODO: better error handling
       console.log(`authResponse error: ` + error);
       res.redirect(
         HOME_REDIRECT_URI +
@@ -199,84 +201,6 @@ router.get("/callback", async (req, res) => {
           })
       );
     }
-
-    // axios.post(SPOTIFY_GET_AUTH_TOKEN_URL);
-
-    // request.post(authRequestOptions, async (error, response, body) => {
-    //   if (!error && response.statusCode === 200) {
-    //     const access_token = body.access_token,
-    //       refresh_token = body.refresh_token;
-    //     console.log("access:", access_token);
-    //     console.log("refresh:", refresh_token);
-    //     const config = {
-    //       headers: { Authorization: "Bearer " + access_token },
-    //     };
-
-    //     try {
-    //       const { data } = await axios.get(GET_ACTIVE_USER_PROFILE_URL, config);
-    //       const spotifyUserId = data.id;
-
-    //       // Sign and set jwt token
-    //       const comparifyToken = jwt.sign(
-    //         { _id: spotifyUserId.toString() },
-    //         process.env.JWT_SECRET,
-    //         { expiresIn: "7d" }
-    //       );
-    //       res.cookie("comparifyToken", comparifyToken, {
-    //         domain: "",
-    //         maxAge: 3600000, // One hour expiration
-    //         httpOnly: true,
-    //       });
-    //       // res.clearCookie("comparifyToken");
-
-    //       // Http-only cookie
-
-    //       // Store user id and token
-    //       // const userRef = db.collection(USERS).doc(spotifyUserId);
-    //       // const userDoc = await userRef.get();
-    //       // if (!userDoc.exists) {
-    //       //   // New user
-    //       //   console.log(
-    //       //     `no such user detected..adding new user with id: ${spotifyUserId}`
-    //       //   );
-    //       //   // userRef.set({ tokens: [comparifyToken] });
-    //       //   // Add one to user count
-    //       //   // await db
-    //       //   //   .collection(STATS)
-    //       //   //   .doc(USERS)
-    //       //   //   .update({ count: firebase.firestore.FieldValue.increment(1) });
-    //       // } else {
-    //       //   // Existing user
-    //       //   console.log(
-    //       //     `User ${spotifyUserId} already exists... adding token.`
-    //       //   );
-    //       //   // await userRef.update({
-    //       //   //   tokens: firebase.firestore.FieldValue.arrayUnion(comparifyToken),
-    //       //   // });
-    //       // }
-
-    //       // Redirect
-    //       res.redirect(HOME_REDIRECT_URI + "/");
-    //     } catch (error) {
-    //       console.log(error);
-    //       res.redirect(
-    //         HOME_REDIRECT_URI +
-    //           "/" +
-    //           queryString.stringify({
-    //             error: "There was a problem getting user data.",
-    //           })
-    //       );
-    //     }
-    //   } else {
-    //     res.redirect(
-    //       HOME_REDIRECT_URI +
-    //         "/" +
-    //         queryString.stringify({
-    //           error: "invalid_token",
-    //         })
-    //     );
-    //   }
-    // });
   }
 });
 

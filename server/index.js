@@ -16,7 +16,7 @@ const db = require("./db/firebase");
 // Routers
 const profile = require("./routers/profile");
 const generate = require("./routers/generate");
-const login = require("./routers/login");
+const auth = require("./routers/auth");
 const logout = require("./routers/logout");
 
 // Constants
@@ -130,7 +130,7 @@ if (!isDev && cluster.isMaster) {
   });
 
   // Routes
-  app.use("/api/login", login);
+  app.use("/api/auth", auth);
 
   app.use("/api/logout", logout);
 

@@ -60,7 +60,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useAsync(async () => {
     try {
-      const response = await fetch(`${DEV_URL}/api/login/verifyToken`, {
+      const response = await fetch(`${DEV_URL}/api/auth/verifyToken`, {
         credentials: "include",
       });
       const responseBody = await response.json();

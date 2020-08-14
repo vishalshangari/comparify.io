@@ -82,7 +82,7 @@ const Home = () => {
             textDecoration: "none",
             margin: "20px",
           }}
-          href={`${DEV_URL}/api/login`}
+          href={`${DEV_URL}/api/auth/login`}
         >
           Login
         </a>

@@ -34,11 +34,12 @@ module.exports = Object.freeze({
   PORT: port,
   IS_DEV: isDev,
   AUTH_REDIRECT_URI: isDev
-    ? "http://localhost:3001/api/login/callback"
-    : "https://spotify-compare-app.herokuapp.com/api/login/callback",
+    ? "http://localhost:3001/api/auth/login/callback"
+    : "https://spotify-compare-app.herokuapp.com/api/auth/login/callback",
   HOME_REDIRECT_URI: isDev ? "http://localhost:3000" : "",
+  COMPARIFY_TOKEN_COOKIE_KEY: "comparifyToken",
   COOKIE_DOMAIN: isDev ? "" : "https://spotify-compare-app.herokuapp.com",
-  MAX_COOKIE_AGE: 604800, // One week, should be same as JWT expiration
+  MAX_COOKIE_AGE: 604800000, // One week, should be same as JWT expiration
 
   RESPONSE_CODES: RESPONSE_CODES,
   ERROR_CODES: ERROR_CODES,
