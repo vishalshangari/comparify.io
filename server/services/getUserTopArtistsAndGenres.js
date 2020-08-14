@@ -1,6 +1,5 @@
 const { GET_ACTIVE_USER_TOP_ARTISTS_URL } = require("../constants");
 const axios = require("axios");
-const { merge } = require("../routers/login");
 
 module.exports = async (authHeader, time_range = "medium_term") => {
   try {
@@ -12,6 +11,7 @@ module.exports = async (authHeader, time_range = "medium_term") => {
       },
     };
     // Get user profile info
+    console.log(`getting top artists`, time_range);
     const {
       data: { items: userTopArtistsResponseData },
     } = await axios.get(GET_ACTIVE_USER_TOP_ARTISTS_URL, requestConfig);
@@ -35,13 +35,22 @@ module.exports = async (authHeader, time_range = "medium_term") => {
     mergedGenresList.forEach((genre) => {
       userTopGenreCounts[genre] = (userTopGenreCounts[genre] || 0) + 1;
     });
-    const userTopGenresListSorted = Object.entries(userTopGenreCounts).sort(
-      (a, b) => b[1] - a[1]
-    );
+    const userTopGenresListSortedArrays = Object.entries(
+      userTopGenreCounts
+    ).sort((a, b) => b[1] - a[1]);
+
+    let userTopGenresListSortedObjects = [];
+
+    userTopGenresListSortedArrays.forEach((pair) => {
+      userTopGenresListSortedObjects.push({
+        name: pair[0],
+        count: pair[1],
+      });
+    });
 
     return {
       topArtists: userTopArtists,
-      topGenres: userTopGenresListSorted,
+      topGenres: userTopGenresListSortedObjects,
     };
   } catch (error) {
     console.log(error);

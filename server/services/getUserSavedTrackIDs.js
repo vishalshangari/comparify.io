@@ -3,6 +3,7 @@ const axios = require("axios");
 
 module.exports = (authHeader) => {
   // Get 50 tracks from provided URL
+  // TODO: can be optimized by making first request, then creating array of promises = the total # of tracks in the response / 50 per request -> Promise.all
   const getTracksFromUrl = async (url) => {
     const requestConfig = {
       headers: authHeader,
@@ -45,5 +46,6 @@ module.exports = (authHeader) => {
     return tracks;
   };
 
+  console.log("getting saved track IDs");
   return getAllTracks();
 };

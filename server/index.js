@@ -21,7 +21,7 @@ const logout = require("./routers/logout");
 
 // Constants
 const { PORT, IS_DEV, USERS } = require("./constants");
-const createNewUserWithData = require("./services/createNewUserWithData");
+const createNewUserWithData = require("./services/getUserInfo");
 const getUserSavedTrackIDs = require("./services/getUserSavedTrackIDs");
 const getUserTopTracks = require("./services/getUserTopTracks");
 const getUserTopArtistsAndGenres = require("./services/getUserTopArtistsAndGenres");
@@ -140,12 +140,12 @@ if (!isDev && cluster.isMaster) {
 
   app.use("/api/apitest", async (req, res) => {
     const accessT =
-      "BQDrmPk0gKQjUuxoDhsjbo30ZT98PcTb9ODZveL0zZcz7nWym-CPrJl01ncNpx5O09OV_uPtSuFQcRYQ6lyQhqaMIco4D2yzhAPHFSImSXsdjhPZO5LseMrGuFdlIVKzz8MWiJFVvIMJtl3MMOrzFL1ZcpBu7C6MKsKaLQbnUosJF-Su8pxnD1Y01AXFDz0JcS25NA";
+      "BQBF6mxoMXJdPO3mT7NOGknS9blPJ9ScCTnGhyZMlwAPX3SaLqM-LODB6-12RFkJFTwJyuW3G004Ur9UcvXsg3q8xDY10gEANIYiHpTu4CbjmPOwSabdKG9b3JK3PEraO-ZK8OQT_dYQdOGf3wSrAqVF1JXFQk2aNHWVvYYkMGVmyL0mRpqQ6VZfWyhARtFD6-zYGQ";
     const authHeader = {
       Authorization: "Bearer " + accessT,
     };
     console.log("started generating...");
-    const userinfo = await createNewUserWithData(authHeader);
+    // const userinfo = await createNewUserWithData(authHeader);
     const tracks = await getUserSavedTrackIDs(authHeader);
     const tracksst = await getUserTopTracks(authHeader, "short_term");
     const tracksmt = await getUserTopTracks(authHeader, "medium_term");
@@ -160,7 +160,7 @@ if (!isDev && cluster.isMaster) {
       "short_term"
     );
     const user = {
-      profile: userinfo,
+      // profile: userinfo,
       tracks: tracks,
       tracksst: tracksst,
       tracksmt: tracksmt,

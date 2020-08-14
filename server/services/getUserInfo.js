@@ -7,12 +7,14 @@ module.exports = async (authHeader) => {
       headers: authHeader,
     };
     // Get user profile info
+    console.log("getting user info");
     const { data: userProfileData } = await axios.get(
       GET_ACTIVE_USER_PROFILE_URL,
       requestConfig
     );
 
     const newUserInfo = {
+      _id: userProfileData.id,
       createdAt: Date.now(),
       displayName: userProfileData.display_name,
       profileImageUrl: userProfileData.images[0].url,
@@ -22,6 +24,6 @@ module.exports = async (authHeader) => {
     // return JSON.stringify(userProfileRes.data, null, 2);
     return newUserInfo;
   } catch (error) {
-    console.error(`Error in data request ${error}`);
+    console.error(`Error in user profile request ${error}`);
   }
 };

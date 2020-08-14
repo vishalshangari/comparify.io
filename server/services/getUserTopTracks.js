@@ -11,6 +11,7 @@ module.exports = async (authHeader, time_range = "medium_term") => {
       },
     };
     // Get user profile info
+    console.log(`getting top tracks`, time_range);
     const {
       data: { items: userTopTracksResponseData },
     } = await axios.get(GET_ACTIVE_USER_TOP_TRACKS_URL, requestConfig);

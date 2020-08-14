@@ -24,7 +24,7 @@ module.exports = Object.freeze({
 
   // Spotify URLs
   SPOTIFY_AUTH_URL: "https://accounts.spotify.com/authorize?",
-  SPOTIFY_GET_AUTH_TOKEN: "https://accounts.spotify.com/api/token",
+  SPOTIFY_GET_AUTH_TOKEN_URL: "https://accounts.spotify.com/api/token",
   GET_ACTIVE_USER_PROFILE_URL: "https://api.spotify.com/v1/me",
   GET_ACTIVE_USER_TRACKS_URL: "https://api.spotify.com/v1/me/tracks",
   GET_ACTIVE_USER_TOP_TRACKS_URL: "https://api.spotify.com/v1/me/top/tracks",
@@ -37,6 +37,7 @@ module.exports = Object.freeze({
     ? "http://localhost:3001/api/login/callback"
     : "https://spotify-compare-app.herokuapp.com/api/login/callback",
   HOME_REDIRECT_URI: isDev ? "http://localhost:3000" : "",
+  COMPARIFY_TOKEN_COOKIE_KEY: "comparifyToken",
   COOKIE_DOMAIN: isDev ? "" : "https://spotify-compare-app.herokuapp.com",
   MAX_COOKIE_AGE: 604800, // One week, should be same as JWT expiration
 

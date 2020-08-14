@@ -4,7 +4,7 @@ const {
   SPOTIFY_AUTH_STATE_KEY,
   SPOTIFY_API_SCOPES,
   SPOTIFY_AUTH_URL,
-  SPOTIFY_GET_AUTH_TOKEN,
+  SPOTIFY_GET_AUTH_TOKEN_URL,
   CLIENT_ID,
   CLIENT_SECRET,
   HOME_REDIRECT_URI,
@@ -12,20 +12,23 @@ const {
   GET_ACTIVE_USER_PROFILE_URL,
   RESPONSE_CODES,
   ERROR_CODES,
+  COMPARIFY_TOKEN_COOKIE_KEY,
   COOKIE_DOMAIN,
   USERS,
   STATS,
   ALPHANUMERIC,
+  MAX_COOKIE_AGE,
 } = require("../constants");
 const router = express.Router();
 const queryString = require("query-string");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
-const createNewUserWithData = require("../services/createNewUserWithData");
+const getUserInfo = require("../services/getUserInfo");
 
 // Firebase db
 const db = require("../db/firebase");
 const firebase = require("firebase");
+const createStandardUserData = require("../services/createStandardUser");
 
 /**
  * Generates a random string containing numbers and letters
@@ -63,11 +66,13 @@ router.get("/", (req, res) => {
   );
 });
 
-router.get("/callback", (req, res) => {
+router.get("/callback", async (req, res) => {
   const code = req.query.code || null;
   const state = req.query.state || null;
   const storedState = req.cookies ? req.cookies[SPOTIFY_AUTH_STATE_KEY] : null;
 
+  // If state sent back from Spotify API does not match local state, reject
+  // TODO: better error handler for state mismatch
   if (state === null || state !== storedState) {
     res.redirect(
       HOME_REDIRECT_URI +
@@ -76,9 +81,12 @@ router.get("/callback", (req, res) => {
         })
     );
   } else {
+    // Clear state cookie, no longer needed
     res.clearCookie(SPOTIFY_AUTH_STATE_KEY);
-    const authOptions = {
-      url: SPOTIFY_GET_AUTH_TOKEN,
+
+    // Spotify API request to get Auth Code
+    const authRequestOptions = {
+      url: SPOTIFY_GET_AUTH_TOKEN_URL,
       form: {
         code: code,
         redirect_uri: AUTH_REDIRECT_URI,
@@ -92,82 +100,183 @@ router.get("/callback", (req, res) => {
       json: true,
     };
 
+    const authRequestConfig = {
+      headers: {
+        Authorization:
+          "Basic " +
+          new Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
+      },
+    };
+
+    const authRequestBody = {
+      code: code,
+      redirect_uri: AUTH_REDIRECT_URI,
+      grant_type: "authorization_code",
+    };
+
     // TODO: change to axios
-    request.post(authOptions, async (error, response, body) => {
-      if (!error && response.statusCode === 200) {
-        const access_token = body.access_token,
-          refresh_token = body.refresh_token;
-        console.log("access:", access_token);
-        console.log("refresh:", refresh_token);
-        const config = {
-          headers: { Authorization: "Bearer " + access_token },
+
+    try {
+      const { data: authResponseData } = await axios.post(
+        SPOTIFY_GET_AUTH_TOKEN_URL,
+        queryString.stringify(authRequestBody),
+        authRequestConfig
+      );
+      console.log(
+        `Successful authResponse: ` + JSON.stringify(authResponseData)
+      );
+
+      const accessToken = authResponseData.access_token,
+        newRefreshToken = authResponseData.refresh_token;
+
+      const requestConfigAuthHeader = {
+        Authorization: `Bearer ${accessToken}`,
+      };
+
+      const userInfo = await getUserInfo(requestConfigAuthHeader);
+      console.log(`User info: ${JSON.stringify(userInfo)}`);
+
+      // New JWT token (regardless of whether user is new)
+      // Shouldn't have existing token as logout will clear old token
+      const comparifyToken = jwt.sign(
+        { _id: userInfo._id.toString() },
+        process.env.JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      // Set cookie
+      res.cookie(COMPARIFY_TOKEN_COOKIE_KEY, comparifyToken, {
+        domain: "",
+        maxAge: MAX_COOKIE_AGE, // One week
+        httpOnly: true,
+      });
+
+      // Check if user exists in firebase
+      const userRef = db.collection(USERS).doc(userInfo._id);
+      const userDoc = await userRef.get();
+
+      if (!userDoc.exists) {
+        // New user
+        console.log(`NEW USER with id: ${userInfo._id}`);
+
+        // Create initial user datastore
+        // const userData = await createStandardUserData(
+        //   requestConfigAuthHeader,
+        //   userInfo
+        // );
+
+        const userData = {
+          info: userInfo,
         };
 
-        try {
-          const { data } = await axios.get(GET_ACTIVE_USER_PROFILE_URL, config);
-          const spotifyUserId = data.id;
+        // Add Spotify refresh token to user
+        userData.spotifyRefreshToken = newRefreshToken;
 
-          // Sign and set jwt token
-          const comparifyToken = jwt.sign(
-            { _id: spotifyUserId.toString() },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-          );
-          res.cookie("comparifyToken", comparifyToken, {
-            domain: "",
-            maxAge: 3600000, // One hour expiration
-            httpOnly: true,
-          });
-          // res.clearCookie("comparifyToken");
+        // Save full new user to firestore
+        userRef.set(userData);
 
-          // Http-only cookie
-
-          // Store user id and token
-          // const userRef = db.collection(USERS).doc(spotifyUserId);
-          // const userDoc = await userRef.get();
-          // if (!userDoc.exists) {
-          //   // New user
-          //   console.log(
-          //     `no such user detected..adding new user with id: ${spotifyUserId}`
-          //   );
-          //   // userRef.set({ tokens: [comparifyToken] });
-          //   // Add one to user count
-          //   // await db
-          //   //   .collection(STATS)
-          //   //   .doc(USERS)
-          //   //   .update({ count: firebase.firestore.FieldValue.increment(1) });
-          // } else {
-          //   // Existing user
-          //   console.log(
-          //     `User ${spotifyUserId} already exists... adding token.`
-          //   );
-          //   // await userRef.update({
-          //   //   tokens: firebase.firestore.FieldValue.arrayUnion(comparifyToken),
-          //   // });
-          // }
-
-          // Redirect
-          res.redirect(HOME_REDIRECT_URI + "/");
-        } catch (error) {
-          console.log(error);
-          res.redirect(
-            HOME_REDIRECT_URI +
-              "/" +
-              queryString.stringify({
-                error: "There was a problem getting user data.",
-              })
-          );
-        }
+        // Add one to user count aggregation
+        // TODO: more aggregation analysis
+        await db
+          .collection(STATS)
+          .doc(USERS)
+          .update({ count: firebase.firestore.FieldValue.increment(1) });
       } else {
-        res.redirect(
-          HOME_REDIRECT_URI +
-            "/" +
-            queryString.stringify({
-              error: "invalid_token",
-            })
-        );
+        // Existing user, update with new Spotify refresh token
+        console.log(`EXISTING USER with id: ${userInfo._id}`);
+        await userRef.update({ spotifyRefreshToken: newRefreshToken });
       }
-    });
+
+      // TODO: redirect back to URL from state
+      res.redirect(HOME_REDIRECT_URI + "/");
+    } catch (error) {
+      console.log(`authResponse error: ` + error);
+      res.redirect(
+        HOME_REDIRECT_URI +
+          "/" +
+          queryString.stringify({
+            error: "invalid_token",
+          })
+      );
+    }
+
+    // axios.post(SPOTIFY_GET_AUTH_TOKEN_URL);
+
+    // request.post(authRequestOptions, async (error, response, body) => {
+    //   if (!error && response.statusCode === 200) {
+    //     const access_token = body.access_token,
+    //       refresh_token = body.refresh_token;
+    //     console.log("access:", access_token);
+    //     console.log("refresh:", refresh_token);
+    //     const config = {
+    //       headers: { Authorization: "Bearer " + access_token },
+    //     };
+
+    //     try {
+    //       const { data } = await axios.get(GET_ACTIVE_USER_PROFILE_URL, config);
+    //       const spotifyUserId = data.id;
+
+    //       // Sign and set jwt token
+    //       const comparifyToken = jwt.sign(
+    //         { _id: spotifyUserId.toString() },
+    //         process.env.JWT_SECRET,
+    //         { expiresIn: "7d" }
+    //       );
+    //       res.cookie("comparifyToken", comparifyToken, {
+    //         domain: "",
+    //         maxAge: 3600000, // One hour expiration
+    //         httpOnly: true,
+    //       });
+    //       // res.clearCookie("comparifyToken");
+
+    //       // Http-only cookie
+
+    //       // Store user id and token
+    //       // const userRef = db.collection(USERS).doc(spotifyUserId);
+    //       // const userDoc = await userRef.get();
+    //       // if (!userDoc.exists) {
+    //       //   // New user
+    //       //   console.log(
+    //       //     `no such user detected..adding new user with id: ${spotifyUserId}`
+    //       //   );
+    //       //   // userRef.set({ tokens: [comparifyToken] });
+    //       //   // Add one to user count
+    //       //   // await db
+    //       //   //   .collection(STATS)
+    //       //   //   .doc(USERS)
+    //       //   //   .update({ count: firebase.firestore.FieldValue.increment(1) });
+    //       // } else {
+    //       //   // Existing user
+    //       //   console.log(
+    //       //     `User ${spotifyUserId} already exists... adding token.`
+    //       //   );
+    //       //   // await userRef.update({
+    //       //   //   tokens: firebase.firestore.FieldValue.arrayUnion(comparifyToken),
+    //       //   // });
+    //       // }
+
+    //       // Redirect
+    //       res.redirect(HOME_REDIRECT_URI + "/");
+    //     } catch (error) {
+    //       console.log(error);
+    //       res.redirect(
+    //         HOME_REDIRECT_URI +
+    //           "/" +
+    //           queryString.stringify({
+    //             error: "There was a problem getting user data.",
+    //           })
+    //       );
+    //     }
+    //   } else {
+    //     res.redirect(
+    //       HOME_REDIRECT_URI +
+    //         "/" +
+    //         queryString.stringify({
+    //           error: "invalid_token",
+    //         })
+    //     );
+    //   }
+    // });
   }
 });
 

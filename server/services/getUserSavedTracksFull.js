@@ -1,9 +1,9 @@
 const { GET_ACTIVE_USER_TRACKS_URL } = require("../constants");
 
 // Get 50 tracks from provided URL
-const getTracksFromUrl = async (access_token) => {
+const getTracksFromUrl = async (authHeader) => {
   const requestConfig = {
-    headers: { Authorization: "Bearer " + access_token },
+    headers: authHeader,
     params: {
       limit: 50,
     },
