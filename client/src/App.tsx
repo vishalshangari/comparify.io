@@ -1,25 +1,13 @@
-import React, { useContext, useState, createContext } from "react";
-import {
-  Switch,
-  Route,
-  BrowserRouter,
-  useHistory,
-  useLocation,
-} from "react-router-dom";
-import Test from "./Test";
-import Home from "./components/Home";
+import React, { useState } from "react";
 import { useAsync } from "react-use";
 import Router from "./components/Router";
 
-import bg from "./bg.jpg";
-import Splash from "./components/Splash/";
 import { theme } from "./theme";
 import GlobalStyle from "./components/GlobalStyle";
 import { ThemeProvider } from "styled-components";
-import FullPageLoader from "./components/FullPageLoader";
+import Loader from "./components/Loader";
 
 import { ERROR_CODES, RESPONSE_CODES } from "./constants";
-import Login from "./components/Login";
 
 let DEV_URL = "";
 if (process.env.NODE_ENV === `development`) {
@@ -77,7 +65,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return (
     <AuthContext.Provider value={{ state: state, setState: setState }}>
-      {state.status === "loading" ? <FullPageLoader /> : children}
+      {state.status === "loading" ? <Loader fullscreen /> : children}
     </AuthContext.Provider>
   );
 };
@@ -95,25 +83,25 @@ const App = () => {
   );
 };
 
-const Create = () => {
-  const handleCreateFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.persist();
-    console.log("Form was submitted");
-    console.log(e);
-  };
+// const Create = () => {
+//   const handleCreateFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+//     e.preventDefault();
+//     e.persist();
+//     console.log("Form was submitted");
+//     console.log(e);
+//   };
 
-  return (
-    <div style={{ textAlign: "center" }}>
-      <h1>Hello this is Create</h1>
-      <form onSubmit={handleCreateFormSubmit}>
-        <input name="comparisonName" type="text" />
-        <br />
-        <br />
-        <button type="submit">Create!</button>
-      </form>
-    </div>
-  );
-};
+//   return (
+//     <div style={{ textAlign: "center" }}>
+//       <h1>Hello this is Create</h1>
+//       <form onSubmit={handleCreateFormSubmit}>
+//         <input name="comparisonName" type="text" />
+//         <br />
+//         <br />
+//         <button type="submit">Create!</button>
+//       </form>
+//     </div>
+//   );
+// };
 
 export default App;

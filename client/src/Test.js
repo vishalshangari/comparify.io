@@ -2,12 +2,7 @@ import React, { useContext } from "react";
 import axios from "axios";
 import { Switch, Route, BrowserRouter, useHistory } from "react-router-dom";
 import { AuthContext } from "./App";
-import { RESPONSE_CODES } from "./constants";
-
-export let DEV_URL = "";
-if (process.env.NODE_ENV === `development`) {
-  DEV_URL = "http://localhost:3001";
-}
+import { DEV_URL } from "./constants";
 
 const Home = () => {
   // const [data, setData] = React.useState(null);

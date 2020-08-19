@@ -14,14 +14,16 @@ const firebase = require("firebase");
 const db = require("./db/firebase");
 
 // Routers
-const profile = require("./routers/profile");
-const generate = require("./routers/generate");
-const auth = require("./routers/auth");
-const logout = require("./routers/logout");
+const profile = require("./routes/profile");
+const generate = require("./routes/generate");
+const get = require("./routes/get");
+const auth = require("./routes/auth");
+const logout = require("./routes/logout");
 
 // Constants
-const { PORT, IS_DEV, USERS } = require("./constants");
-const createNewUserWithData = require("./services/getUserInfo");
+const { PORT, IS_DEV, USERS, STATS } = require("./constants");
+
+// Services
 const getUserSavedTrackIDs = require("./services/getUserSavedTrackIDs");
 const getUserTopTracks = require("./services/getUserTopTracks");
 const getUserTopArtistsAndGenres = require("./services/getUserTopArtistsAndGenres");
@@ -138,6 +140,8 @@ if (!isDev && cluster.isMaster) {
 
   app.use("/api/generate", generate);
 
+  app.use("/api/get", get);
+
   app.use("/api/apitest", async (req, res) => {
     const accessT =
       "BQBF6mxoMXJdPO3mT7NOGknS9blPJ9ScCTnGhyZMlwAPX3SaLqM-LODB6-12RFkJFTwJyuW3G004Ur9UcvXsg3q8xDY10gEANIYiHpTu4CbjmPOwSabdKG9b3JK3PEraO-ZK8OQT_dYQdOGf3wSrAqVF1JXFQk2aNHWVvYYkMGVmyL0mRpqQ6VZfWyhARtFD6-zYGQ";
@@ -175,20 +179,23 @@ if (!isDev && cluster.isMaster) {
   });
 
   app.get("/api/dbtest", async (req, res) => {
+    const country = "CN";
+    const countryUpdateKey = `countries.${country}`;
+    const time = Date.now();
+
+    userAggregationUpdates = {
+      [countryUpdateKey]: firebase.firestore.FieldValue.increment(1),
+      count: firebase.firestore.FieldValue.increment(1),
+      userCreationTimestamps: firebase.firestore.FieldValue.arrayUnion(time),
+    };
+
     try {
-      const userRes = await db
-        .collection(USERS)
-        .doc("newuser1")
-        .set({ tokens: ["firstToken"] });
-      const userRef = db.collection(USERS).doc("newuser1");
-      const tokenRes = await userRef.update({
-        tokens: firebase.firestore.FieldValue.arrayUnion("secondToken"),
-      });
+      await db.collection(STATS).doc(USERS).update(userAggregationUpdates);
     } catch (error) {
       console.log(error);
     }
 
-    res.send("success!");
+    res.send("successful db test!");
   });
 
   // All remaining requests return the React app, so React Router can handle forwarding.

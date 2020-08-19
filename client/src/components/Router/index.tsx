@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
   BrowserRouter,
   Switch,
@@ -10,8 +10,7 @@ import Test from "../../Test";
 import Home from "../../components/Home";
 import Splash from "../../components/Splash";
 import Login from "../../components/Login";
-import Create from "../../components/Home";
-import { AuthContext, useAuthState } from "../../App";
+import { useAuthState } from "../../App";
 import TestPrivateRoute from "../TestPrivateRoute";
 import { RESPONSE_CODES } from "../../constants";
 
@@ -46,7 +45,7 @@ const PrivateRoute = ({
 };
 
 const Router = () => {
-  const { state: authState, setState: setAuthState } = useAuthState();
+  const { state: authState } = useAuthState();
   const isAuthenticated = authState.status === RESPONSE_CODES.AUTHENTICATED;
 
   return (

@@ -11,12 +11,12 @@ const Header = () => {
           <HeaderDisplay>
             <ul>
               <li>
-                <a className="nav" href="#">
+                <a className="nav" href="/">
                   Compare
                 </a>
               </li>
               <li>
-                <a className="nav" href="#">
+                <a className="nav" href="/">
                   My Account
                 </a>
               </li>
@@ -25,11 +25,6 @@ const Header = () => {
           </HeaderDisplay>
         </HeaderInner>
       </Navigation>
-      <HeaderInner>
-        <MainTitle>
-          <h1>Hi, Vishal</h1>
-        </MainTitle>
-      </HeaderInner>
     </HeaderWrap>
   );
 };
@@ -66,19 +61,6 @@ const Navigation = styled.div`
   }
 `;
 
-const MainTitle = styled.div`
-  margin-top: -4rem;
-  h1 {
-    color: ${({ theme }) => theme.colors.textPrimary};
-    font-size: 5rem;
-    z-index: 3;
-    position: relative;
-    display: inline-block;
-    line-height: 1.3;
-    border-bottom: 6px solid ${({ theme }) => theme.colors.mainAccent};
-  }
-`;
-
 const HeaderInner = styled.div`
   width: 94%;
   max-width: ${({ theme }) => theme.maxWidth};
@@ -87,6 +69,7 @@ const HeaderInner = styled.div`
 
 const HeaderWrap = styled.header`
   position: relative;
+  margin-bottom: 3em;
   /* Header media queries */
 `;
 

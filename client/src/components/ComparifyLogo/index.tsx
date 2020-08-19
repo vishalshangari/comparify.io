@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import { spawnSync } from "child_process";
 
 type ComparifyLogo = {
   color: string;
@@ -10,7 +9,7 @@ type ComparifyLogo = {
 const ComparifyLogo = ({ color, size }: ComparifyLogo) => {
   return (
     <LogoContainer color={color} size={size}>
-      <a href="#">Comparify</a>
+      <a href="/">Comparify</a>
     </LogoContainer>
   );
 };
@@ -23,7 +22,7 @@ const LogoContainer = styled.div<{
   -moz-user-select: none; /* Firefox all */
   -ms-user-select: none; /* IE 10+ */
   a {
-    transition: 0.2 ease all;
+    transition: 0.2s ease all;
     opacity: 0.7;
     color: ${({ color }) => color};
     font-size: ${({ size }) => size};

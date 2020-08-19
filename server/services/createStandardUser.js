@@ -40,14 +40,19 @@ module.exports = async (authHeader, userInfo) => {
     spotifyData: {
       savedTracks: result[0],
       topTracks: {
-        shortTerm: result[1],
-        mediumTerm: result[2],
-        longTerm: result[3],
+        shortTerm: result[1].tracks,
+        mediumTerm: result[2].tracks,
+        longTerm: result[3].tracks,
       },
-      topArtists: {
+      topArtistsAndGenres: {
         shortTerm: result[4],
         mediumTerm: result[5],
         longTerm: result[6],
+      },
+      audioFeatures: {
+        shortTerm: result[1].stats,
+        mediumTerm: result[2].stats,
+        longTerm: result[3].stats,
       },
     },
     // TODO: analysis data

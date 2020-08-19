@@ -18,23 +18,22 @@ const GlobalStyle = createGlobalStyle<{ theme: Theme }>`
 
   body {
     background: ${({ theme }) => theme.colors.navigationBg};
+    font-family: ${({ theme }) => theme.fonts.main}, sans-serif;
   }
 
   * {
     transition: 0.2s ease font-size;
   }
 
-  h1 {
-    font-family: 'Roboto Slab', serif;
-  }
-
-  h2 {
-    font-family: 'Roboto Slab', serif;
+  h1, h2 {
+    font-family: ${({ theme }) => theme.fonts.brand}, serif;
+    color: ${({ theme }) => theme.colors.textPrimary};
   }
 
   h3 {
     font-family: 'open sans', sans-serif;
   }
+
 
   a {
     text-decoration: none;

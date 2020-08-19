@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useMedia } from "react-use";
+// import { useMedia } from "react-use";
 import {
-  splash,
+  // splash,
   splash2x,
   artist,
   artistLink,
@@ -19,9 +19,10 @@ type SplashProps = {
 };
 
 const Splash = ({ img }: SplashProps) => {
-  const isHighPixelDensity = useMedia(
-    "(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)"
-  );
+  // If retina display query needed for bg
+  // const isHighPixelDensity = useMedia(
+  //   "(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)"
+  // );
   const [splashLoading, setSplashLoading] = useState(true);
   const [splashEntered, setSplashEntered] = useState(false);
   const [titleEntered, setTitleEntered] = useState(false);
@@ -46,7 +47,8 @@ const Splash = ({ img }: SplashProps) => {
             <SplashBackground state={state}>
               <img
                 onLoad={() => setSplashLoading(false)}
-                // src={isHighPixelDensity ? splash3x : splash}
+                // src={isHighPixelDensity ? splash2x : splash}
+                alt={""}
                 src={splash2x}
               />
             </SplashBackground>

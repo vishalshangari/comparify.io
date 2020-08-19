@@ -29,6 +29,8 @@ module.exports = Object.freeze({
   GET_ACTIVE_USER_TRACKS_URL: "https://api.spotify.com/v1/me/tracks",
   GET_ACTIVE_USER_TOP_TRACKS_URL: "https://api.spotify.com/v1/me/top/tracks",
   GET_ACTIVE_USER_TOP_ARTISTS_URL: "https://api.spotify.com/v1/me/top/artists",
+  GET_TRACKS_URL: "https://api.spotify.com/v1/tracks",
+  GET_AUDIO_FEATURES_URL: "https://api.spotify.com/v1/audio-features",
 
   // Server config
   PORT: port,
@@ -43,6 +45,9 @@ module.exports = Object.freeze({
 
   RESPONSE_CODES: RESPONSE_CODES,
   ERROR_CODES: ERROR_CODES,
+
+  // Client
+  DEV_URL: isDev ? "http://localhost:3001" : "",
 
   // Others
   ALPHANUMERIC:

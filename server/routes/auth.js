@@ -24,27 +24,12 @@ const queryString = require("query-string");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const getUserInfo = require("../services/getUserInfo");
+const generateRandomString = require("../utils/generateRandomString");
 
 // Firebase db
 const db = require("../db/firebase");
 const firebase = require("firebase");
 const createStandardUserData = require("../services/createStandardUser");
-
-/**
- * Generates a random string containing numbers and letters
- * @param  {number} length The length of the string
- * @return {string} The generated string
- */
-const generateRandomString = (length) => {
-  let text = "";
-
-  for (let i = 0; i < length; i++) {
-    text += ALPHANUMERIC.charAt(
-      Math.floor(Math.random() * ALPHANUMERIC.length)
-    );
-  }
-  return text;
-};
 
 router.get("/login", (req, res) => {
   // Set auth request state cookie
@@ -114,8 +99,6 @@ router.get("/login/callback", async (req, res) => {
       grant_type: "authorization_code",
     };
 
-    // TODO: change to axios
-
     try {
       const { data: authResponseData } = await axios.post(
         SPOTIFY_GET_AUTH_TOKEN_URL,
@@ -144,12 +127,14 @@ router.get("/login/callback", async (req, res) => {
         { expiresIn: "7d" }
       );
 
+      console.log("new token: ", comparifyToken);
+
       // Set cookie
       res.cookie(COMPARIFY_TOKEN_COOKIE_KEY, comparifyToken, {
         domain: "",
         maxAge: MAX_COOKIE_AGE, // One week
         httpOnly: true,
-        secure: true,
+        path: "/",
       });
 
       // Check if user exists in firebase
@@ -161,14 +146,17 @@ router.get("/login/callback", async (req, res) => {
         console.log(`NEW USER with id: ${userInfo._id}`);
 
         // Create initial user datastore
-        // const userData = await createStandardUserData(
-        //   requestConfigAuthHeader,
-        //   userInfo
-        // );
+        const userData = await createStandardUserData(
+          requestConfigAuthHeader,
+          userInfo
+        );
 
-        const userData = {
-          info: userInfo,
-        };
+        userData.lastLogin = userInfo.createdAt;
+
+        // const userData = {
+        //   info: userInfo,
+        //   lastLogin: userInfo.createdAt,
+        // };
 
         // Add Spotify refresh token to user
         userData.spotifyRefreshToken = newRefreshToken;
@@ -185,7 +173,10 @@ router.get("/login/callback", async (req, res) => {
       } else {
         // Existing user, update with new Spotify refresh token
         console.log(`EXISTING USER with id: ${userInfo._id}`);
-        await userRef.update({ spotifyRefreshToken: newRefreshToken });
+        await userRef.update({
+          spotifyRefreshToken: newRefreshToken,
+          lastLogin: Date.now(),
+        });
       }
 
       // TODO: redirect back to URL from state
