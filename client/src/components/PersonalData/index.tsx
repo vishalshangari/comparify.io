@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import axios from "axios";
 import { ChartData } from "chart.js";
 import { DEV_URL } from "../../constants";
@@ -120,12 +120,13 @@ const PersonalData = () => {
       <HomeTitle>{loading ? null : <h1>Hi, {userInfo!.name}</h1>}</HomeTitle>
       <PersonalDataWrapper>
         <ComponentWithLoadingState loading={loading}>
-          <PersonalDataInner>
+          <PersonalDataInner position="top">
             <TopGenres data={topGenres} />
             <Obscurity score={popularityScores} />
+          </PersonalDataInner>
+          <AudioFeatures scores={featureScores} />
+          <PersonalDataInner position="bottom">
             <TopTracks tracks={topTracks} />
-            <AudioFeatures scores={featureScores} />
-            {/* <Danceability scores={shortTerm:} /> */}
           </PersonalDataInner>
         </ComponentWithLoadingState>
       </PersonalDataWrapper>
@@ -134,7 +135,9 @@ const PersonalData = () => {
 };
 
 const HomeTitle = styled.div`
-  margin: -8em 0 3em 0;
+  width: 94%;
+  max-width: 1500px;
+  margin: -8em auto 3em;
   h1 {
     color: ${({ theme }) => theme.colors.textPrimary};
     font-size: 6rem;
@@ -146,28 +149,33 @@ const HomeTitle = styled.div`
   }
 `;
 
-const PersonalDataInner = styled.div`
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-gap: 2em;
-  grid-template-areas:
-    "genres genres genres genres genres genres genres obscurity obscurity obscurity obscurity obscurity"
-    ". features features features features features features features features features features ."
-    "tracks tracks tracks tracks tracks tracks . . . . . .";
-
-  ${breakpoints.lessThan("74")`
-    grid-template-areas:
-      "genres genres genres genres genres genres genres obscurity obscurity obscurity obscurity obscurity"
-      ". . features features features features features features features features . ."
-      "tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks";
-  `}
+const topGridLayout = css`
+  grid-template-areas: "genres genres genres genres genres genres genres obscurity obscurity obscurity obscurity obscurity";
   ${breakpoints.lessThan("66")`
     grid-template-areas: 
     "genres genres genres genres genres genres genres genres genres genres genres genres"
-    "obscurity obscurity obscurity obscurity obscurity obscurity obscurity obscurity obscurity obscurity obscurity obscurity"
-    ". . features features features features features features features features . ."
-    "tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks"
+    "obscurity obscurity obscurity obscurity obscurity obscurity obscurity obscurity obscurity obscurity obscurity obscurity";
   `}
+`;
+
+const bottomGridLayout = css`
+  grid-template-areas: "tracks tracks tracks tracks tracks tracks . . . . . . ";
+  ${breakpoints.lessThan("66")`
+    grid-template-areas: 
+    "tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks";
+  `}
+`;
+
+const PersonalDataInner = styled.div<{ position?: string }>`
+  width: 94%;
+  max-width: 1500px;
+  margin: 0 auto 2em;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-gap: 2em;
+  ${({ position }) => (position === "top" ? topGridLayout : "")};
+  ${({ position }) => (position === "bottom" ? bottomGridLayout : "")};
+
   > div {
     position: relative;
     display: flex;

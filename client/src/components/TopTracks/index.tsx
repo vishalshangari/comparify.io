@@ -129,7 +129,10 @@ const MusicItem = ({
   preview_url,
 }: LoadedTrack) => {
   return (
-    <MusicItemInner href={href}>
+    <MusicItemInner
+      href={href}
+      title={`${name} by ${artists.join(", ")}, Album: ${album}`}
+    >
       <div className="image">
         <img src={image.url} alt={`${name} by ${artists.join(", ")}`} />
       </div>
@@ -145,6 +148,7 @@ const MusicItem = ({
 const MusicItemInner = styled.a`
   display: flex;
   align-items: center;
+  position: relative;
   overflow: hidden;
   box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.3);
   background: ${({ theme }) => theme.colors.darkBodyOverlay};
@@ -167,6 +171,19 @@ const MusicItemInner = styled.a`
   }
   .info {
     padding: 0.5em 0;
+    &:after {
+      content: "";
+      height: 100%;
+      width: 1em;
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0) 0%,
+        ${({ theme }) => theme.colors.darkBodyOverlay} 100%
+      );
+    }
   }
   .name {
     color: ${({ theme }) => theme.colors.textPrimary};
@@ -174,10 +191,12 @@ const MusicItemInner = styled.a`
   }
   .artists {
     color: ${({ theme }) => theme.colors.textTertiary};
+    white-space: nowrap;
   }
   .album {
     color: ${({ theme }) => theme.colors.textTertiary};
     opacity: 0.5;
+    white-space: nowrap;
   }
 `;
 

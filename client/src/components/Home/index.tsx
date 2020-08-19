@@ -22,10 +22,6 @@ const Home = () => {
   );
 };
 
-const MainContent = styled.div`
-  width: 94%;
-  max-width: 1500px;
-  margin: 0 auto;
-`;
+const MainContent = styled.div``;
 
 export default Home;
