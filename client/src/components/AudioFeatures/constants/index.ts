@@ -1,29 +1,33 @@
 import { colors } from "../../../theme";
 
-export const labels = [
-  "0",
-  "0.05",
-  "0.1",
-  "0.15",
-  "0.2",
-  "0.25",
-  "0.3",
-  "0.35",
-  "0.4",
-  "0.45",
-  "0.5",
-  "0.55",
-  "0.6",
-  "0.65",
-  "0.7",
-  "0.75",
-  "0.8",
-  "0.85",
-  "0.9",
-  "0.95",
-  "1.0",
-];
-
+export const audioFeatureDescriptions = {
+  valence: {
+    desc: `describes the musical positiveness conveyed by a track. Tracks
+  with high valence sound more positive (e.g. happy, cheerful,
+  euphoric), while tracks with low valence sound more negative (e.g.
+  sad, depressed, angry).`,
+    measurement: `score out of 100`,
+  },
+  energy: {
+    desc: `represents a perceptual measure of intensity and activity.
+  Typically, energetic tracks feel fast, loud, and noisy. For
+  example, death metal has high energy, while a Bach prelude scores
+  low on the scale.`,
+    measurement: `score out of 100`,
+  },
+  danceability: {
+    desc: `describes how suitable a track is for dancing based on a
+  combination of musical elements including tempo, rhythm stability,
+  beat strength, and overall regularity.`,
+    measurement: `score out of 100`,
+  },
+  tempo: {
+    desc: `is the overall estimated tempo of a track in beats per minute
+  (BPM). In musical terminology, tempo is the speed or pace of a
+  given piece and derives directly from the average beat duration.`,
+    measurement: `in beats per minute`,
+  },
+};
 // const data = [
 //   17,
 //   35,
@@ -48,7 +52,7 @@ export const labels = [
 //   0,
 // ];
 
-export const featureGraphLabels = ["All-Time", "Recent", "Now"];
+export const featureGraphLabels = ["your all-time", "your recent", "your now"];
 
 export const featureGraphOptions = {
   tooltips: {

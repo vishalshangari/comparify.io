@@ -2,6 +2,7 @@ const getUserTopArtistsAndGenres = require("./getUserTopArtistsAndGenres");
 const getUserSavedTrackIDs = require("./getUserSavedTrackIDs");
 const getUserTopTracks = require("./getUserTopTracks");
 const sizeof = require("object-sizeof");
+const getUserObscurityScore = require("./getUserObscurityScore");
 
 // Requires authHeader and userInfo (from main login router)
 module.exports = async (authHeader, userInfo) => {
@@ -35,6 +36,8 @@ module.exports = async (authHeader, userInfo) => {
     topArtistsLongTerm,
   ]);
 
+  console.log(`TOP ARTISTS SHORT TERM: `, result[4].topArtists);
+
   const standardUserData = {
     info: userInfo,
     spotifyData: {
@@ -55,12 +58,14 @@ module.exports = async (authHeader, userInfo) => {
         longTerm: result[3].stats,
       },
     },
-    // TODO: analysis data
   };
 
-  console.log("done generating: " + (Date.now() - time) / 1000 + " seconds");
+  standardUserData.spotifyData.obscurityScore = getUserObscurityScore(
+    standardUserData.spotifyData.topArtistsAndGenres,
+    standardUserData.spotifyData.topTracks
+  );
 
-  console.log(sizeof(standardUserData));
+  console.log("done generating: " + (Date.now() - time) / 1000 + " seconds");
 
   return standardUserData;
 };

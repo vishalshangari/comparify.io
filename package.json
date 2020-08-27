@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/vishalshangari/spotify-mainstream#readme",
   "dependencies": {
+    "@types/lodash": "^4.14.160",
     "async": "^3.2.0",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
@@ -31,6 +32,7 @@
     "express": "^4.17.1",
     "firebase": "^7.17.2",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.20",
     "object-sizeof": "^1.6.1",
     "query-string": "^6.13.1",
     "react-icons": "^3.10.0",

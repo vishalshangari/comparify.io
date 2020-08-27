@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { breakpoints } from "../../theme";
 import { DataOptions, DataButton } from "../shared/DataOptions";
-import { TopTracks } from "../PersonalData";
-import axios from "axios";
-import { DEV_URL } from "../../constants";
+import DisplayQuantityToggleBtn from "../shared/DisplayQuantityToggleBtn";
+import { TopTracksType } from "../PersonalData";
 import Loader from "../Loader";
+import fetchMultipleTracks from "../../utils/fetchMultipleTracks";
+import { BsChevronDown, BsChevronUp } from "react-icons/bs";
+import { Link, Element, scroller } from "react-scroll";
 
 type TopTracksProps = {
-  tracks: TopTracks;
+  tracks: TopTracksType;
 };
 
-type LoadedTrack = {
+export type LoadedTrack = {
   name: string;
   image: {
     height?: number;
@@ -24,7 +26,7 @@ type LoadedTrack = {
   album: string;
 };
 
-type DisplayData = {
+export type TracksDisplayData = {
   now: LoadedTrack[];
   recent: LoadedTrack[];
   allTime: LoadedTrack[];
@@ -32,37 +34,53 @@ type DisplayData = {
 
 const TopTracksWrapper = ({ tracks }: TopTracksProps) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [tracksData, setTracksData] = useState<null | DisplayData>(null);
-  const [currentDisplayState, setCurrentDisplayState] = useState<
-    keyof DisplayData
+  const [tracksData, setTracksData] = useState<null | TracksDisplayData>(null);
+  const [currentDisplayPeriod, setCurrentDisplayPeriod] = useState<
+    keyof TracksDisplayData
   >("now");
+  const [displayShortenedQuantity, setDisplayShortenedQuantity] = useState(
+    true
+  );
 
   useEffect(() => {
     const getTracksData = async () => {
-      let trackIDs = "";
-      for (let i = 0; i < 10; i++) {
-        trackIDs += tracks!.shortTerm[i].id + ",";
+      let shortTermTrackIDs: string[] = [];
+      for (let i = 0; i < tracks!.shortTerm.length; i++) {
+        shortTermTrackIDs.push(tracks!.shortTerm[i].id);
       }
-      for (let i = 0; i < 10; i++) {
-        trackIDs += tracks!.mediumTerm[i].id + ",";
+
+      const shortTermTrackInfo = fetchMultipleTracks(shortTermTrackIDs);
+
+      let mediumTermTrackIDs: string[] = [];
+      for (let i = 0; i < tracks!.mediumTerm.length; i++) {
+        mediumTermTrackIDs.push(tracks!.mediumTerm[i].id);
       }
-      for (let i = 0; i < 10; i++) {
-        trackIDs += tracks!.longTerm[i].id + ",";
+
+      const mediumTermTrackInfo = fetchMultipleTracks(mediumTermTrackIDs);
+
+      let longTermTrackIDs: string[] = [];
+      for (let i = 0; i < tracks!.longTerm.length; i++) {
+        longTermTrackIDs.push(tracks!.longTerm[i].id);
       }
+
+      const longTermTrackInfo = fetchMultipleTracks(longTermTrackIDs);
+
       try {
-        const {
-          data: { shortTerm, mediumTerm, longTerm },
-        } = await axios.post(`${DEV_URL}/api/get/track-info`, {
-          ids: trackIDs.substring(0, trackIDs.length - 1),
-        });
+        const result = await Promise.all([
+          shortTermTrackInfo,
+          mediumTermTrackInfo,
+          longTermTrackInfo,
+        ]);
+
         setTracksData({
-          now: shortTerm,
-          recent: mediumTerm,
-          allTime: longTerm,
+          now: result[0],
+          recent: result[1],
+          allTime: result[2],
         });
+        setCurrentDisplayPeriod("now");
         setIsLoading(false);
-        setCurrentDisplayState("now");
       } catch (error) {
+        // TODO: handle errors in fetching top tracks by setting loading false and rendering error message
         console.error(error);
       }
     };
@@ -70,36 +88,45 @@ const TopTracksWrapper = ({ tracks }: TopTracksProps) => {
   }, [tracks]);
 
   const handleNowClick = () => {
-    setCurrentDisplayState("now");
+    setCurrentDisplayPeriod("now");
   };
 
   const handleRecentClick = () => {
-    setCurrentDisplayState("recent");
+    setCurrentDisplayPeriod("recent");
   };
 
   const handleAllTimeClick = () => {
-    setCurrentDisplayState("allTime");
+    setCurrentDisplayPeriod("allTime");
+  };
+
+  const handleDisplayQuantityToggle = () => {
+    setDisplayShortenedQuantity((prevState) => !prevState);
+    scroller.scrollTo("tracksItemList", {
+      duration: 300,
+      delay: 0,
+      smooth: true,
+    });
   };
 
   return (
-    <TracksDisplay>
+    <TracksDisplay name="tracksItemList">
       <div className="dataItemHeader">
         <h2>Top Tracks</h2>
         <DataOptions>
           <DataButton
-            active={currentDisplayState === "now" ? true : false}
+            active={currentDisplayPeriod === "now" ? true : false}
             onClick={() => handleNowClick()}
           >
             Now
           </DataButton>
           <DataButton
-            active={currentDisplayState === "recent" ? true : false}
+            active={currentDisplayPeriod === "recent" ? true : false}
             onClick={() => handleRecentClick()}
           >
             Recent
           </DataButton>
           <DataButton
-            active={currentDisplayState === "allTime" ? true : false}
+            active={currentDisplayPeriod === "allTime" ? true : false}
             onClick={() => handleAllTimeClick()}
           >
             All-Time
@@ -107,20 +134,46 @@ const TopTracksWrapper = ({ tracks }: TopTracksProps) => {
         </DataOptions>
       </div>
       {isLoading ? (
-        <Loader />
+        <Loader label={false} />
+      ) : tracksData ? (
+        <>
+          <ItemList>
+            {tracksData[currentDisplayPeriod]
+              .slice(0, displayShortenedQuantity ? 15 : undefined)
+              .map((item, idx) => (
+                <TrackItemWrapper key={idx} {...item} />
+              ))}
+          </ItemList>
+          <DisplayQuantityToggleBtn
+            show={tracksData[currentDisplayPeriod].length > 15}
+            onClick={handleDisplayQuantityToggle}
+          >
+            {displayShortenedQuantity ? (
+              <>
+                <BsChevronDown />
+                <span>
+                  Show More{" "}
+                  <span className={"totalCount"}>
+                    {tracksData[currentDisplayPeriod].length}
+                  </span>
+                </span>
+              </>
+            ) : (
+              <>
+                <BsChevronUp />
+                <span>Show Fewer</span>
+              </>
+            )}
+          </DisplayQuantityToggleBtn>
+        </>
       ) : (
-        <ItemList>
-          {tracksData &&
-            tracksData[currentDisplayState].map((item, idx) => (
-              <MusicItem key={idx} {...item} />
-            ))}
-        </ItemList>
+        `Oops, there was an error loading your top tracks 😔`
       )}
     </TracksDisplay>
   );
 };
 
-const MusicItem = ({
+export const TrackItemWrapper = ({
   name,
   image,
   href,
@@ -129,7 +182,7 @@ const MusicItem = ({
   preview_url,
 }: LoadedTrack) => {
   return (
-    <MusicItemInner
+    <TrackItem
       href={href}
       title={`${name} by ${artists.join(", ")}, Album: ${album}`}
     >
@@ -141,21 +194,26 @@ const MusicItem = ({
         <div className="artists">{artists.join(", ")}</div>
         <div className="album">{album === name ? "Single" : album}</div>
       </div>
-    </MusicItemInner>
+    </TrackItem>
   );
 };
 
-const MusicItemInner = styled.a`
+export const TrackItem = styled.a`
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
   box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.3);
   background: ${({ theme }) => theme.colors.darkBodyOverlay};
+  background: ${({ theme }) =>
+    `linear-gradient(180deg, rgba(29,31,33,1) 0%, ${theme.colors.darkBodyOverlay} 100%)`};
   border-radius: 0.25em;
-  border: 1px solid rgb(255, 255, 255, 0.07);
+  border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlayBorder};
   &:hover {
     border: 1px solid rgb(255, 255, 255, 0.25);
+    .name {
+      text-decoration: underline;
+    }
   }
   transition: 0.2s ease all;
   .image {
@@ -188,6 +246,7 @@ const MusicItemInner = styled.a`
   .name {
     color: ${({ theme }) => theme.colors.textPrimary};
     font-weight: 700;
+    white-space: nowrap;
   }
   .artists {
     color: ${({ theme }) => theme.colors.textTertiary};
@@ -203,11 +262,16 @@ const MusicItemInner = styled.a`
 const ItemList = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
 `;
 
-const TracksDisplay = styled.div`
+const TracksDisplay = styled(Element)`
+  && {
+    display: block;
+  }
   grid-area: tracks;
+  margin-bottom: 2em;
+  min-height: 300px;
   ${breakpoints.lessThan("85")`
     .dataItemHeader {
       flex-wrap: wrap;

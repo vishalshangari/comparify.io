@@ -2,11 +2,10 @@ import React from "react";
 import ComponentWithLoadingStateProps from "./models";
 import Loader from "../../Loader";
 
-const ComponentWithLoadingState = ({
+export default ({
   loading,
   children,
+  label,
 }: ComponentWithLoadingStateProps) => {
-  return loading ? <Loader /> : <>{children}</>;
+  return loading ? <Loader label={label} /> : <>{children}</>;
 };
-
-export default ComponentWithLoadingState;

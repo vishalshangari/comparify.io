@@ -8,10 +8,15 @@ import TopGenres from "../TopGenres";
 import { breakpoints } from "../../theme";
 import Obscurity from "../Obscurity";
 import TopTracks from "../TopTracks";
+import TopArtists from "../TopArtists";
 import AudioFeatures from "../AudioFeatures";
 import { pieChartColors } from "./constants";
+import { PageTitle, PageTitleInner } from "../shared/PageTitle";
+import Header from "../shared/Header";
+import fetchUserSavedData from "../../utils/fetchUserSavedData";
+import filterTopGenresForDisplay from "../../utils/filterTopGenresForDisplay";
 
-type Genre = {
+export type Genre = {
   name: string;
   count: number;
 };
@@ -29,19 +34,29 @@ export type TopGenresDataType = null | {
 };
 
 type UserInfo = null | {
-  name: string;
+  names: string[];
 };
 
-export type Track = {
+type AristTrackType = {
   id: string;
   name: string;
   popularity: number;
 };
 
-export type TopTracks = null | {
+export type Track = AristTrackType;
+
+export type TopTracksType = null | {
   shortTerm: Track[];
   mediumTerm: Track[];
   longTerm: Track[];
+};
+
+export type Artist = AristTrackType;
+
+export type TopArtistsType = null | {
+  shortTerm: Artist[];
+  mediumTerm: Artist[];
+  longTerm: Artist[];
 };
 
 export type FeatureScores = null | {
@@ -53,101 +68,56 @@ export type FeatureScores = null | {
 const PersonalData = () => {
   const [loading, setLoading] = useState(true);
   const [topGenres, setTopGenres] = useState<TopGenresDataType>(null);
-  const [popularityScores, setPopularityScores] = useState(0);
+  const [obscurityScore, setObscurityScore] = useState(0);
   const [userInfo, setUserInfo] = useState<UserInfo>(null);
-  const [topTracks, setTopTracks] = useState<TopTracks>(null);
+  const [topTracks, setTopTracks] = useState<TopTracksType>(null);
+  const [topArtists, setTopArtists] = useState<TopArtistsType>(null);
   const [featureScores, setFeatureScores] = useState<FeatureScores>(null);
+  const [pageTitle, setPageTitle] = useState(`Loading...`);
 
   useEffect(() => {
-    const getGenresData = async () => {
+    const getUserData = async () => {
       try {
-        setLoading(true);
-        const {
-          data: {
-            topGenres,
-            popularityScores,
-            userInfo,
-            topTracks,
-            featureScores: userFeatureScores,
-          },
-        } = await axios.get(`${DEV_URL}/api/get/saved-data`, {
-          withCredentials: true,
-        });
-        const filterTopGenres = (data: Genre[]) => {
-          let names = [];
-          let counts = [];
-          let colors = [];
-          for (let i = 0; i < 10; i++) {
-            names.push(`${i + 1}. ` + data[i].name);
-            counts.push(data[i].count);
-            colors.push(`#` + pieChartColors[i]);
-          }
-          return {
-            labels: names,
-            datasets: [
-              {
-                data: counts,
-                backgroundColor: colors,
-                borderColor: "rgb(220,220,220)",
-                borderWidth: 2,
-              },
-            ],
-          };
-        };
+        const userData = await fetchUserSavedData();
         const filteredTopGenres = {
-          shortTerm: filterTopGenres(topGenres.shortTerm),
-          longTerm: filterTopGenres(topGenres.longTerm),
+          shortTerm: filterTopGenresForDisplay(userData.topGenres.shortTerm),
+          longTerm: filterTopGenresForDisplay(userData.topGenres.longTerm),
         };
-        setUserInfo(userInfo);
+        setUserInfo(userData.userInfo);
+        setPageTitle(`Hi, ${userData.userInfo.names[0]}`);
         setTopGenres(filteredTopGenres);
-        const calculatedObscurityScore =
-          100 -
-          (popularityScores.artists * 0.6 + popularityScores.tracks * 0.4);
-        setPopularityScores(Math.floor(calculatedObscurityScore));
-        setTopTracks(topTracks);
-        setFeatureScores(userFeatureScores);
+        setObscurityScore(Math.floor(userData.obscurityScore));
+        setFeatureScores(userData.userFeatureScores);
+        setTopTracks(userData.topTracks);
+        setTopArtists(userData.topArtists);
         setLoading(false);
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     };
 
-    getGenresData();
+    getUserData();
   }, []);
 
   return (
     <>
-      <HomeTitle>{loading ? null : <h1>Hi, {userInfo!.name}</h1>}</HomeTitle>
+      <Header standardNav={true} pageTitle={pageTitle} loading={loading} />
       <PersonalDataWrapper>
-        <ComponentWithLoadingState loading={loading}>
+        <ComponentWithLoadingState label={false} loading={loading}>
           <PersonalDataInner position="top">
             <TopGenres data={topGenres} />
-            <Obscurity score={popularityScores} />
+            <Obscurity score={obscurityScore} />
           </PersonalDataInner>
           <AudioFeatures scores={featureScores} />
           <PersonalDataInner position="bottom">
             <TopTracks tracks={topTracks} />
+            <TopArtists artists={topArtists} />
           </PersonalDataInner>
         </ComponentWithLoadingState>
       </PersonalDataWrapper>
     </>
   );
 };
-
-const HomeTitle = styled.div`
-  width: 94%;
-  max-width: 1500px;
-  margin: -8em auto 3em;
-  h1 {
-    color: ${({ theme }) => theme.colors.textPrimary};
-    font-size: 6rem;
-    z-index: 3;
-    position: relative;
-    display: inline-block;
-    line-height: 1.3;
-    border-bottom: 8px solid ${({ theme }) => theme.colors.mainAccent};
-  }
-`;
 
 const topGridLayout = css`
   grid-template-areas: "genres genres genres genres genres genres genres obscurity obscurity obscurity obscurity obscurity";
@@ -159,17 +129,19 @@ const topGridLayout = css`
 `;
 
 const bottomGridLayout = css`
-  grid-template-areas: "tracks tracks tracks tracks tracks tracks . . . . . . ";
+  grid-template-areas:
+    "tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks"
+    "artists artists artists artists artists artists artists artists artists artists artists artists";
   ${breakpoints.lessThan("66")`
-    grid-template-areas: 
+    grid-template-areas:                          
     "tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks";
   `}
 `;
 
 const PersonalDataInner = styled.div<{ position?: string }>`
   width: 94%;
-  max-width: 1500px;
-  margin: 0 auto 2em;
+  /* max-width: 1500px; */
+  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   grid-gap: 2em;
@@ -193,7 +165,7 @@ const PersonalDataInner = styled.div<{ position?: string }>`
     box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.3);
     background: ${({ theme }) => theme.colors.darkBodyOverlay};
     border-radius: 0.5em;
-    border: 1px solid rgb(255, 255, 255, 0.07);
+    border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlayBorder};
     &:hover {
       border: 1px solid rgb(255, 255, 255, 0.25);
     }
@@ -202,7 +174,11 @@ const PersonalDataInner = styled.div<{ position?: string }>`
 `;
 
 const PersonalDataWrapper = styled.div`
-  min-height: 800px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.colors.mainContentBg};
+  padding: 4em 0;
   h2 {
     font-size: 4rem;
     font-weight: 700;

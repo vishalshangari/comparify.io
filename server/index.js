@@ -15,10 +15,12 @@ const db = require("./db/firebase");
 
 // Routers
 const profile = require("./routes/profile");
-const generate = require("./routes/generate");
+// const generate = require("./routes/generate");
+const create = require("./routes/create");
 const get = require("./routes/get");
 const auth = require("./routes/auth");
 const logout = require("./routes/logout");
+const comparify = require("./routes/comparify");
 
 // Constants
 const { PORT, IS_DEV, USERS, STATS } = require("./constants");
@@ -138,9 +140,13 @@ if (!isDev && cluster.isMaster) {
 
   app.use("/api/profile", profile);
 
-  app.use("/api/generate", generate);
+  // app.use("/api/generate", generate);
+
+  app.use("/api/create", create);
 
   app.use("/api/get", get);
+
+  app.use("/api/comparify", comparify);
 
   app.use("/api/apitest", async (req, res) => {
     const accessT =

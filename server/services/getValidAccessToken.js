@@ -6,8 +6,8 @@ const {
   CLIENT_SECRET,
   SPOTIFY_GET_AUTH_TOKEN_URL,
 } = require("../constants");
-const getValidAccessToken = async () => {
-  const tokensDoc = db.collection("config").doc("tokens");
+const getValidAccessToken = async (COLLECTION, DOC) => {
+  const tokensDoc = db.collection(COLLECTION).doc(DOC);
   const tokens = await tokensDoc.get();
   let tokenValues = {};
   if (!tokens.exists) {
@@ -52,6 +52,6 @@ const getValidAccessToken = async () => {
     console.log("token is valid");
   }
 
-  return tokenValues;
+  return tokenValues.accessToken;
 };
-exports.getValidAccessToken = getValidAccessToken;
+module.exports = getValidAccessToken;

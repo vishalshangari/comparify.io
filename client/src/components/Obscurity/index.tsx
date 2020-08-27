@@ -118,8 +118,8 @@ const ObscurityLabelDisplay = styled.div<{ label: ObscurityLabelType }>`
   }
 `;
 const Description = styled.div`
-  color: ${({ theme }) => theme.colors.textTertiary};
-  background: rgb(255, 255, 255, 0.04);
+  background: ${({ theme }) => theme.colors.darkBodyOverlayBorder};
+  color: ${({ theme }) => theme.colors.textPrimary};
   padding: 1em;
   border-radius: 0.5em;
   display: flex;
@@ -128,7 +128,7 @@ const Description = styled.div`
     font-size: 1.5em;
     display: flex;
     align-items: center;
-    color: ${({ theme }) => theme.colors.textTertiary};
+    color: ${({ theme }) => theme.colors.textPrimary};
     margin-right: 0.5em;
   }
   ${breakpoints.lessThan("74")`

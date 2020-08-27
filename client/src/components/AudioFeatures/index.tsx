@@ -1,10 +1,15 @@
 import React from "react";
 import { Bar } from "react-chartjs-2";
 import styled from "styled-components";
-import { featureGraphOptions, featureGraphLabels } from "./constants";
+import {
+  featureGraphOptions,
+  featureGraphLabels,
+  audioFeatureDescriptions,
+} from "./constants";
 import { FeatureScores } from "../PersonalData";
-import { colors } from "../../theme";
-import { round5x } from "../../utils";
+import { colors, breakpoints } from "../../theme";
+import { IoMdInformationCircle } from "react-icons/io";
+import round5x from "../../utils/round5x";
 
 export type FeatureProps = {
   shortTerm: number;
@@ -17,8 +22,7 @@ type AudioFeatureProps = {
 };
 
 const AudioFeatures = ({ scores }: AudioFeatureProps) => {
-  console.log(scores);
-
+  // TODO: verify existence of scores before trying to present data
   const data = {
     danceability: {
       labels: featureGraphLabels,
@@ -28,9 +32,9 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
           barPercentage: 0.5,
           hoverBackgroundColor: colors.white,
           data: [
-            Math.floor(scores!.longTerm.danceability),
-            Math.floor(scores!.mediumTerm.danceability),
-            Math.floor(scores!.shortTerm.danceability),
+            Math.round(scores!.longTerm.danceability),
+            Math.round(scores!.mediumTerm.danceability),
+            Math.round(scores!.shortTerm.danceability),
           ],
         },
       ],
@@ -43,9 +47,9 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
           barPercentage: 0.5,
           hoverBackgroundColor: colors.white,
           data: [
-            Math.floor(scores!.longTerm.energy),
-            Math.floor(scores!.mediumTerm.energy),
-            Math.floor(scores!.shortTerm.energy),
+            Math.round(scores!.longTerm.energy),
+            Math.round(scores!.mediumTerm.energy),
+            Math.round(scores!.shortTerm.energy),
           ],
         },
       ],
@@ -58,9 +62,9 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
           barPercentage: 0.5,
           hoverBackgroundColor: colors.white,
           data: [
-            Math.floor(scores!.longTerm.valence),
-            Math.floor(scores!.mediumTerm.valence),
-            Math.floor(scores!.shortTerm.valence),
+            Math.round(scores!.longTerm.valence),
+            Math.round(scores!.mediumTerm.valence),
+            Math.round(scores!.shortTerm.valence),
           ],
         },
       ],
@@ -73,40 +77,62 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
           barPercentage: 0.5,
           hoverBackgroundColor: colors.white,
           data: [
-            Math.floor(scores!.longTerm.tempo) / 100,
-            Math.floor(scores!.mediumTerm.tempo) / 100,
-            Math.floor(scores!.shortTerm.tempo) / 100,
+            Math.round(scores!.longTerm.tempo),
+            Math.round(scores!.mediumTerm.tempo),
+            Math.round(scores!.shortTerm.tempo),
           ],
         },
       ],
     },
   };
 
+  const backgroundGifs = false;
+
   return (
     <FeaturesDisplay>
+      <FeaturesHeaderWrap>
+        <FeaturesHeader>
+          <h2>Your Moods</h2>
+          <p>Changes in your listening habits and preferences over time</p>
+          <PeriodLabels>
+            <div>
+              <strong>All-Time:</strong> your full music history
+            </div>
+            <div>
+              <strong>Recent:</strong> over the last 4 to 6 months
+            </div>
+            <div>
+              <strong>All-Time:</strong> over the last month
+            </div>
+          </PeriodLabels>
+        </FeaturesHeader>
+      </FeaturesHeaderWrap>
       <ValenceDisplay>
-        <FeatureBackground>
-          <div
-            style={{
-              width: "100%",
-              height: 0,
-              paddingBottom: "56%",
-              position: "relative",
-            }}
-          >
-            <iframe
-              src="https://giphy.com/embed/S5WhyGI8gRdKSjobRo"
+        {backgroundGifs && (
+          <FeatureBackground>
+            <div
               style={{
                 width: "100%",
-                height: "100%",
-                position: "absolute",
-                border: 0,
+                height: 0,
+                paddingBottom: "56%",
+                position: "relative",
               }}
-              className="giphy-embed"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </FeatureBackground>
+            >
+              <iframe
+                title="valencebackground"
+                src="https://giphy.com/embed/S5WhyGI8gRdKSjobRo"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  position: "absolute",
+                  border: 0,
+                }}
+                className="giphy-embed"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </FeatureBackground>
+        )}
         <FeatureContainer>
           <div className="featureInfo">
             <div className="featureTitle">
@@ -114,10 +140,14 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
             </div>
 
             <div className="featureDescription">
-              describes the musical positiveness conveyed by a track. Tracks
-              with high valence sound more positive (e.g. happy, cheerful,
-              euphoric), while tracks with low valence sound more negative (e.g.
-              sad, depressed, angry).
+              {audioFeatureDescriptions.valence.desc}
+            </div>
+
+            <div className="featureTechnical">
+              <div className="icon">
+                <IoMdInformationCircle />
+              </div>{" "}
+              <p> {audioFeatureDescriptions.valence.measurement}</p>
             </div>
           </div>
           <div className="featureGraph">
@@ -157,28 +187,31 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
         </FeatureContainer>
       </ValenceDisplay>
       <EnergyDisplay>
-        <FeatureBackground>
-          <div
-            style={{
-              width: "100%",
-              height: 0,
-              paddingBottom: "54%",
-              position: "relative",
-            }}
-          >
-            <iframe
-              src="https://giphy.com/embed/LpoosGQsF6iM9AHThG"
+        {backgroundGifs && (
+          <FeatureBackground>
+            <div
               style={{
                 width: "100%",
-                height: "100%",
-                position: "absolute",
-                border: 0,
+                height: 0,
+                paddingBottom: "54%",
+                position: "relative",
               }}
-              className="giphy-embed"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </FeatureBackground>
+            >
+              <iframe
+                src="https://giphy.com/embed/LpoosGQsF6iM9AHThG"
+                title="energybackground"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  position: "absolute",
+                  border: 0,
+                }}
+                className="giphy-embed"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </FeatureBackground>
+        )}
 
         <FeatureContainer>
           <div className="featureInfo">
@@ -187,14 +220,16 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
             </div>
 
             <div className="featureDescription">
-              represents a perceptual measure of intensity and activity.
-              Typically, energetic tracks feel fast, loud, and noisy. For
-              example, death metal has high energy, while a Bach prelude scores
-              low on the scale. Perceptual features contributing to this
-              attribute include dynamic range, perceived loudness, timbre, onset
-              rate, and general entropy.
+              {audioFeatureDescriptions.energy.desc}
+            </div>
+            <div className="featureTechnical">
+              <div className="icon">
+                <IoMdInformationCircle />
+              </div>{" "}
+              <p> {audioFeatureDescriptions.energy.measurement}</p>
             </div>
           </div>
+
           <div className="featureGraph">
             <Bar
               data={data.energy}
@@ -232,28 +267,31 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
         </FeatureContainer>
       </EnergyDisplay>
       <DanceabilityDisplay>
-        <FeatureBackground>
-          <div
-            style={{
-              width: "100%",
-              height: 0,
-              paddingBottom: "55.7%",
-              position: "relative",
-            }}
-          >
-            <iframe
-              src="https://giphy.com/embed/l4FsoQbfD0J53F8Xe"
+        {backgroundGifs && (
+          <FeatureBackground>
+            <div
               style={{
                 width: "100%",
-                height: "100%",
-                position: "absolute",
-                border: 0,
+                height: 0,
+                paddingBottom: "55.7%",
+                position: "relative",
               }}
-              className="giphy-embed"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </FeatureBackground>
+            >
+              <iframe
+                title="danceabilitybackground"
+                src="https://giphy.com/embed/l4FsoQbfD0J53F8Xe"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  position: "absolute",
+                  border: 0,
+                }}
+                className="giphy-embed"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </FeatureBackground>
+        )}
         <FeatureContainer>
           <div className="featureInfo">
             <div className="featureTitle">
@@ -261,11 +299,16 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
             </div>
 
             <div className="featureDescription">
-              describes how suitable a track is for dancing based on a
-              combination of musical elements including tempo, rhythm stability,
-              beat strength, and overall regularity.
+              {audioFeatureDescriptions.danceability.desc}
+            </div>
+            <div className="featureTechnical">
+              <div className="icon">
+                <IoMdInformationCircle />
+              </div>{" "}
+              <p> {audioFeatureDescriptions.danceability.measurement}</p>
             </div>
           </div>
+
           <div className="featureGraph">
             <Bar
               data={data.danceability}
@@ -303,28 +346,31 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
         </FeatureContainer>
       </DanceabilityDisplay>
       <TempoDisplay>
-        <FeatureBackground>
-          <div
-            style={{
-              width: "100%",
-              height: 0,
-              paddingBottom: "45%",
-              position: "relative",
-            }}
-          >
-            <iframe
-              src="https://giphy.com/embed/cOEwxyi9cWNst5l81a"
+        {backgroundGifs && (
+          <FeatureBackground>
+            <div
               style={{
                 width: "100%",
-                height: "100%",
-                position: "absolute",
-                border: 0,
+                height: 0,
+                paddingBottom: "45%",
+                position: "relative",
               }}
-              className="giphy-embed"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </FeatureBackground>
+            >
+              <iframe
+                title="tempobackground"
+                src="https://giphy.com/embed/cOEwxyi9cWNst5l81a"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  position: "absolute",
+                  border: 0,
+                }}
+                className="giphy-embed"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </FeatureBackground>
+        )}
         <FeatureContainer>
           <div className="featureInfo">
             <div className="featureTitle">
@@ -332,11 +378,16 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
             </div>
 
             <div className="featureDescription">
-              is the overall estimated tempo of a track in beats per minute
-              (BPM). In musical terminology, tempo is the speed or pace of a
-              given piece and derives directly from the average beat duration.
+              {audioFeatureDescriptions.tempo.desc}
+            </div>
+            <div className="featureTechnical">
+              <div className="icon">
+                <IoMdInformationCircle />
+              </div>{" "}
+              <p> {audioFeatureDescriptions.tempo.measurement}</p>
             </div>
           </div>
+
           <div className="featureGraph">
             <Bar
               data={data.tempo}
@@ -397,6 +448,7 @@ const FeatureContainer = styled.div`
 `;
 
 const FeaturesDisplay = styled.div`
+  margin: 4em 0;
   > div {
     padding: 4em 0;
     position: relative;
@@ -421,13 +473,87 @@ const FeaturesDisplay = styled.div`
     flex: 3;
     order: 2;
   }
+  .featureTechnical {
+    margin-top: 1em;
+    float: left;
+    color: ${({ theme }) => theme.colors.textPrimary};
+    background: ${({ theme }) => theme.colors.darkBodyOverlayBorder};
+    padding: 1em;
+    border-radius: 0.5em;
+    display: flex;
+    align-items: center;
+    .icon {
+      font-size: 1.5em;
+      display: flex;
+      align-items: center;
+      color: ${({ theme }) => theme.colors.textPrimary};
+      margin-right: 0.5em;
+    }
+    ${breakpoints.lessThan("74")`
+        font-size: 0.875rem;
+    `}
+  }
   canvas {
     width: 100% !important;
   }
 `;
 
+const FeaturesHeaderWrap = styled.div`
+  && {
+    padding: 0;
+    margin-bottom: 1em;
+  }
+`;
+
+const FeaturesHeader = styled.div`
+  width: 94%;
+  margin: 0 auto;
+  h2 {
+    display: block;
+    text-align: center;
+    line-height: 1;
+    margin-bottom: 0.25em;
+  }
+  p {
+    display: block;
+    text-align: center;
+    color: ${({ theme }) => theme.colors.textPrimary};
+    font-size: 1.25em;
+  }
+`;
+
+const PeriodLabels = styled.div`
+  margin: 2em 0 0 0;
+  display: flex;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.textTertiary};
+  strong {
+    color: ${({ theme }) => theme.colors.textPrimary};
+  }
+  flex-wrap: wrap;
+  > div {
+    margin: 0em 1em 1em 0;
+    padding: 1em 2em;
+    text-align: center;
+    box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.3);
+    background: ${({ theme }) => theme.colors.darkBodyOverlay};
+    border-radius: 0.5em;
+    border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlayBorder};
+    &:last-child {
+      margin-right: 0;
+    }
+    ${breakpoints.lessThan("66")`
+      flex-basis: 100%;
+      margin-right: 0;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    `}
+  }
+`;
+
 const DanceabilityDisplay = styled.div`
-  grid-area: danceability;
+  background: ${({ theme }) => theme.colors.blueCityBlue10p};
   min-height: 400px;
   h2 {
     border-bottom: 0.125em solid ${({ theme }) => theme.colors.blueCityBlue};
@@ -435,6 +561,7 @@ const DanceabilityDisplay = styled.div`
 `;
 
 const EnergyDisplay = styled.div`
+  background: ${({ theme }) => theme.colors.spanishViolet10p};
   min-height: 400px;
   .featureInfo {
     order: 2;
@@ -449,6 +576,7 @@ const EnergyDisplay = styled.div`
 `;
 
 const ValenceDisplay = styled.div`
+  background: ${({ theme }) => theme.colors.straw10p};
   min-height: 400px;
   h2 {
     border-bottom: 0.125em solid ${({ theme }) => theme.colors.straw};
@@ -456,6 +584,7 @@ const ValenceDisplay = styled.div`
 `;
 
 const TempoDisplay = styled.div`
+  background: ${({ theme }) => theme.colors.seaGreen10p};
   min-height: 400px;
   .featureInfo {
     order: 2;

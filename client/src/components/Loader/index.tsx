@@ -4,9 +4,14 @@ import ScaleLoader from "react-spinners/ScaleLoader";
 
 type LoaderProps = {
   fullscreen?: boolean;
+  label: boolean;
 };
 
-const LoaderInner = () => {
+type LoaderInnerProps = {
+  label: boolean;
+};
+
+const LoaderInner = ({ label }: LoaderInnerProps) => {
   return (
     <LoadContent>
       <ScaleLoader
@@ -16,26 +21,27 @@ const LoaderInner = () => {
         margin={5}
         color={"#333"}
       />
-      <div className="loadingLabel">Loading...</div>
+      {label ? <div className="loadingLabel">Loading...</div> : null}
     </LoadContent>
   );
 };
 
-const Loader = ({ fullscreen }: LoaderProps) => {
+const Loader = ({ fullscreen, label }: LoaderProps) => {
   if (fullscreen) {
     return (
       <LoadCover>
-        <LoaderInner></LoaderInner>
+        <LoaderInner label={label}></LoaderInner>
       </LoadCover>
     );
   } else {
-    return <LoaderInner />;
+    return <LoaderInner label={label} />;
   }
 };
 
 const LoadContent = styled.div`
   display: flex;
   height: 100%;
+  flex-grow: 1;
   width: 100%;
   flex-direction: column;
   align-items: center;

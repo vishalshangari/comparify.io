@@ -13,36 +13,40 @@ import Login from "../../components/Login";
 import { useAuthState } from "../../App";
 import TestPrivateRoute from "../TestPrivateRoute";
 import { RESPONSE_CODES } from "../../constants";
+import CreateComparePage from "../CreateComparePage";
+import AuthenticatedComparePage from "../compare/AuthenticatedComparePage";
+import UnauthenticatedComparePage from "../compare/UnauthenticatedComparePage";
 
 export interface PrivateRouteProps extends RouteProps {
   isAuthenticated: boolean;
 }
 
-const PrivateRoute = ({
-  component: Component,
-  isAuthenticated,
-  ...rest
-}: PrivateRouteProps) => {
-  if (!Component) {
-    throw new Error("Private route component was not specified!");
-  }
-  return (
-    <Route
-      {...rest}
-      render={(props) =>
-        isAuthenticated ? (
-          <Component {...props} />
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/login",
-            }}
-          />
-        )
-      }
-    />
-  );
-};
+// Old Private Route - TODO: delete
+// const PrivateRoute = ({
+//   component: Component,
+//   isAuthenticated,
+//   ...rest
+// }: PrivateRouteProps) => {
+//   if (!Component) {
+//     throw new Error("Private route component was not specified!");
+//   }
+//   return (
+//     <Route
+//       {...rest}
+//       render={(props) =>
+//         isAuthenticated ? (
+//           <Component {...props} />
+//         ) : (
+//           <Redirect
+//             to={{
+//               pathname: "/login",
+//             }}
+//           />
+//         )
+//       }
+//     />
+//   );
+// };
 
 const Router = () => {
   const { state: authState } = useAuthState();
@@ -53,14 +57,27 @@ const Router = () => {
       <Switch>
         {/* <Route path="/create" exact component={Create} /> */}
         <Route path="/splash" exact component={Splash} />
-        <Route path="/home" exact component={Home} />
+        <Route path="/home" exact component={Home} />=
         <Route path="/login" exact component={Login} />
+        <Route path="/create" exact component={CreateComparePage} />
+        <Route path="/auth" component={Test} />
+        <Route path="/private" exact>
+          {isAuthenticated ? <TestPrivateRoute /> : <Redirect to="/login" />}
+        </Route>
+        <Route path="/:comparifyPageID">
+          {isAuthenticated ? (
+            <AuthenticatedComparePage />
+          ) : (
+            <UnauthenticatedComparePage />
+          )}
+        </Route>
+        {/* OLD Private route
         <PrivateRoute
           isAuthenticated={isAuthenticated}
           path="/private"
           exact
           component={TestPrivateRoute}
-        />
+        /> */}
         <Route path="*" component={Test} />
       </Switch>
     </BrowserRouter>

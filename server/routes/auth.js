@@ -1,5 +1,4 @@
 const express = require("express");
-const request = require("request");
 const {
   SPOTIFY_AUTH_STATE_KEY,
   SPOTIFY_API_SCOPES,
@@ -23,13 +22,15 @@ const router = express.Router();
 const queryString = require("query-string");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
+
+// Services
 const getUserInfo = require("../services/getUserInfo");
 const generateRandomString = require("../utils/generateRandomString");
+const createStandardUserData = require("../services/createStandardUser");
 
-// Firebase db
+// Database
 const db = require("../db/firebase");
 const firebase = require("firebase");
-const createStandardUserData = require("../services/createStandardUser");
 
 router.get("/login", (req, res) => {
   // Set auth request state cookie
@@ -152,6 +153,7 @@ router.get("/login/callback", async (req, res) => {
         );
 
         userData.lastLogin = userInfo.createdAt;
+        userData.lastUpdated = userInfo.createdAt;
 
         // const userData = {
         //   info: userInfo,
@@ -159,7 +161,11 @@ router.get("/login/callback", async (req, res) => {
         // };
 
         // Add Spotify refresh token to user
-        userData.spotifyRefreshToken = newRefreshToken;
+        userData.tokens = {
+          accessToken: accessToken,
+          refreshToken: newRefreshToken,
+          accessTokenIssuedAt: userInfo.createdAt,
+        };
 
         // Save full new user to firestore
         userRef.set(userData);
@@ -172,9 +178,14 @@ router.get("/login/callback", async (req, res) => {
           .update({ count: firebase.firestore.FieldValue.increment(1) });
       } else {
         // Existing user, update with new Spotify refresh token
+        const tokens = {
+          accessToken: accessToken,
+          refreshToken: newRefreshToken,
+          accessTokenIssuedAt: Date.now(),
+        };
         console.log(`EXISTING USER with id: ${userInfo._id}`);
         await userRef.update({
-          spotifyRefreshToken: newRefreshToken,
+          tokens: tokens,
           lastLogin: Date.now(),
         });
       }
@@ -211,6 +222,7 @@ router.get("/verifyToken", (req, res) => {
       console.log(`Error in jwt verification:`, error);
       const errorType = error.name;
       if (errorType === `TokenExpiredError`) {
+        // TODO: ask user to login again
         res.status(401).json({
           status: RESPONSE_CODES.AUTHENTICATION_ERROR,
           errorType: ERROR_CODES.EXPIRED_TOKEN,
@@ -230,6 +242,7 @@ router.get("/verifyToken", (req, res) => {
 });
 
 router.get("/clearSession", (req, res) => {
+  // TODO: on logout
   console.log("clearing session...");
 });
 

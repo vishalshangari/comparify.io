@@ -4,7 +4,7 @@ import Router from "./components/Router";
 
 import { theme } from "./theme";
 import GlobalStyle from "./components/GlobalStyle";
-import { ThemeProvider } from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import Loader from "./components/Loader";
 
 import { ERROR_CODES, RESPONSE_CODES } from "./constants";
@@ -65,7 +65,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return (
     <AuthContext.Provider value={{ state: state, setState: setState }}>
-      {state.status === "loading" ? <Loader fullscreen /> : children}
+      {state.status === "loading" ? <Loader label fullscreen /> : children}
     </AuthContext.Provider>
   );
 };
@@ -76,12 +76,20 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <AuthProvider>
-          <Router />
+          <FullSiteWrap>
+            <Router />
+          </FullSiteWrap>
         </AuthProvider>
       </ThemeProvider>
     </>
   );
 };
+
+const FullSiteWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+`;
 
 // const Create = () => {
 //   const handleCreateFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {

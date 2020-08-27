@@ -16,6 +16,8 @@ const {
   COOKIE_DOMAIN,
   SPOTIFY_AUTH_URL,
   GET_TRACKS_URL,
+  GET_ARTISTS_URL,
+  GET_USER_PROFILE_URL,
   GET_AUDIO_FEATURES_URL,
   CLIENT_ID,
   CLIENT_SECRET,
@@ -24,8 +26,10 @@ const {
   ALPHANUMERIC,
   SPOTIFY_AUTH_STATE_KEY,
   SPOTIFY_GET_AUTH_TOKEN_URL,
+  DB_SITE_CONFIGURATIONS,
+  DB_SITE_TOKENS,
 } = require("../constants");
-const { getValidAccessToken } = require("../services/getValidAccessToken");
+const getValidAccessToken = require("../services/getValidAccessToken");
 
 router.post("/", (req, res) => {
   console.log("You hit /api/get");
@@ -35,6 +39,43 @@ router.post("/", (req, res) => {
   //   errorType: null,
   // });
   res.redirect(HOME_REDIRECT_URI);
+});
+
+router.get("/public/user-info/:id", async (req, res) => {
+  const userID = req.params.id;
+  let accessToken = "";
+
+  // Get valid comparify domain access token for Spotify public API requests
+  try {
+    accessToken = await getValidAccessToken(
+      DB_SITE_CONFIGURATIONS,
+      DB_SITE_TOKENS
+    );
+  } catch (error) {
+    console.error(error);
+    res.redirect(
+      HOME_REDIRECT_URI +
+        "/" +
+        queryString.stringify({
+          error: "unkown_error",
+        })
+    );
+  }
+
+  // Do work
+  try {
+    const {
+      data: { display_name: name, images: images, uri: uri },
+    } = await axios.get(`${GET_USER_PROFILE_URL}${userID}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    res.send({ name: name, images: images, uri: uri });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 router.get("/saved-data", async (req, res) => {
@@ -60,7 +101,12 @@ router.get("/saved-data", async (req, res) => {
 
   const {
     info: userInfo,
-    spotifyData: { topArtistsAndGenres, topTracks, audioFeatures },
+    spotifyData: {
+      topArtistsAndGenres,
+      topTracks,
+      audioFeatures,
+      obscurityScore,
+    },
   } = userDoc.data();
 
   const topGenres = {
@@ -69,75 +115,21 @@ router.get("/saved-data", async (req, res) => {
     longTerm: topArtistsAndGenres.longTerm.topGenres,
   };
 
-  const getArtistsPopularityScores = () => {
-    const artistsShortTerm = topArtistsAndGenres.shortTerm.topArtists;
-    const artistsMediumTerm = topArtistsAndGenres.mediumTerm.topArtists;
-    const artistsLongTerm = topArtistsAndGenres.longTerm.topArtists;
-
-    let shortTermTotal = 0;
-    for (let i = 0; i < artistsShortTerm.length; i++) {
-      shortTermTotal += artistsShortTerm[i].popularity;
-    }
-
-    let mediumTermTotal = 0;
-    for (let i = 0; i < artistsMediumTerm.length; i++) {
-      mediumTermTotal += artistsMediumTerm[i].popularity;
-    }
-
-    let longTermTotal = 0;
-    for (let i = 0; i < artistsLongTerm.length; i++) {
-      longTermTotal += artistsLongTerm[i].popularity;
-    }
-
-    const weightedScore =
-      (shortTermTotal / artistsShortTerm.length) * 0.2 +
-      (mediumTermTotal / artistsMediumTerm.length) * 0.3 +
-      (longTermTotal / artistsLongTerm.length) * 0.5;
-
-    return weightedScore;
-  };
-
-  const getTracksPopularityScores = () => {
-    const tracksShortTerm = topTracks.shortTerm;
-    const tracksMediumTerm = topTracks.mediumTerm;
-    const tracksLongTerm = topTracks.longTerm;
-
-    let shortTermTotal = 0;
-    for (let i = 0; i < tracksShortTerm.length; i++) {
-      shortTermTotal += tracksShortTerm[i].popularity;
-    }
-
-    let mediumTermTotal = 0;
-    for (let i = 0; i < tracksMediumTerm.length; i++) {
-      mediumTermTotal += tracksMediumTerm[i].popularity;
-    }
-
-    let longTermTotal = 0;
-    for (let i = 0; i < tracksLongTerm.length; i++) {
-      longTermTotal += tracksLongTerm[i].popularity;
-    }
-
-    const weightedScore =
-      (shortTermTotal / tracksShortTerm.length) * 0.2 +
-      (mediumTermTotal / tracksMediumTerm.length) * 0.3 +
-      (longTermTotal / tracksLongTerm.length) * 0.5;
-
-    return weightedScore;
-  };
-
   const names = userInfo.displayName.split(" ");
 
   const responseData = {
     userInfo: {
-      name: names[0],
+      names: names,
     },
     topGenres: topGenres,
-    popularityScores: {
-      artists: getArtistsPopularityScores(),
-      tracks: getTracksPopularityScores(),
-    },
+    obscurityScore: obscurityScore,
     topTracks: topTracks,
     featureScores: audioFeatures,
+    topArtists: {
+      shortTerm: topArtistsAndGenres.shortTerm.topArtists,
+      mediumTerm: topArtistsAndGenres.mediumTerm.topArtists,
+      longTerm: topArtistsAndGenres.longTerm.topArtists,
+    },
   };
   // console.log(responseData);
   res.send(responseData);
@@ -233,12 +225,16 @@ router.get("/site-token", async (req, res) => {
   }
 });
 
-router.post("/track-info", async (req, res) => {
+router.post("/track-info/multiple", async (req, res) => {
   const trackIDs = req.body.ids;
-  let tokenValues = {};
+  let accessToken = "";
 
+  // Get valid comparify domain access token for Spotify public API requests
   try {
-    tokenValues = await getValidAccessToken();
+    accessToken = await getValidAccessToken(
+      DB_SITE_CONFIGURATIONS,
+      DB_SITE_TOKENS
+    );
   } catch (error) {
     console.error(error);
     res.redirect(
@@ -259,14 +255,9 @@ router.post("/track-info", async (req, res) => {
         ids: trackIDs,
       },
       headers: {
-        Authorization: `Bearer ${tokenValues.accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
-
-    let shortTermTracks = [];
-    let mediumTermTracks = [];
-    let longTermTracks = [];
-
     const getArtistNames = (artists) => {
       let names = [];
       artists.forEach((artist) => names.push(artist.name));
@@ -284,27 +275,241 @@ router.post("/track-info", async (req, res) => {
       };
     };
 
+    let reshapedTracks = [];
+
     for (let i = 0; i < tracksFull.length; i++) {
-      if (i < 10) {
-        shortTermTracks.push(getTrackInfo(tracksFull[i]));
-      } else if (i < 20) {
-        mediumTermTracks.push(getTrackInfo(tracksFull[i]));
-      } else {
-        longTermTracks.push(getTrackInfo(tracksFull[i]));
-      }
+      reshapedTracks.push(getTrackInfo(tracksFull[i]));
+      // if (i < 12) {
+      //   shortTermTracks.push(getTrackInfo(tracksFull[i]));
+      // } else if (i < 24) {
+      //   mediumTermTracks.push(getTrackInfo(tracksFull[i]));
+      // } else {
+      //   longTermTracks.push(getTrackInfo(tracksFull[i]));
+      // }
     }
 
-    res.send({
-      shortTerm: shortTermTracks,
-      mediumTerm: mediumTermTracks,
-      longTerm: longTermTracks,
-    });
+    res.send(reshapedTracks);
   } catch (error) {
     console.log(error);
   }
 });
 
-// Old route to get track audio features -> moved to createStandardUser process
+router.post("/artist-info/multiple", async (req, res) => {
+  const artistIDs = req.body.ids;
+  let accessToken = "";
+
+  try {
+    accessToken = await getValidAccessToken(
+      DB_SITE_CONFIGURATIONS,
+      DB_SITE_TOKENS
+    );
+  } catch (error) {
+    console.error(error);
+    res.redirect(
+      HOME_REDIRECT_URI +
+        "/" +
+        queryString.stringify({
+          error: "unkown_error",
+        })
+    );
+  }
+
+  // Do work
+  try {
+    const {
+      data: { artists: artistsFull },
+    } = await axios.get(GET_ARTISTS_URL, {
+      params: {
+        ids: artistIDs,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    // let shortTermArtists = [];
+    // let mediumTermArtists = [];
+    // let longTermArtists = [];
+
+    const getArtistInfo = (artist) => {
+      return {
+        name: artist.name,
+        images: artist.images,
+        href: artist.uri,
+        popularity: artist.popularity,
+      };
+    };
+
+    let reshapedArtists = [];
+
+    for (let i = 0; i < artistsFull.length; i++) {
+      reshapedArtists.push(getArtistInfo(artistsFull[i]));
+      // if (i < 12) {
+      //   shortTermArtists.push(getArtistInfo(artistsFull[i]));
+      // } else if (i < 24) {
+      //   mediumTermArtists.push(getArtistInfo(artistsFull[i]));
+      // } else {
+      //   longTermArtists.push(getArtistInfo(artistsFull[i]));
+      // }
+    }
+
+    res.send(reshapedArtists);
+  } catch (error) {
+    console.log(error);
+    res.send(`There was an error getting your top`);
+  }
+});
+
+router.post("/artist-info", async (req, res) => {
+  const artistIDs = req.body.ids;
+  let accessToken = "";
+
+  try {
+    accessToken = await getValidAccessToken(
+      DB_SITE_CONFIGURATIONS,
+      DB_SITE_TOKENS
+    );
+  } catch (error) {
+    console.error(error);
+    res.redirect(
+      HOME_REDIRECT_URI +
+        "/" +
+        queryString.stringify({
+          error: "unkown_error",
+        })
+    );
+  }
+
+  // Do work
+  try {
+    const {
+      data: { artists: artistsFull },
+    } = await axios.get(GET_ARTISTS_URL, {
+      params: {
+        ids: artistIDs,
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    let shortTermArtists = [];
+    let mediumTermArtists = [];
+    let longTermArtists = [];
+
+    const getArtistInfo = (artist) => {
+      return {
+        name: artist.name,
+        images: artist.images,
+        href: artist.uri,
+        popularity: artist.popularity,
+      };
+    };
+
+    for (let i = 0; i < artistsFull.length; i++) {
+      if (i < 12) {
+        shortTermArtists.push(getArtistInfo(artistsFull[i]));
+      } else if (i < 24) {
+        mediumTermArtists.push(getArtistInfo(artistsFull[i]));
+      } else {
+        longTermArtists.push(getArtistInfo(artistsFull[i]));
+      }
+    }
+
+    res.send({
+      shortTerm: shortTermArtists,
+      mediumTerm: mediumTermArtists,
+      longTerm: longTermArtists,
+    });
+  } catch (error) {
+    console.log(error);
+    res.redirect(
+      HOME_REDIRECT_URI +
+        "/" +
+        queryString.stringify({
+          error: "unkown_error",
+        })
+    );
+  }
+});
+
+// TODO: old route to get all tracks
+// router.post("/track-info", async (req, res) => {
+//   const trackIDs = req.body.ids;
+//   let accessToken = "";
+
+//   // Get valid comparify domain access token for Spotify public API requests
+//   try {
+//     accessToken = await getValidAccessToken(
+//       DB_SITE_CONFIGURATIONS,
+//       DB_SITE_TOKENS
+//     );
+//   } catch (error) {
+//     console.error(error);
+//     res.redirect(
+//       HOME_REDIRECT_URI +
+//         "/" +
+//         queryString.stringify({
+//           error: "unkown_error",
+//         })
+//     );
+//   }
+
+//   // Do work
+//   try {
+//     const {
+//       data: { tracks: tracksFull },
+//     } = await axios.get(GET_TRACKS_URL, {
+//       params: {
+//         ids: trackIDs,
+//       },
+//       headers: {
+//         Authorization: `Bearer ${accessToken}`,
+//       },
+//     });
+
+//     let shortTermTracks = [];
+//     let mediumTermTracks = [];
+//     let longTermTracks = [];
+
+//     const getArtistNames = (artists) => {
+//       let names = [];
+//       artists.forEach((artist) => names.push(artist.name));
+//       return names;
+//     };
+
+//     const getTrackInfo = (track) => {
+//       return {
+//         name: track.name,
+//         album: track.album.name,
+//         image: track.album.images[0],
+//         artists: getArtistNames(track.artists),
+//         preview_url: track.preview_url,
+//         href: track.uri,
+//       };
+//     };
+
+//     for (let i = 0; i < tracksFull.length; i++) {
+//       if (i < 12) {
+//         shortTermTracks.push(getTrackInfo(tracksFull[i]));
+//       } else if (i < 24) {
+//         mediumTermTracks.push(getTrackInfo(tracksFull[i]));
+//       } else {
+//         longTermTracks.push(getTrackInfo(tracksFull[i]));
+//       }
+//     }
+
+//     res.send({
+//       shortTerm: shortTermTracks,
+//       mediumTerm: mediumTermTracks,
+//       longTerm: longTermTracks,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
+
+// TODO: Old route to get track audio features -> moved to createStandardUser process
 
 // router.post("/track-audio-features", async (req, res) => {
 //   const trackIDs = req.body.ids;

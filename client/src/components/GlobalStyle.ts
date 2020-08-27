@@ -7,7 +7,7 @@ const GlobalStyle = createGlobalStyle<{ theme: Theme }>`
   *::before,
   *::after{box-sizing:border-box;}
   a{text-decoration:none; color:inherit; cursor:pointer;}
-  button{background-color:transparent; color:inherit; border-width:0; padding:0; cursor:pointer;}
+  button{background-color:transparent; color:inherit; border-width:0; padding:0; cursor:pointer; font-size: 1rem;}
   figure{margin:0;}
   input::-moz-focus-inner {border:0; padding:0; margin:0;}
   ul, ol, dd{margin:0; padding:0; list-style:none;}
@@ -17,8 +17,10 @@ const GlobalStyle = createGlobalStyle<{ theme: Theme }>`
   fieldset{border-width:0; padding:0; margin:0;}
 
   body {
-    background: ${({ theme }) => theme.colors.navigationBg};
+    background: black;
+    // background: ${({ theme }) => theme.colors.bodyBg};
     font-family: ${({ theme }) => theme.fonts.main}, sans-serif;
+    color: ${({ theme }) => theme.colors.textPrimary};
   }
 
   * {

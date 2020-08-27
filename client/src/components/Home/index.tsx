@@ -1,27 +1,20 @@
 import React from "react";
-import styled, { createGlobalStyle } from "styled-components";
-import Header from "../Header";
-import { Theme } from "../../theme";
+import styled from "styled-components";
+import Header from "../shared/Header";
 import PersonalData from "../PersonalData";
-
-const GlobalStyle = createGlobalStyle<{ theme: Theme }>`
-  body {
-    background: ${({ theme }) => theme.colors.darkBodyBg};
-  }
-`;
+import Footer from "../shared/Footer";
 
 const Home = () => {
   return (
     <>
-      <GlobalStyle />
-      <Header />
-      <MainContent>
-        <PersonalData></PersonalData>
-      </MainContent>
+      <PersonalData></PersonalData>
+      <Footer />
     </>
   );
 };
 
-const MainContent = styled.div``;
+const MainContent = styled.div`
+  background: ${({ theme }) => theme.colors.mainContentBg};
+`;
 
 export default Home;

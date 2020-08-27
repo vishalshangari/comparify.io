@@ -26,10 +26,12 @@ module.exports = Object.freeze({
   SPOTIFY_AUTH_URL: "https://accounts.spotify.com/authorize?",
   SPOTIFY_GET_AUTH_TOKEN_URL: "https://accounts.spotify.com/api/token",
   GET_ACTIVE_USER_PROFILE_URL: "https://api.spotify.com/v1/me",
+  GET_USER_PROFILE_URL: "https://api.spotify.com/v1/users/",
   GET_ACTIVE_USER_TRACKS_URL: "https://api.spotify.com/v1/me/tracks",
   GET_ACTIVE_USER_TOP_TRACKS_URL: "https://api.spotify.com/v1/me/top/tracks",
   GET_ACTIVE_USER_TOP_ARTISTS_URL: "https://api.spotify.com/v1/me/top/artists",
   GET_TRACKS_URL: "https://api.spotify.com/v1/tracks",
+  GET_ARTISTS_URL: "https://api.spotify.com/v1/artists",
   GET_AUDIO_FEATURES_URL: "https://api.spotify.com/v1/audio-features",
 
   // Server config
@@ -42,6 +44,7 @@ module.exports = Object.freeze({
   COMPARIFY_TOKEN_COOKIE_KEY: "comparifyToken",
   COOKIE_DOMAIN: isDev ? "" : "https://spotify-compare-app.herokuapp.com",
   MAX_COOKIE_AGE: 604800000, // One week, should be same as JWT expiration
+  SERVER_PRIVATE_KEY: "serverPrivateAPIKey",
 
   RESPONSE_CODES: RESPONSE_CODES,
   ERROR_CODES: ERROR_CODES,
@@ -56,4 +59,7 @@ module.exports = Object.freeze({
   // DB config
   USERS: "users",
   STATS: "stats",
+  DB_SITE_CONFIGURATIONS: "config",
+  DB_SITE_TOKENS: "tokens",
+  DB_COMPARIFYPAGE_COLLECTION: "comparifyPages",
 });
