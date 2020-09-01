@@ -87,12 +87,12 @@ router.get(
       for (let j = 0; j < periods.length; j++) {
         visitorData.push(
           Math.round(
-            visitorSpotifyData?.audioFeatures?.[features[i]]?.[periods[j]] || 0
+            visitorSpotifyData?.audioFeatures[features[i]][periods[j]] || 0
           )
         );
         creatorData.push(
           Math.round(
-            creatorSpotifyData?.audioFeatures?.[features[i]]?.[periods[j]] || 0
+            creatorSpotifyData?.audioFeatures[features[i]][periods[j]] || 0
           )
         );
       }
