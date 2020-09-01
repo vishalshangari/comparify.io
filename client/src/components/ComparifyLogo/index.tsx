@@ -8,7 +8,7 @@ type ComparifyLogo = {
 
 const ComparifyLogo = ({ color, size }: ComparifyLogo) => {
   return (
-    <LogoContainer color={color} size={size}>
+    <LogoContainer color={color} size={size} className="logoWrap">
       <a href="/">Comparify</a>
     </LogoContainer>
   );

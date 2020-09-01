@@ -2,65 +2,50 @@ import React from "react";
 import styled from "styled-components";
 import { IoMdInformationCircle } from "react-icons/io";
 import { breakpoints } from "../../theme";
-type ObscurityScoreProps = {
-  score: number;
-};
-type ObscurityLabelType = {
-  text: string;
-  emoji: string;
-  color: string;
-};
-const obscurityLables = Object.freeze({
-  low: {
-    text: "Low",
-    color: "#c32f27",
-    emoji: "🙁",
-  },
-  belowAvg: {
-    text: "Below Average",
-    emoji: "🤔",
-    color: "#db7c26",
-  },
-  avg: {
-    text: "Average",
-    emoji: "😌",
-    color: "#9BC53D",
-  },
-  aboveAvg: {
-    text: "Above Average",
-    emoji: "😎",
-    color: "#5B85AA",
-  },
-  strong: {
-    text: "Strong",
-    emoji: "😳",
-    color: "#05299E",
-  },
-  veryStrong: {
-    text: "Very Obscure!",
-    emoji: "🤩",
-    color: "#B91DB7",
-  },
-});
+import ErrorComp from "../shared/ErrorComp";
+import { obscurityLables } from "./constants";
+import { ObscurityScoreProps, ObscurityLabelType } from "./models";
 
-const Obscurity = ({ score }: ObscurityScoreProps) => {
-  const getObscurityLabel = () => {
-    if (score <= 20) {
+const Obscurity = ({ score, scoreOnly }: ObscurityScoreProps) => {
+  const getObscurityLabel = (score: number) => {
+    if (score <= 10) {
       return obscurityLables.low;
-    } else if (score <= 30) {
+    } else if (score <= 15) {
       return obscurityLables.belowAvg;
-    } else if (score <= 40) {
+    } else if (score <= 30) {
       return obscurityLables.avg;
-    } else if (score <= 50) {
+    } else if (score <= 40) {
       return obscurityLables.aboveAvg;
-    } else if (score <= 60) {
+    } else if (score <= 50) {
       return obscurityLables.strong;
     } else {
       return obscurityLables.veryStrong;
     }
   };
 
-  const obscurityLabel = getObscurityLabel();
+  if (scoreOnly) {
+    return (
+      <ObscurityScoreDisplay>
+        <div className="dataItemInner">
+          {score ? (
+            <div className="flexGrow">
+              <ScoreDisplay>
+                <span className="score">{score!}</span>/100
+              </ScoreDisplay>
+              <ObscurityLabelDisplay obscurityLabel={getObscurityLabel(score)}>
+                <span>{getObscurityLabel(score).text}</span>
+                <div className="emoji">{getObscurityLabel(score).emoji}</div>
+              </ObscurityLabelDisplay>
+            </div>
+          ) : (
+            <ErrorComp>
+              <span>There was an error loading your obscurity score.</span>
+            </ErrorComp>
+          )}
+        </div>
+      </ObscurityScoreDisplay>
+    );
+  }
 
   return (
     <ObscurityScoreDisplay>
@@ -68,33 +53,44 @@ const Obscurity = ({ score }: ObscurityScoreProps) => {
         <h2>Obscurity</h2>
       </div>
       <div className="dataItemInner">
-        <div className="flexGrow">
-          <ScoreDisplay>
-            <span className="score">{score!}</span>/100
-          </ScoreDisplay>
-          <ObscurityLabelDisplay label={obscurityLabel}>
-            <span>{obscurityLabel.text}</span>
-            <div className="emoji">{obscurityLabel.emoji}</div>
-          </ObscurityLabelDisplay>
-        </div>
-        <Description>
-          <div className="icon">
-            <IoMdInformationCircle />
-          </div>
-          <p>
-            Calculated using time-weighted average popularity scores of your top
-            artists and tracks.
-          </p>
-        </Description>
+        {score ? (
+          <>
+            <div className="flexGrow">
+              <ScoreDisplay>
+                <span className="score">{score!}</span>/100
+              </ScoreDisplay>
+              <ObscurityLabelDisplay obscurityLabel={getObscurityLabel(score)}>
+                <span>{getObscurityLabel(score).text}</span>
+                <div className="emoji">{getObscurityLabel(score).emoji}</div>
+              </ObscurityLabelDisplay>
+            </div>
+            <Description>
+              <div className="icon">
+                <IoMdInformationCircle />
+              </div>
+              <p>
+                Calculated using time-weighted average popularity scores of your
+                top artists and tracks.
+              </p>
+            </Description>
+          </>
+        ) : (
+          <ErrorComp>
+            <span>There was an error loading your obscurity score.</span>
+          </ErrorComp>
+        )}
       </div>
     </ObscurityScoreDisplay>
   );
 };
-const ObscurityLabelDisplay = styled.div<{ label: ObscurityLabelType }>`
+
+const ObscurityLabelDisplay = styled.div<{
+  obscurityLabel: ObscurityLabelType;
+}>`
   text-align: center;
   color: ${({ theme }) => theme.colors.textPrimary};
   font-weight: 700;
-  margin: 2em 0;
+  margin: 2em 0 1em;
   ${breakpoints.lessThan("74")`
     margin: 1em 0;
   `}
@@ -102,7 +98,7 @@ const ObscurityLabelDisplay = styled.div<{ label: ObscurityLabelType }>`
   span {
     display: inline-block;
     margin-bottom: 1em;
-    background: ${({ label }) => label.color};
+    background: ${({ obscurityLabel: label }) => label.color};
     padding: 0.75em 1.5em;
     border-radius: 1em;
     text-transform: uppercase;
@@ -124,6 +120,9 @@ const Description = styled.div`
   border-radius: 0.5em;
   display: flex;
   align-items: center;
+  ${breakpoints.lessThan("66")`
+    justify-content: center;
+  `}
   .icon {
     font-size: 1.5em;
     display: flex;
@@ -139,7 +138,6 @@ const ObscurityScoreDisplay = styled.div`
   grid-area: obscurity;
 `;
 const ScoreDisplay = styled.div`
-  margin: 1em 0 0;
   text-align: center;
   font-family: ${({ theme }) => theme.fonts.main};
   line-height: 1;
@@ -150,9 +148,6 @@ const ScoreDisplay = styled.div`
     ${breakpoints.lessThan("74")`
         font-size: 6rem;
     `}
-  }
-  .spacingFix {
-    letter-spacing: -10px;
   }
   font-weight: 500;
   letter-spacing: -2px;

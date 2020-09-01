@@ -5,6 +5,12 @@ export const breakpoints = generateMedia({
   "85": "85em",
   "74": "74em",
   "66": "66em",
+  "58": "58em",
+  "48": "48em",
+  "42": "42em",
+  "38": "38em",
+  "33": "33em",
+  "30": "30em",
 });
 
 // Color list def
@@ -58,6 +64,7 @@ export const colors: Colors = {
   strawDark: "#59500A",
   orangeRed: "rgba(255,105,41)",
   orangeRed10p: "rgba(255,105,41,0.1)",
+  darkRed: "rgba(106,4,15,1)",
 };
 
 // Color assignment object def
@@ -99,6 +106,7 @@ const themeColors: ThemeColors = {
   strawDark: colors.strawDark,
   orangeRed: colors.orangeRed,
   orangeRed10p: colors.orangeRed10p,
+  errorRed: colors.darkRed,
 
   // Text
   textPrimary: colors.grey1,

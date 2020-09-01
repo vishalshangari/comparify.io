@@ -16,6 +16,7 @@ import { RESPONSE_CODES } from "../../constants";
 import CreateComparePage from "../CreateComparePage";
 import AuthenticatedComparePage from "../compare/AuthenticatedComparePage";
 import UnauthenticatedComparePage from "../compare/UnauthenticatedComparePage";
+import DiscoverTogether from "../compare/DiscoverTogether";
 
 export interface PrivateRouteProps extends RouteProps {
   isAuthenticated: boolean;
@@ -61,6 +62,7 @@ const Router = () => {
         <Route path="/login" exact component={Login} />
         <Route path="/create" exact component={CreateComparePage} />
         <Route path="/auth" component={Test} />
+        <Route path="/test" component={DiscoverTogether} />
         <Route path="/private" exact>
           {isAuthenticated ? <TestPrivateRoute /> : <Redirect to="/login" />}
         </Route>

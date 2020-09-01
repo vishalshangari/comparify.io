@@ -14,7 +14,7 @@ import ComparifyPreview from "../ComparifyPreview";
 const AuthenticatedComparePage = () => {
   const { comparifyPageID } = useParams();
   const [showComparison, setShowComparison] = useState(false);
-  const [showPreview, setshowPreview] = useState(true);
+  const [showPreview, setShowPreview] = useState(true);
   const [enableCompareButton, setEnableCompareButton] = useState(false);
   const comparifyPage = useComparifyPage(comparifyPageID);
 
@@ -40,15 +40,8 @@ const AuthenticatedComparePage = () => {
                       <ComparifyPreview
                         comparifyPage={comparifyPage}
                         setEnableCompareButton={setEnableCompareButton}
+                        setShowPreview={setShowPreview}
                       />
-                      <CompareBtnWrap>
-                        <CompareBtn
-                          disabled={!enableCompareButton}
-                          onClick={() => setshowPreview(false)}
-                        >
-                          Comparify
-                        </CompareBtn>
-                      </CompareBtnWrap>
                     </>
                   ) : (
                     <h2>
@@ -121,67 +114,6 @@ const ComparePageWrapper = styled(StandardInnerContentWrapper)`
   align-items: center;
   justify-content: center;
   flex-grow: 1;
-`;
-
-const CompareBtnWrap = styled.div`
-  border-radius: 0.5em;
-  overflow: hidden;
-`;
-
-const CompareBtn = styled.button`
-  padding: 0.5em 1em 0.625em;
-  border: 0;
-  font-family: "roboto slab", "open sans", "sans-serif";
-  font-size: 1.75rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
-  letter-spacing: 1px;
-  outline: 0;
-  display: inline-block;
-  vertical-align: middle;
-  -webkit-transform: perspective(1px) translateZ(0);
-  transform: perspective(1px) translateZ(0);
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
-  position: relative;
-  background: ${({ theme }) => theme.colors.mainAccent};
-  -webkit-transition-property: color;
-  transition-property: color;
-  -webkit-transition-duration: 0.3s;
-  transition-duration: 0.3s;
-  &:enabled:before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: ${({ theme }) => theme.colors.blueCityBlue};
-    -webkit-transform: scaleX(0);
-    transform: scaleX(0);
-    -webkit-transform-origin: 50%;
-    transform-origin: 50%;
-    -webkit-transition-property: transform;
-    transition-property: transform;
-    -webkit-transition-duration: 0.3s;
-    transition-duration: 0.3s;
-    -webkit-transition-timing-function: ease-out;
-    transition-timing-function: ease-out;
-  }
-  &:enabled:hover,
-  &:enabled:focus,
-  &:enabled:active {
-    color: white;
-  }
-  &:enabled:hover:before,
-  &:enabled:focus:before,
-  &:enabled:active:before {
-    -webkit-transform: scaleX(1);
-    transform: scaleX(1);
-  }
-  &:disabled {
-    background: gray;
-  }
 `;
 
 export default AuthenticatedComparePage;

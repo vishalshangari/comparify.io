@@ -10,7 +10,10 @@ import { GoLinkExternal } from "react-icons/go";
 import fetchMultipleArtists from "../../utils/fetchMultipleArtists";
 import { Link, Element, scroller } from "react-scroll";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
+import { APIError } from "../../models";
 import DisplayQuantityToggleBtn from "../shared/DisplayQuantityToggleBtn";
+import { useMedia } from "react-use";
+import ErrorComp from "../shared/ErrorComp";
 
 type TopArtistsProps = {
   artists: TopArtistsType;
@@ -30,12 +33,13 @@ export type LoadedArtist = {
 };
 
 type ArtistsDisplayData = {
-  now: LoadedArtist[];
-  recent: LoadedArtist[];
-  allTime: LoadedArtist[];
+  now: APIError | LoadedArtist[];
+  recent: APIError | LoadedArtist[];
+  allTime: APIError | LoadedArtist[];
 };
 
 const TopArtistsWrapper = ({ artists }: TopArtistsProps) => {
+  const ARTISTS_SHORTENED_QUANTITY = useMedia("(max-width: 38em)") ? 8 : 12;
   const [isLoading, setIsLoading] = useState(true);
   const [artistsData, setArtistsData] = useState<null | ArtistsDisplayData>(
     null
@@ -70,25 +74,34 @@ const TopArtistsWrapper = ({ artists }: TopArtistsProps) => {
 
       const longTermArtistInfo = fetchMultipleArtists(longTermArtistIDs);
 
-      try {
-        const result = await Promise.all([
-          shortTermArtistInfo,
-          mediumTermArtistInfo,
-          longTermArtistInfo,
-        ]);
+      const getPromiseResult = (
+        result: PromiseSettledResult<LoadedArtist[]>
+      ) => {
+        console.log(result);
+        if (result.status !== `fulfilled`) {
+          return {
+            isError: true,
+            status: 500,
+            message: `There was an error loading these artists.`,
+          };
+        }
+        return result.value;
+      };
 
-        setArtistsData({
-          now: result[0],
-          recent: result[1],
-          allTime: result[2],
-        });
+      const result = await Promise.allSettled([
+        shortTermArtistInfo,
+        mediumTermArtistInfo,
+        longTermArtistInfo,
+      ]);
 
-        setCurrentDisplayPeriod("now");
-        setIsLoading(false);
-      } catch (error) {
-        // TODO: handle errors in fetching top artists by setting loading false and rendering error message
-        console.log(error);
-      }
+      setArtistsData({
+        now: getPromiseResult(result[0]),
+        recent: getPromiseResult(result[1]),
+        allTime: getPromiseResult(result[2]),
+      });
+
+      setCurrentDisplayPeriod("now");
+      setIsLoading(false);
     };
     getArtistsData();
   }, [artists]);
@@ -112,6 +125,59 @@ const TopArtistsWrapper = ({ artists }: TopArtistsProps) => {
       delay: 0,
       smooth: true,
     });
+  };
+
+  const determineIfError = (
+    data: APIError | LoadedArtist[]
+  ): data is APIError => {
+    if ((data as APIError).isError) {
+      return true;
+    }
+    return false;
+  };
+
+  const artistListToDisplay = (data: APIError | LoadedArtist[]) => {
+    if (determineIfError(data)) {
+      return <ErrorComp>{data.message}</ErrorComp>;
+    } else {
+      return (
+        <>
+          <ItemList>
+            {data
+              .slice(
+                0,
+                displayShortenedQuantity
+                  ? ARTISTS_SHORTENED_QUANTITY
+                  : undefined
+              )
+              .map((item, idx) => (
+                <ArtistItemWrapper key={idx} {...item} />
+              ))}
+          </ItemList>
+          <DisplayQuantityToggleBtn
+            show={data.length > ARTISTS_SHORTENED_QUANTITY}
+            onClick={handleDisplayQuantityToggle}
+          >
+            {displayShortenedQuantity ? (
+              <>
+                <BsChevronDown />
+                <span>
+                  Show More{" "}
+                  <span className={"totalCount"}>
+                    {data.length - ARTISTS_SHORTENED_QUANTITY}
+                  </span>
+                </span>
+              </>
+            ) : (
+              <>
+                <BsChevronUp />
+                <span>Show Fewer</span>
+              </>
+            )}
+          </DisplayQuantityToggleBtn>
+        </>
+      );
+    }
   };
 
   return (
@@ -142,37 +208,11 @@ const TopArtistsWrapper = ({ artists }: TopArtistsProps) => {
       {isLoading ? (
         <Loader label={false} />
       ) : artistsData ? (
-        <>
-          <ItemList>
-            {artistsData &&
-              artistsData[currentDisplayPeriod]
-                .slice(0, displayShortenedQuantity ? 15 : undefined)
-                .map((item, idx) => <ArtistItemWrapper key={idx} {...item} />)}
-          </ItemList>
-          <DisplayQuantityToggleBtn
-            show={artistsData[currentDisplayPeriod].length > 15}
-            onClick={handleDisplayQuantityToggle}
-          >
-            {displayShortenedQuantity ? (
-              <>
-                <BsChevronDown />
-                <span>
-                  Show More{" "}
-                  <span className={"totalCount"}>
-                    {artistsData[currentDisplayPeriod].length}
-                  </span>
-                </span>
-              </>
-            ) : (
-              <>
-                <BsChevronUp />
-                <span>Show Fewer</span>
-              </>
-            )}
-          </DisplayQuantityToggleBtn>
-        </>
+        artistListToDisplay(artistsData[currentDisplayPeriod])
       ) : (
-        `Oops, there was an error loading your top artists 😟`
+        <ErrorComp>
+          `Oops, there was an unknown error loading your top artists 😟`
+        </ErrorComp>
       )}
     </ArtistsDisplay>
   );
@@ -278,6 +318,10 @@ const ItemList = styled.div`
   grid-gap: 1em;
   grid-template-columns: repeat(auto-fill, minmax(12em, 1fr));
   grid-auto-rows: 12em;
+  ${breakpoints.lessThan("48")`
+    grid-template-columns: repeat(auto-fill, minmax(8em, 1fr));
+    grid-auto-rows: 8em;
+  `};
   /* grid-template-rows: repeat(auto-fill, minmax(10em, 1fr)); */
 `;
 

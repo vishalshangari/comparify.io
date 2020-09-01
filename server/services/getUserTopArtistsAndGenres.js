@@ -2,14 +2,14 @@ const { GET_ACTIVE_USER_TOP_ARTISTS_URL } = require("../constants");
 const axios = require("axios");
 
 module.exports = async (authHeader, time_range = "medium_term") => {
+  const requestConfig = {
+    headers: authHeader,
+    params: {
+      limit: 50,
+      time_range: time_range,
+    },
+  };
   try {
-    const requestConfig = {
-      headers: authHeader,
-      params: {
-        limit: 50,
-        time_range: time_range,
-      },
-    };
     // Get user profile info
     console.log(`getting top artists`, time_range);
     const {
@@ -53,6 +53,8 @@ module.exports = async (authHeader, time_range = "medium_term") => {
       topGenres: userTopGenresListSortedObjects,
     };
   } catch (error) {
+    // LOG error
     console.log(error);
+    throw error;
   }
 };

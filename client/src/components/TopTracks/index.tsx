@@ -7,7 +7,10 @@ import { TopTracksType } from "../PersonalData";
 import Loader from "../Loader";
 import fetchMultipleTracks from "../../utils/fetchMultipleTracks";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
-import { Link, Element, scroller } from "react-scroll";
+import { Element, scroller } from "react-scroll";
+import { APIError } from "../../models";
+import { useMedia } from "react-use";
+import ErrorComp from "../shared/ErrorComp";
 
 type TopTracksProps = {
   tracks: TopTracksType;
@@ -27,12 +30,13 @@ export type LoadedTrack = {
 };
 
 export type TracksDisplayData = {
-  now: LoadedTrack[];
-  recent: LoadedTrack[];
-  allTime: LoadedTrack[];
+  now: APIError | LoadedTrack[];
+  recent: APIError | LoadedTrack[];
+  allTime: APIError | LoadedTrack[];
 };
 
 const TopTracksWrapper = ({ tracks }: TopTracksProps) => {
+  const TRACKS_SHORTENED_QUANTITY = useMedia("(max-width: 38em)") ? 8 : 12;
   const [isLoading, setIsLoading] = useState(true);
   const [tracksData, setTracksData] = useState<null | TracksDisplayData>(null);
   const [currentDisplayPeriod, setCurrentDisplayPeriod] = useState<
@@ -65,24 +69,33 @@ const TopTracksWrapper = ({ tracks }: TopTracksProps) => {
 
       const longTermTrackInfo = fetchMultipleTracks(longTermTrackIDs);
 
-      try {
-        const result = await Promise.all([
-          shortTermTrackInfo,
-          mediumTermTrackInfo,
-          longTermTrackInfo,
-        ]);
+      const getPromiseResult = (
+        result: PromiseSettledResult<LoadedTrack[]>
+      ) => {
+        console.log(result);
+        if (result.status !== `fulfilled`) {
+          return {
+            isError: true,
+            status: 500,
+            message: `There was an error loading these tracks.`,
+          };
+        }
+        return result.value;
+      };
 
-        setTracksData({
-          now: result[0],
-          recent: result[1],
-          allTime: result[2],
-        });
-        setCurrentDisplayPeriod("now");
-        setIsLoading(false);
-      } catch (error) {
-        // TODO: handle errors in fetching top tracks by setting loading false and rendering error message
-        console.error(error);
-      }
+      const result = await Promise.allSettled([
+        shortTermTrackInfo,
+        mediumTermTrackInfo,
+        longTermTrackInfo,
+      ]);
+
+      setTracksData({
+        now: getPromiseResult(result[0]),
+        recent: getPromiseResult(result[1]),
+        allTime: getPromiseResult(result[2]),
+      });
+      setCurrentDisplayPeriod("now");
+      setIsLoading(false);
     };
     getTracksData();
   }, [tracks]);
@@ -106,6 +119,57 @@ const TopTracksWrapper = ({ tracks }: TopTracksProps) => {
       delay: 0,
       smooth: true,
     });
+  };
+
+  const determineIfError = (
+    data: APIError | LoadedTrack[]
+  ): data is APIError => {
+    if ((data as APIError).isError) {
+      return true;
+    }
+    return false;
+  };
+
+  const trackListToDisplay = (data: APIError | LoadedTrack[]) => {
+    if (determineIfError(data)) {
+      return <ErrorComp>{data.message}</ErrorComp>;
+    } else {
+      return (
+        <>
+          <ItemList>
+            {data
+              .slice(
+                0,
+                displayShortenedQuantity ? TRACKS_SHORTENED_QUANTITY : undefined
+              )
+              .map((item, idx) => (
+                <TrackItemWrapper key={idx} {...item} />
+              ))}
+          </ItemList>
+          <DisplayQuantityToggleBtn
+            show={data.length > TRACKS_SHORTENED_QUANTITY}
+            onClick={handleDisplayQuantityToggle}
+          >
+            {displayShortenedQuantity ? (
+              <>
+                <BsChevronDown />
+                <span>
+                  Show More{" "}
+                  <span className={"totalCount"}>
+                    {data.length - TRACKS_SHORTENED_QUANTITY}
+                  </span>
+                </span>
+              </>
+            ) : (
+              <>
+                <BsChevronUp />
+                <span>Show Fewer</span>
+              </>
+            )}
+          </DisplayQuantityToggleBtn>
+        </>
+      );
+    }
   };
 
   return (
@@ -136,38 +200,11 @@ const TopTracksWrapper = ({ tracks }: TopTracksProps) => {
       {isLoading ? (
         <Loader label={false} />
       ) : tracksData ? (
-        <>
-          <ItemList>
-            {tracksData[currentDisplayPeriod]
-              .slice(0, displayShortenedQuantity ? 15 : undefined)
-              .map((item, idx) => (
-                <TrackItemWrapper key={idx} {...item} />
-              ))}
-          </ItemList>
-          <DisplayQuantityToggleBtn
-            show={tracksData[currentDisplayPeriod].length > 15}
-            onClick={handleDisplayQuantityToggle}
-          >
-            {displayShortenedQuantity ? (
-              <>
-                <BsChevronDown />
-                <span>
-                  Show More{" "}
-                  <span className={"totalCount"}>
-                    {tracksData[currentDisplayPeriod].length}
-                  </span>
-                </span>
-              </>
-            ) : (
-              <>
-                <BsChevronUp />
-                <span>Show Fewer</span>
-              </>
-            )}
-          </DisplayQuantityToggleBtn>
-        </>
+        trackListToDisplay(tracksData[currentDisplayPeriod])
       ) : (
-        `Oops, there was an error loading your top tracks 😔`
+        <ErrorComp>
+          `Oops, there was an unknown error loading your top tracks 😔`
+        </ErrorComp>
       )}
     </TracksDisplay>
   );
@@ -263,16 +300,23 @@ const ItemList = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 1fr 1fr 1fr 1fr;
+  ${breakpoints.lessThan("66")`
+    grid-template-columns: 1fr 1fr;
+  `};
+  ${breakpoints.lessThan("38")`
+    grid-template-columns: 1fr;
+    font-size: 0.875rem;
+  `}
 `;
 
 const TracksDisplay = styled(Element)`
+  grid-area: tracks;
+  margin-bottom: 2em;
   && {
     display: block;
   }
-  grid-area: tracks;
-  margin-bottom: 2em;
   min-height: 300px;
-  ${breakpoints.lessThan("85")`
+  ${breakpoints.lessThan("74")`
     .dataItemHeader {
       flex-wrap: wrap;
       h2 {

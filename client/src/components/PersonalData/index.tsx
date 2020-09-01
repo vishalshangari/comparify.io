@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled, { css } from "styled-components";
-import axios from "axios";
 import { ChartData } from "chart.js";
-import { DEV_URL } from "../../constants";
 import ComponentWithLoadingState from "../shared/ComponentWithLoadingState";
 import TopGenres from "../TopGenres";
 import { breakpoints } from "../../theme";
@@ -10,10 +8,11 @@ import Obscurity from "../Obscurity";
 import TopTracks from "../TopTracks";
 import TopArtists from "../TopArtists";
 import AudioFeatures from "../AudioFeatures";
-import { pieChartColors } from "./constants";
-import { PageTitle, PageTitleInner } from "../shared/PageTitle";
+
 import Header from "../shared/Header";
 import fetchUserSavedData from "../../utils/fetchUserSavedData";
+import { APIError } from "../../models";
+import ErrorComp from "../shared/ErrorComp";
 import filterTopGenresForDisplay from "../../utils/filterTopGenresForDisplay";
 
 export type Genre = {
@@ -28,9 +27,10 @@ type GenresDataArrays = {
   counts: number[];
 };
 
-export type TopGenresDataType = null | {
+export type TopGenresDataType = {
   shortTerm: ChartData;
-  longTerm: ChartData;
+  mediumTerm: null | ChartData;
+  longTerm: null | ChartData;
 };
 
 type UserInfo = null | {
@@ -60,14 +60,17 @@ export type TopArtistsType = null | {
 };
 
 export type FeatureScores = null | {
-  shortTerm: { [key: string]: number };
-  mediumTerm: { [key: string]: number };
-  longTerm: { [key: string]: number };
+  [key: string]: {
+    shortTerm: number;
+    mediumTerm: number;
+    longTerm: number;
+  };
 };
 
 const PersonalData = () => {
   const [loading, setLoading] = useState(true);
-  const [topGenres, setTopGenres] = useState<TopGenresDataType>(null);
+  const [apiError, setApiError] = useState<null | APIError>(null);
+  const [topGenres, setTopGenres] = useState<null | TopGenresDataType>(null);
   const [obscurityScore, setObscurityScore] = useState(0);
   const [userInfo, setUserInfo] = useState<UserInfo>(null);
   const [topTracks, setTopTracks] = useState<TopTracksType>(null);
@@ -81,7 +84,16 @@ const PersonalData = () => {
         const userData = await fetchUserSavedData();
         const filteredTopGenres = {
           shortTerm: filterTopGenresForDisplay(userData.topGenres.shortTerm),
-          longTerm: filterTopGenresForDisplay(userData.topGenres.longTerm),
+          mediumTerm:
+            userData.topGenres.mediumTerm &&
+            userData.topGenres.mediumTerm.length > 0
+              ? filterTopGenresForDisplay(userData.topGenres.mediumTerm)
+              : null,
+          longTerm:
+            userData.topGenres.longTerm &&
+            userData.topGenres.longTerm.length > 0
+              ? filterTopGenresForDisplay(userData.topGenres.longTerm)
+              : null,
         };
         setUserInfo(userData.userInfo);
         setPageTitle(`Hi, ${userData.userInfo.names[0]}`);
@@ -93,11 +105,33 @@ const PersonalData = () => {
         setLoading(false);
       } catch (error) {
         console.log(error);
+        setApiError({
+          isError: true,
+          status: error.response.data.status,
+          message: error.response.data.message,
+        });
       }
     };
 
     getUserData();
   }, []);
+
+  if (apiError) {
+    return (
+      <>
+        <Header standardNav={true} />
+        <PersonalDataWrapper>
+          <ErrorComp art>
+            <span>
+              {apiError.status === 404
+                ? apiError.message
+                : `There was an error loading your data. Please try again later.`}
+            </span>
+          </ErrorComp>
+        </PersonalDataWrapper>
+      </>
+    );
+  }
 
   return (
     <>
@@ -121,6 +155,9 @@ const PersonalData = () => {
 
 const topGridLayout = css`
   grid-template-areas: "genres genres genres genres genres genres genres obscurity obscurity obscurity obscurity obscurity";
+  ${breakpoints.lessThan("74")`
+      grid-template-areas: "genres genres genres genres genres genres genres genres obscurity obscurity obscurity obscurity";
+    `}
   ${breakpoints.lessThan("66")`
     grid-template-areas: 
     "genres genres genres genres genres genres genres genres genres genres genres genres"
@@ -132,10 +169,6 @@ const bottomGridLayout = css`
   grid-template-areas:
     "tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks"
     "artists artists artists artists artists artists artists artists artists artists artists artists";
-  ${breakpoints.lessThan("66")`
-    grid-template-areas:                          
-    "tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks tracks";
-  `}
 `;
 
 const PersonalDataInner = styled.div<{ position?: string }>`
@@ -156,6 +189,7 @@ const PersonalDataInner = styled.div<{ position?: string }>`
   .dataItemHeader {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     justify-content: space-between;
     margin-bottom: 1.5em;
   }
@@ -179,20 +213,33 @@ const PersonalDataWrapper = styled.div`
   flex-direction: column;
   background: ${({ theme }) => theme.colors.mainContentBg};
   padding: 4em 0;
+  ${breakpoints.lessThan("66")`
+    padding: 2em 0;
+  `}
   h2 {
-    font-size: 4rem;
-    font-weight: 700;
+    font-size: 5rem;
+    font-weight: 400;
     white-space: nowrap;
   }
+  ${breakpoints.lessThan("90")`
+    h2 {
+      font-size: 3.75rem
+    }
+  `}
   ${breakpoints.lessThan("74")`
     h2 {
-      font-size: 2.5rem
+      font-size: 3rem
     }
   `}
   ${breakpoints.lessThan("66")`
     min-height: 600px;
     h2 {
-      font-size: 4rem
+      font-size: 3.75rem;
+    }
+  `}
+  ${breakpoints.lessThan("38")`
+    h2 {
+      font-size: 2.75rem;
     }
   `}
 `;

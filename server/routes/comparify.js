@@ -7,16 +7,22 @@ const jwt = require("jsonwebtoken");
 const compareTopGenres = require("../utils/compareTopGenres");
 const compareTopArtists = require("../utils/compareTopArtists");
 const compareTopTracks = require("../utils/compareTopTracks");
+const catchAsync = require("../utils/catchAsync");
 
 // Database
 const db = require("../db/firebase");
 const firebase = require("firebase");
 
-// Create new page / page name already checked for existence client side
-router.get("/:comparifyPageName", async (req, res) => {
-  try {
+// Models
+const AppError = require("../models/AppError");
+
+// Execute comparison
+router.get(
+  "/:comparifyPageName",
+  catchAsync(async (req, res) => {
     const { comparifyPageName } = req.params;
 
+    // Only auth'd users so token will be verified
     const { _id: visitorID } = jwt.verify(
       req.cookies["comparifyToken"],
       process.env.JWT_SECRET
@@ -25,7 +31,17 @@ router.get("/:comparifyPageName", async (req, res) => {
     const comparifyPageRef = db
       .collection(DB_COMPARIFYPAGE_COLLECTION)
       .doc(comparifyPageName);
-    const { creator } = (await comparifyPageRef.get()).data();
+
+    const comparifyPageDoc = await comparifyPageRef.get();
+
+    if (!comparifyPageDoc.exists) {
+      throw new AppError(
+        "This page was not found, it may have been deleted.",
+        404
+      );
+    }
+
+    const { creator } = comparifyPageDoc.data();
 
     const creatorRef = db.collection(USERS).doc(creator._id).get();
     const visitorRef = db.collection(USERS).doc(visitorID).get();
@@ -42,40 +58,22 @@ router.get("/:comparifyPageName", async (req, res) => {
     } = refResponse[1].data();
 
     // Analyze top genres
-
     const genresComparison = compareTopGenres(
       creatorSpotifyData.topArtistsAndGenres,
       visitorSpotifyData.topArtistsAndGenres
     );
 
+    // Analyze top artists
     const artistsComparison = compareTopArtists(
       creatorSpotifyData.topArtistsAndGenres,
       visitorSpotifyData.topArtistsAndGenres
     );
 
+    // Analyze top tracks
     const tracksComparison = compareTopTracks(
       creatorSpotifyData.topTracks,
       visitorSpotifyData.topTracks
     );
-
-    // let genresComparison = {
-    //   allTime: {
-    //     shared: intersection(
-    //       creatorSpotifyData.topArtistsAndGenres.longTerm.topGenres,
-    //       visitorSpotifyData.topArtistsAndGenres.longTerm.topGenres
-    //     ),
-    //   },
-    // };
-
-    // genresComparison.allTime.visitorUnique = difference(
-    //   visitorSpotifyData.topArtistsAndGenres.longTerm.topGenres,
-    //   genresComparison.allTime.shared
-    // );
-
-    // genresComparison.allTime.creatorUnique = difference(
-    //   creatorSpotifyData.topArtistsAndGenres.longTerm.topGenres,
-    //   genresComparison.allTime.shared
-    // );
 
     // Audio features comparison
     const periods = ["shortTerm", "mediumTerm", "longTerm"];
@@ -89,12 +87,12 @@ router.get("/:comparifyPageName", async (req, res) => {
       for (let j = 0; j < periods.length; j++) {
         visitorData.push(
           Math.round(
-            visitorSpotifyData.audioFeatures[periods[j]][features[i]] || 0
+            visitorSpotifyData?.audioFeatures?.[features[i]]?.[periods[j]] || 0
           )
         );
         creatorData.push(
           Math.round(
-            creatorSpotifyData.audioFeatures[periods[j]][features[i]] || 0
+            creatorSpotifyData?.audioFeatures?.[features[i]]?.[periods[j]] || 0
           )
         );
       }
@@ -117,6 +115,10 @@ router.get("/:comparifyPageName", async (req, res) => {
       artistsComparison: artistsComparison,
       tracksComparison: tracksComparison,
       audioFeaturesComparison: audioFeaturesComparison,
+      obscurityComparison: {
+        visitor: Math.round(visitorSpotifyData.obscurityScore || 0),
+        creator: Math.round(creatorSpotifyData.obscurityScore || 0),
+      },
     };
     res.send(responseData);
     // Stats
@@ -124,9 +126,42 @@ router.get("/:comparifyPageName", async (req, res) => {
     //   .collection(STATS)
     //   .doc(DB_COMPARIFYPAGE_COLLECTION)
     //   .update({ count: firebase.firestore.FieldValue.increment(1) });
-  } catch (error) {
-    console.error(error);
+  })
+);
+
+// Error handling
+router.use(function (err, req, res, next) {
+  // LOG ERROR
+  let responseStatus, responseMessage;
+  if (err.isAxiosError) {
+    console.log(err.response.data);
+    // Error in communicating with Spotify API
+    const {
+      response: {
+        data: {
+          error: { status, message },
+        },
+      },
+    } = err;
+
+    // Forward Spotify API response in case of 404
+    if (status === 404) {
+      responseStatus = status;
+      responseMessage = message;
+    } else {
+      responseStatus = 500;
+      responseMessage = "Server error";
+    }
+  } else {
+    console.log(err);
+    responseStatus = err.statusCode || 500;
+    responseMessage = err.message || "Unknown error";
   }
+
+  res.status(responseStatus).json({
+    status: responseStatus,
+    message: responseMessage,
+  });
 });
 
 module.exports = router;

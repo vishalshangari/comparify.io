@@ -6,14 +6,14 @@ export default async (ids: string[]) => {
     return null;
   }
   try {
-    const { data } = await axios.post(
-      `${DEV_URL}/api/get/track-info/multiple`,
-      {
+    const { data } = await axios.get(`${DEV_URL}/api/get/track-info/multiple`, {
+      params: {
         ids: ids.join(","),
-      }
-    );
+      },
+    });
     return data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };

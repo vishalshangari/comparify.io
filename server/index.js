@@ -21,16 +21,34 @@ const get = require("./routes/get");
 const auth = require("./routes/auth");
 const logout = require("./routes/logout");
 const comparify = require("./routes/comparify");
+const recommend = require("./routes/recommend");
+const siteTokenInitialization = require("./routes/siteTokenInitialization");
+const apitest = require("./routes/apitest");
+
+// Models
+const AppError = require("./models/AppError");
 
 // Constants
-const { PORT, IS_DEV, USERS, STATS } = require("./constants");
+const {
+  PORT,
+  IS_DEV,
+  USERS,
+  STATS,
+  PRIVATE_TOKEN_ENDPOINTS_ENDPOINT,
+} = require("./constants");
 
 // Services
 const getUserSavedTrackIDs = require("./services/getUserSavedTrackIDs");
 const getUserTopTracks = require("./services/getUserTopTracks");
 const getUserTopArtistsAndGenres = require("./services/getUserTopArtistsAndGenres");
 
+// MISC
 const sizeof = require("object-sizeof");
+
+// Logging
+const expressWinston = require("express-winston");
+const winston = require("winston");
+const { createLogger } = require("winston");
 
 // Firestore initial script
 // const songRef = db.collection("songs").doc("jKVoXZPJm0g8aRwarEv2");
@@ -112,6 +130,32 @@ if (!isDev && cluster.isMaster) {
   //   next();
   // });
 
+  // // Logger format config
+  // const alignedWithColorsAndTime = winston.format.combine(
+  //   winston.format.colorize(),
+  //   winston.format.timestamp(),
+  //   winston.format.align(),
+  //   winston.format.printf((info) => {
+  //     const { timestamp, level, message, ...args } = info;
+
+  //     const ts = timestamp.slice(0, 19).replace("T", " ");
+  //     return `${ts} [${level}]: ${message} ${
+  //       Object.keys(args).length ? JSON.stringify(args, null, 2) : ""
+  //     }`;
+  //   })
+  // );
+
+  // // Set up logger
+  // app.use(
+  //   expressWinston.logger({
+  //     transports: [
+  //       new winston.transports.Console({
+  //         format: alignedWithColorsAndTime,
+  //       }),
+  //     ],
+  //   })
+  // );
+
   // Priority serve any static files.
   app.use(express.static(path.resolve(__dirname, "../client/build")));
 
@@ -148,61 +192,54 @@ if (!isDev && cluster.isMaster) {
 
   app.use("/api/comparify", comparify);
 
-  app.use("/api/apitest", async (req, res) => {
-    const accessT =
-      "BQBF6mxoMXJdPO3mT7NOGknS9blPJ9ScCTnGhyZMlwAPX3SaLqM-LODB6-12RFkJFTwJyuW3G004Ur9UcvXsg3q8xDY10gEANIYiHpTu4CbjmPOwSabdKG9b3JK3PEraO-ZK8OQT_dYQdOGf3wSrAqVF1JXFQk2aNHWVvYYkMGVmyL0mRpqQ6VZfWyhARtFD6-zYGQ";
-    const authHeader = {
-      Authorization: "Bearer " + accessT,
-    };
-    console.log("started generating...");
-    // const userinfo = await createNewUserWithData(authHeader);
-    const tracks = await getUserSavedTrackIDs(authHeader);
-    const tracksst = await getUserTopTracks(authHeader, "short_term");
-    const tracksmt = await getUserTopTracks(authHeader, "medium_term");
-    const trackslt = await getUserTopTracks(authHeader, "long_term");
-    const artistslt = await getUserTopArtistsAndGenres(authHeader, "long_term");
-    const artistsmt = await getUserTopArtistsAndGenres(
-      authHeader,
-      "medium_term"
-    );
-    const artistsst = await getUserTopArtistsAndGenres(
-      authHeader,
-      "short_term"
-    );
-    const user = {
-      // profile: userinfo,
-      tracks: tracks,
-      tracksst: tracksst,
-      tracksmt: tracksmt,
-      trackslt: trackslt,
-      artistsst: artistsst,
-      artistsmt: artistsmt,
-      artistslt: artistslt,
-    };
-    console.log("done generating.");
-    console.log(sizeof(user));
-    res.send(user);
-  });
+  app.use("/api/recommend", comparify);
 
-  app.get("/api/dbtest", async (req, res) => {
-    const country = "CN";
-    const countryUpdateKey = `countries.${country}`;
-    const time = Date.now();
+  app.use("/api/apitest", apitest);
 
-    userAggregationUpdates = {
-      [countryUpdateKey]: firebase.firestore.FieldValue.increment(1),
-      count: firebase.firestore.FieldValue.increment(1),
-      userCreationTimestamps: firebase.firestore.FieldValue.arrayUnion(time),
-    };
+  app.use(
+    `/api/private/${PRIVATE_TOKEN_ENDPOINTS_ENDPOINT}`,
+    siteTokenInitialization
+  );
 
-    try {
-      await db.collection(STATS).doc(USERS).update(userAggregationUpdates);
-    } catch (error) {
-      console.log(error);
-    }
+  // // Error logging
+  // app.use(
+  //   expressWinston.errorLogger({
+  //     transports: [new winston.transports.Console()],
+  //     format: alignedWithColorsAndTime,
+  //   })
+  // );
 
-    res.send("successful db test!");
-  });
+  // Error handling
+  // app.use(function (err, req, res, next) {
+  //   console.log("error");
+  //   err.statusCode = err.statusCode || 500;
+  //   err.status = err.status || "error";
+
+  //   res.status(err.statusCode).json({
+  //     status: err.status,
+  //     message: err.message,
+  //   });
+  // });
+
+  // app.get("/api/dbtest", async (req, res) => {
+  //   const country = "CN";
+  //   const countryUpdateKey = `countries.${country}`;
+  //   const time = Date.now();
+
+  //   userAggregationUpdates = {
+  //     [countryUpdateKey]: firebase.firestore.FieldValue.increment(1),
+  //     count: firebase.firestore.FieldValue.increment(1),
+  //     userCreationTimestamps: firebase.firestore.FieldValue.arrayUnion(time),
+  //   };
+
+  //   try {
+  //     await db.collection(STATS).doc(USERS).update(userAggregationUpdates);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+
+  //   res.send("successful db test!");
+  // });
 
   // All remaining requests return the React app, so React Router can handle forwarding.
   app.get("*", (req, res) => {

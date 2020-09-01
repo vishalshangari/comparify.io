@@ -9,8 +9,16 @@ const generateRandomString = require("../utils/generateRandomString");
 const db = require("../db/firebase");
 const firebase = require("firebase");
 
-const router = express.Router();
+// Services
+const getValidAccessToken = require("../services/getValidAccessToken");
 
+// Utils
+const catchAsync = require("../utils/catchAsync");
+
+// Models
+const AppError = require("../models/AppError");
+
+// Constants
 const {
   HOME_REDIRECT_URI,
   COOKIE_DOMAIN,
@@ -28,8 +36,10 @@ const {
   SPOTIFY_GET_AUTH_TOKEN_URL,
   DB_SITE_CONFIGURATIONS,
   DB_SITE_TOKENS,
+  GET_RECOMMENDATIONS_URL,
 } = require("../constants");
-const getValidAccessToken = require("../services/getValidAccessToken");
+
+const router = express.Router();
 
 router.post("/", (req, res) => {
   console.log("You hit /api/get");
@@ -41,29 +51,50 @@ router.post("/", (req, res) => {
   res.redirect(HOME_REDIRECT_URI);
 });
 
-router.get("/public/user-info/:id", async (req, res) => {
-  const userID = req.params.id;
-  let accessToken = "";
+const oldGetPublicUserInfoId = () => {
+  // router.get("/public/user-info/:id", async (req, res) => {
+  //   const userID = req.params.id;
+  //   let accessToken = "";
+  //   // Get valid comparify domain access token for Spotify public API requests
+  //   try {
+  //     accessToken = await getValidAccessToken(
+  //       DB_SITE_CONFIGURATIONS,
+  //       DB_SITE_TOKENS
+  //     );
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   // Do work
+  //   try {
+  //     const {
+  //       data: { display_name: name, images: images, uri: uri },
+  //     } = await axios.get(`${GET_USER_PROFILE_URL}${userID}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${accessToken}`,
+  //       },
+  //     });
+  //     res.send({ name: name, images: images, uri: uri });
+  //   } catch (error) {
+  //     // LOG error
+  //     // console.log(Object.getOwnPropertyNames(error));
+  //     console.log(error.response.data);
+  //     res.status(500).send({ message: "Error getting user public profile" });
+  //   }
+  // });
+};
 
-  // Get valid comparify domain access token for Spotify public API requests
-  try {
-    accessToken = await getValidAccessToken(
+router.get(
+  "/public/user-info/:id",
+  catchAsync(async (req, res, next) => {
+    const userID = req.params.id;
+
+    // Get valid comparify domain access token for Spotify public API requests
+    const accessToken = await getValidAccessToken(
       DB_SITE_CONFIGURATIONS,
       DB_SITE_TOKENS
     );
-  } catch (error) {
-    console.error(error);
-    res.redirect(
-      HOME_REDIRECT_URI +
-        "/" +
-        queryString.stringify({
-          error: "unkown_error",
-        })
-    );
-  }
 
-  // Do work
-  try {
+    // Do work
     const {
       data: { display_name: name, images: images, uri: uri },
     } = await axios.get(`${GET_USER_PROFILE_URL}${userID}`, {
@@ -73,191 +104,95 @@ router.get("/public/user-info/:id", async (req, res) => {
     });
 
     res.send({ name: name, images: images, uri: uri });
-  } catch (error) {
-    console.log(error);
-  }
-});
+  })
+);
 
-router.get("/saved-data", async (req, res) => {
-  console.log(JSON.stringify(req.cookies));
-  const { _id: userId } = jwt.verify(
-    req.cookies["comparifyToken"],
-    process.env.JWT_SECRET
-  );
-
-  const userRef = db.collection(USERS).doc(userId);
-  let userDoc;
-  try {
-    userDoc = await userRef.get();
-  } catch (error) {
-    res.redirect(
-      HOME_REDIRECT_URI +
-        "/" +
-        queryString.stringify({
-          error: "error_retrieving_user_data",
-        })
+router.get(
+  "/saved-data",
+  catchAsync(async (req, res) => {
+    console.log(JSON.stringify(req.cookies));
+    // Token will already be validated by auth provider (call to auth/verifyToken)
+    // This should never fail
+    const { _id: userId } = jwt.verify(
+      req.cookies["comparifyToken"],
+      process.env.JWT_SECRET
     );
-  }
 
-  const {
-    info: userInfo,
-    spotifyData: {
-      topArtistsAndGenres,
-      topTracks,
-      audioFeatures,
-      obscurityScore,
-    },
-  } = userDoc.data();
-
-  const topGenres = {
-    shortTerm: topArtistsAndGenres.shortTerm.topGenres,
-    mediumTerm: topArtistsAndGenres.mediumTerm.topGenres,
-    longTerm: topArtistsAndGenres.longTerm.topGenres,
-  };
-
-  const names = userInfo.displayName.split(" ");
-
-  const responseData = {
-    userInfo: {
-      names: names,
-    },
-    topGenres: topGenres,
-    obscurityScore: obscurityScore,
-    topTracks: topTracks,
-    featureScores: audioFeatures,
-    topArtists: {
-      shortTerm: topArtistsAndGenres.shortTerm.topArtists,
-      mediumTerm: topArtistsAndGenres.mediumTerm.topArtists,
-      longTerm: topArtistsAndGenres.longTerm.topArtists,
-    },
-  };
-  // console.log(responseData);
-  res.send(responseData);
-});
-
-router.get("/site-tokens-initialize", (req, res) => {
-  const state = generateRandomString(16);
-  res.cookie(SPOTIFY_AUTH_STATE_KEY, state);
-
-  res.redirect(
-    SPOTIFY_AUTH_URL +
-      queryString.stringify({
-        response_type: "code",
-        client_id: CLIENT_ID,
-        redirect_uri: "http://localhost:3001/api/get/site-token",
-        state: state,
-      })
-  );
-});
-
-router.get("/site-token", async (req, res) => {
-  const code = req.query.code || null;
-  const state = req.query.state || null;
-  const storedState = req.cookies ? req.cookies[SPOTIFY_AUTH_STATE_KEY] : null;
-
-  // If state sent back from Spotify API does not match local state, reject
-  // TODO: better error handler for state mismatch
-  if (state === null || state !== storedState) {
-    console.log("oops");
-    res.redirect(
-      HOME_REDIRECT_URI +
-        queryString.stringify({
-          error: "state_mismatch",
-        })
-    );
-  } else {
-    // Clear state cookie, no longer needed
-    res.clearCookie(SPOTIFY_AUTH_STATE_KEY);
-
-    // Spotify API request to get Auth Code
-
-    const authRequestConfig = {
-      headers: {
-        Authorization:
-          "Basic " +
-          new Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
-      },
-    };
-
-    const authRequestBody = {
-      code: code,
-      redirect_uri: "http://localhost:3001/api/get/site-token",
-      grant_type: "authorization_code",
-    };
-
-    try {
-      const { data: authResponseData } = await axios.post(
-        SPOTIFY_GET_AUTH_TOKEN_URL,
-        queryString.stringify(authRequestBody),
-        authRequestConfig
-      );
-      console.log(
-        `Successful authResponse: ` + JSON.stringify(authResponseData)
-      );
-
-      const accessToken = authResponseData.access_token,
-        newRefreshToken = authResponseData.refresh_token;
-
-      await db.collection("config").doc("tokens").set({
-        accessToken: accessToken,
-        accessTokenIssuedAt: Date.now(),
-        refreshToken: newRefreshToken,
-      });
-
-      res.redirect(
-        HOME_REDIRECT_URI +
-          "/" +
-          queryString.stringify({
-            error: "successfully_got_site_tokens",
-          })
-      );
-    } catch (error) {
-      // TODO: better error handling
-      console.log(`Site token get error: ` + error);
-      res.redirect(
-        HOME_REDIRECT_URI +
-          "/" +
-          queryString.stringify({
-            error: "could_not_get_site_token",
-          })
+    const userRef = db.collection(USERS).doc(userId);
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) {
+      throw new AppError(
+        "User not found in database. Please try logging out and logging in again.",
+        404
       );
     }
-  }
-});
 
-router.post("/track-info/multiple", async (req, res) => {
-  const trackIDs = req.body.ids;
-  let accessToken = "";
+    const {
+      info: userInfo,
+      spotifyData: {
+        topArtistsAndGenres,
+        topTracks,
+        audioFeatures,
+        obscurityScore,
+      },
+    } = userDoc.data();
 
-  // Get valid comparify domain access token for Spotify public API requests
-  try {
-    accessToken = await getValidAccessToken(
+    const names = userInfo.displayName.split(" ");
+
+    const responseData = {
+      userInfo: {
+        names: names,
+      },
+      obscurityScore: obscurityScore,
+      topTracks: topTracks,
+      featureScores: audioFeatures,
+      topArtists: {
+        shortTerm: topArtistsAndGenres.shortTerm.topArtists,
+        mediumTerm: topArtistsAndGenres.mediumTerm.topArtists,
+        longTerm: topArtistsAndGenres.longTerm.topArtists,
+      },
+      topGenres: {
+        shortTerm: topArtistsAndGenres.shortTerm.topGenres,
+        mediumTerm: topArtistsAndGenres.mediumTerm.topGenres,
+        longTerm: topArtistsAndGenres.longTerm.topGenres,
+      },
+    };
+    // console.log(responseData);
+    res.send(responseData);
+  })
+);
+
+// GET tracks info
+router.get(
+  "/track-info/multiple",
+  catchAsync(async (req, res) => {
+    const { ids } = req.query;
+
+    // Get valid comparify domain access token for Spotify public API requests
+    const accessToken = await getValidAccessToken(
       DB_SITE_CONFIGURATIONS,
       DB_SITE_TOKENS
     );
-  } catch (error) {
-    console.error(error);
-    res.redirect(
-      HOME_REDIRECT_URI +
-        "/" +
-        queryString.stringify({
-          error: "unkown_error",
-        })
-    );
-  }
 
-  // Do work
-  try {
+    // Do work
     const {
       data: { tracks: tracksFull },
     } = await axios.get(GET_TRACKS_URL, {
       params: {
-        ids: trackIDs,
+        ids: ids,
       },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+
+    if (!tracksFull || tracksFull[0] === null) {
+      throw new AppError(
+        "There was an error loading tracks from the Spotify database.",
+        500
+      );
+    }
+
     const getArtistNames = (artists) => {
       let names = [];
       artists.forEach((artist) => names.push(artist.name));
@@ -279,57 +214,41 @@ router.post("/track-info/multiple", async (req, res) => {
 
     for (let i = 0; i < tracksFull.length; i++) {
       reshapedTracks.push(getTrackInfo(tracksFull[i]));
-      // if (i < 12) {
-      //   shortTermTracks.push(getTrackInfo(tracksFull[i]));
-      // } else if (i < 24) {
-      //   mediumTermTracks.push(getTrackInfo(tracksFull[i]));
-      // } else {
-      //   longTermTracks.push(getTrackInfo(tracksFull[i]));
-      // }
     }
 
     res.send(reshapedTracks);
-  } catch (error) {
-    console.log(error);
-  }
-});
+  })
+);
 
-router.post("/artist-info/multiple", async (req, res) => {
-  const artistIDs = req.body.ids;
-  let accessToken = "";
+router.get(
+  "/artist-info/multiple",
+  catchAsync(async (req, res) => {
+    const { ids } = req.query;
 
-  try {
-    accessToken = await getValidAccessToken(
+    // Get valid comparify domain access token for Spotify public API requests
+    let accessToken = await getValidAccessToken(
       DB_SITE_CONFIGURATIONS,
       DB_SITE_TOKENS
     );
-  } catch (error) {
-    console.error(error);
-    res.redirect(
-      HOME_REDIRECT_URI +
-        "/" +
-        queryString.stringify({
-          error: "unkown_error",
-        })
-    );
-  }
 
-  // Do work
-  try {
+    // Do work
     const {
       data: { artists: artistsFull },
     } = await axios.get(GET_ARTISTS_URL, {
       params: {
-        ids: artistIDs,
+        ids: ids,
       },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    // let shortTermArtists = [];
-    // let mediumTermArtists = [];
-    // let longTermArtists = [];
+    if (!artistsFull || artistsFull[0] === null) {
+      throw new AppError(
+        "There was an error loading artists from the Spotify database.",
+        500
+      );
+    }
 
     const getArtistInfo = (artist) => {
       return {
@@ -344,93 +263,104 @@ router.post("/artist-info/multiple", async (req, res) => {
 
     for (let i = 0; i < artistsFull.length; i++) {
       reshapedArtists.push(getArtistInfo(artistsFull[i]));
-      // if (i < 12) {
-      //   shortTermArtists.push(getArtistInfo(artistsFull[i]));
-      // } else if (i < 24) {
-      //   mediumTermArtists.push(getArtistInfo(artistsFull[i]));
-      // } else {
-      //   longTermArtists.push(getArtistInfo(artistsFull[i]));
-      // }
     }
 
     res.send(reshapedArtists);
-  } catch (error) {
-    console.log(error);
-    res.send(`There was an error getting your top`);
-  }
-});
+  })
+);
 
-router.post("/artist-info", async (req, res) => {
-  const artistIDs = req.body.ids;
-  let accessToken = "";
+router.get(
+  "/recommendations",
+  catchAsync(async (req, res) => {
+    const { seed_genres, seed_artists, seed_tracks } = req.query;
 
-  try {
-    accessToken = await getValidAccessToken(
+    // Get valid comparify domain access token for Spotify public API requests
+    const accessToken = await getValidAccessToken(
       DB_SITE_CONFIGURATIONS,
       DB_SITE_TOKENS
     );
-  } catch (error) {
-    console.error(error);
-    res.redirect(
-      HOME_REDIRECT_URI +
-        "/" +
-        queryString.stringify({
-          error: "unkown_error",
-        })
-    );
-  }
 
-  // Do work
-  try {
+    // Do work
     const {
-      data: { artists: artistsFull },
-    } = await axios.get(GET_ARTISTS_URL, {
+      data: { tracks: tracksFull },
+    } = await axios.get(GET_RECOMMENDATIONS_URL, {
       params: {
-        ids: artistIDs,
+        seed_genres: seed_genres,
+        seed_artists: seed_artists,
+        seed_tracks: seed_tracks,
+        limit: 25,
       },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    let shortTermArtists = [];
-    let mediumTermArtists = [];
-    let longTermArtists = [];
+    if (!tracksFull || tracksFull[0] === null) {
+      throw new AppError(
+        "There was an error loading recommendations from the Spotify database. Please try again later.",
+        500
+      );
+    }
 
-    const getArtistInfo = (artist) => {
+    const getArtistNames = (artists) => {
+      let names = [];
+      artists.forEach((artist) => names.push(artist.name));
+      return names;
+    };
+
+    const getTrackInfo = (track) => {
       return {
-        name: artist.name,
-        images: artist.images,
-        href: artist.uri,
-        popularity: artist.popularity,
+        name: track.name,
+        album: track.album.name,
+        image: track.album.images[0],
+        artists: getArtistNames(track.artists),
+        preview_url: track.preview_url,
+        href: track.uri,
       };
     };
 
-    for (let i = 0; i < artistsFull.length; i++) {
-      if (i < 12) {
-        shortTermArtists.push(getArtistInfo(artistsFull[i]));
-      } else if (i < 24) {
-        mediumTermArtists.push(getArtistInfo(artistsFull[i]));
-      } else {
-        longTermArtists.push(getArtistInfo(artistsFull[i]));
-      }
-    }
+    let reshapedTracks = [];
 
-    res.send({
-      shortTerm: shortTermArtists,
-      mediumTerm: mediumTermArtists,
-      longTerm: longTermArtists,
-    });
-  } catch (error) {
-    console.log(error);
-    res.redirect(
-      HOME_REDIRECT_URI +
-        "/" +
-        queryString.stringify({
-          error: "unkown_error",
-        })
-    );
+    for (let i = 0; i < tracksFull.length; i++) {
+      reshapedTracks.push(getTrackInfo(tracksFull[i]));
+    }
+    res.send(reshapedTracks);
+  })
+);
+
+// Error handling
+router.use(function (err, req, res, next) {
+  // LOG ERROR
+  let responseStatus, responseMessage;
+  if (err.isAxiosError) {
+    console.log(err.response.data);
+    // Error in communicating with Spotify API
+    const {
+      response: {
+        data: {
+          error: { status, message },
+        },
+      },
+    } = err;
+
+    // Forward Spotify API response in case of 404
+    if (status === 404) {
+      responseStatus = status;
+      responseMessage = message;
+    } else {
+      responseStatus = 500;
+      responseMessage = "Server error";
+    }
+  } else {
+    console.log(err);
+    responseStatus = err.statusCode || 500;
+    responseMessage = err.message || "Unknown error";
   }
+
+  res.status(responseStatus).json({
+    status: responseStatus,
+    message: responseMessage,
+  });
 });
 
 // TODO: old route to get all tracks

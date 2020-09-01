@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import ComparifyLogo from "../../ComparifyLogo";
-import { theme } from "../../../theme";
+import { theme, breakpoints } from "../../../theme";
 import { RESPONSE_CODES } from "../../../constants";
 import { useAuthState } from "../../../App";
+import { HiMenu } from "react-icons/hi";
+import { VscClose } from "react-icons/vsc";
+import { Transition } from "react-transition-group";
 
 type HeaderProps = {
   pageTitle?: string;
@@ -20,38 +23,68 @@ const Header = ({
 }: HeaderProps) => {
   const { state: authState } = useAuthState();
   const isAuthenticated = authState.status === RESPONSE_CODES.AUTHENTICATED;
+  const [isMobileNavExpanded, setIsMobileNavExpanded] = useState(false);
 
   return (
     <HeaderWrap>
       <HeaderInner>
-        {pageTitle ? (
-          <StatefulPageTitle loading={loading}>
-            <h1>{pageTitle}</h1>
-          </StatefulPageTitle>
-        ) : null}
+        <StatefulPageTitle loading={loading}>
+          {pageTitle ? <h1>{pageTitle}</h1> : ` `}
+        </StatefulPageTitle>
 
         {standardNav ? (
-          <Navigation>
-            <ul>
-              <li>
-                <a className="nav" href="/">
-                  Compare
-                </a>
-              </li>
-              <li>
-                {isAuthenticated ? (
+          <>
+            <Navigation>
+              <ul>
+                <li>
                   <a className="nav" href="/">
-                    My Account
+                    Compare
                   </a>
-                ) : (
-                  <a className="nav" href="/">
-                    Login
-                  </a>
-                )}
-              </li>
-            </ul>
-            <ComparifyLogo color={theme.colors.textPrimary} size="1.5rem" />
-          </Navigation>
+                </li>
+                <li>
+                  {isAuthenticated ? (
+                    <a className="nav" href="/">
+                      My Account
+                    </a>
+                  ) : (
+                    <a className="nav" href="/">
+                      Login
+                    </a>
+                  )}
+                </li>
+              </ul>
+              <ComparifyLogo color={theme.colors.textPrimary} size="1.5rem" />
+              <MobileNavExpand
+                onClick={() => setIsMobileNavExpanded((prev) => !prev)}
+              >
+                {isMobileNavExpanded ? <VscClose /> : <HiMenu />}
+              </MobileNavExpand>
+            </Navigation>
+            <Transition in={isMobileNavExpanded} timeout={500}>
+              {(state) => (
+                <MobileNavigation state={state}>
+                  <ul>
+                    <li>
+                      <a className="nav" href="/">
+                        Compare
+                      </a>
+                    </li>
+                    <li>
+                      {isAuthenticated ? (
+                        <a className="nav" href="/">
+                          My Account
+                        </a>
+                      ) : (
+                        <a className="nav" href="/">
+                          Login
+                        </a>
+                      )}
+                    </li>
+                  </ul>
+                </MobileNavigation>
+              )}
+            </Transition>
+          </>
         ) : null}
 
         {logoOnlyNav ? (
@@ -105,12 +138,73 @@ export const PageTitle = styled.div<{ loading?: boolean }>`
     line-height: 1.3;
     border-bottom: 8px solid ${({ theme }) => theme.colors.mainAccent};
   }
+  ${breakpoints.lessThan("74")`
+    h1 {
+      font-size: 4rem
+    }
+  `}
+  ${breakpoints.lessThan("42")`
+    h1 {
+      font-size: 3rem;
+    }
+  `}
+`;
+
+const MobileNavigation = styled.div<{ state: string }>`
+  display: none;
+  flex-basis: 100%;
+  overflow: hidden;
+  transition: 0.5s ease all;
+  ${({ state }) =>
+    state === "entered" || state === `entering`
+      ? `max-height: 10em;`
+      : `max-height: 0;`}
+  ${breakpoints.lessThan("66")`
+    display: block;
+  `};
+  justify-content: flex-end;
+  ul {
+    margin: 1em 0;
+    flex-basis: 300px;
+    border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlay};
+    border-radius: 0.25em;
+    background: ${({ theme }) => theme.colors.mainContentBg};
+  }
+  li {
+    border-bottom: 1px solid
+      ${({ theme }) => theme.colors.darkBodyOverlayBorder};
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  a.nav {
+    display: block;
+    padding: 1em;
+    font-weight: 600;
+    text-align: center;
+  }
+`;
+
+const MobileNavExpand = styled.button`
+  margin-left: 1em;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5em;
+  font-size: 1.5rem;
+  border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlay};
+  border-radius: 0.25em;
+  background: ${({ theme }) => theme.colors.mainContentBg};
+  ${breakpoints.lessThan("66")`
+    display: inline-flex;
+  `};
 `;
 
 const Navigation = styled.div`
   overflow: hidden;
   flex: 0 0 auto;
   display: flex;
+
   align-items: center;
   ul {
     display: flex;
@@ -119,6 +213,9 @@ const Navigation = styled.div`
     border-radius: 0.25em;
     background: ${({ theme }) => theme.colors.mainContentBg};
     margin-right: 2em;
+    ${breakpoints.lessThan("66")`
+    display: none;
+  `};
   }
   li {
     margin-right: 2em;
@@ -126,7 +223,6 @@ const Navigation = styled.div`
       margin-right: 0;
     }
   }
-
   a.nav {
     font-weight: 600;
     transition: 0.2s ease all;
@@ -139,6 +235,11 @@ const Navigation = styled.div`
       border-bottom: 2px solid ${({ theme }) => theme.colors.mainAccent};
     }
   }
+  ${breakpoints.lessThan("48")`
+    .logoWrap {
+      display: none;
+    }
+  `}
 `;
 
 const LogoOnlyNavWrap = styled.div`
@@ -158,6 +259,7 @@ const HeaderInner = styled.div`
   width: 94%;
   margin: 0 auto;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
 `;
 

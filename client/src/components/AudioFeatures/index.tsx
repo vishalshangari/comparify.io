@@ -6,89 +6,82 @@ import {
   featureGraphLabels,
   audioFeatureDescriptions,
 } from "./constants";
-import { FeatureScores } from "../PersonalData";
 import { colors, breakpoints } from "../../theme";
 import { IoMdInformationCircle } from "react-icons/io";
 import round5x from "../../utils/round5x";
-
-export type FeatureProps = {
-  shortTerm: number;
-  mediumTerm: number;
-  longTerm: number;
-};
-
-type AudioFeatureProps = {
-  scores: FeatureScores;
-};
+import { AudioFeatureProps, DisplayedAudioFeatureKeys } from "./models";
+import { FeatureScores } from "../PersonalData";
+import ErrorComp from "../shared/ErrorComp";
 
 const AudioFeatures = ({ scores }: AudioFeatureProps) => {
-  // TODO: verify existence of scores before trying to present data
-  const data = {
-    danceability: {
-      labels: featureGraphLabels,
-      datasets: [
-        {
-          backgroundColor: colors.blueCityBlue,
-          barPercentage: 0.5,
-          hoverBackgroundColor: colors.white,
-          data: [
-            Math.round(scores!.longTerm.danceability),
-            Math.round(scores!.mediumTerm.danceability),
-            Math.round(scores!.shortTerm.danceability),
+  const data = scores
+    ? {
+        danceability: {
+          labels: featureGraphLabels,
+          datasets: [
+            {
+              backgroundColor: colors.blueCityBlue,
+              barPercentage: 0.5,
+              hoverBackgroundColor: colors.white,
+              data: [
+                Math.round(scores.danceability.shortTerm || 0),
+                Math.round(scores.danceability.mediumTerm || 0),
+                Math.round(scores.danceability.longTerm || 0),
+              ],
+            },
           ],
         },
-      ],
-    },
-    energy: {
-      labels: featureGraphLabels,
-      datasets: [
-        {
-          backgroundColor: colors.spanishViolet,
-          barPercentage: 0.5,
-          hoverBackgroundColor: colors.white,
-          data: [
-            Math.round(scores!.longTerm.energy),
-            Math.round(scores!.mediumTerm.energy),
-            Math.round(scores!.shortTerm.energy),
+        energy: {
+          labels: featureGraphLabels,
+          datasets: [
+            {
+              backgroundColor: colors.spanishViolet,
+              barPercentage: 0.5,
+              hoverBackgroundColor: colors.white,
+              data: [
+                Math.round(scores.energy.longTerm || 0),
+                Math.round(scores.energy.mediumTerm || 0),
+                Math.round(scores.energy.shortTerm || 0),
+              ],
+            },
           ],
         },
-      ],
-    },
-    valence: {
-      labels: featureGraphLabels,
-      datasets: [
-        {
-          backgroundColor: colors.straw,
-          barPercentage: 0.5,
-          hoverBackgroundColor: colors.white,
-          data: [
-            Math.round(scores!.longTerm.valence),
-            Math.round(scores!.mediumTerm.valence),
-            Math.round(scores!.shortTerm.valence),
+        valence: {
+          labels: featureGraphLabels,
+          datasets: [
+            {
+              backgroundColor: colors.straw,
+              barPercentage: 0.5,
+              hoverBackgroundColor: colors.white,
+              data: [
+                Math.round(scores.valence.longTerm || 0),
+                Math.round(scores.valence.mediumTerm || 0),
+                Math.round(scores.valence.shortTerm || 0),
+              ],
+            },
           ],
         },
-      ],
-    },
-    tempo: {
-      labels: featureGraphLabels,
-      datasets: [
-        {
-          backgroundColor: colors.seaGreen,
-          barPercentage: 0.5,
-          hoverBackgroundColor: colors.white,
-          data: [
-            Math.round(scores!.longTerm.tempo),
-            Math.round(scores!.mediumTerm.tempo),
-            Math.round(scores!.shortTerm.tempo),
+        tempo: {
+          labels: featureGraphLabels,
+          datasets: [
+            {
+              backgroundColor: colors.seaGreen,
+              barPercentage: 0.5,
+              hoverBackgroundColor: colors.white,
+              data: [
+                Math.round(scores.tempo.longTerm || 0),
+                Math.round(scores.tempo.mediumTerm || 0),
+                Math.round(scores.tempo.shortTerm || 0),
+              ],
+            },
           ],
         },
-      ],
-    },
-  };
+      }
+    : null;
 
   const backgroundGifs = false;
 
-  return (
+  return data ? (
     <FeaturesDisplay>
       <FeaturesHeaderWrap>
         <FeaturesHeader>
@@ -319,10 +312,10 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
                     {
                       ticks: {
                         min: round5x(
-                          Math.min(...data.danceability.datasets[0].data) - 20
+                          Math.min(...data.danceability.datasets[0]!.data) - 20
                         ),
                         max: round5x(
-                          Math.max(...data.danceability.datasets[0].data) + 5
+                          Math.max(...data.danceability.datasets[0]!.data) + 5
                         ),
                         fontColor: colors.grey1,
                         stepSize: 5,
@@ -425,6 +418,10 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
         </FeatureContainer>
       </TempoDisplay>
     </FeaturesDisplay>
+  ) : (
+    <ErrorComp>
+      <span>There was an error loading your moods data.</span>
+    </ErrorComp>
   );
 };
 
@@ -443,23 +440,33 @@ const FeatureContainer = styled.div`
   margin: 0 auto;
   display: flex;
   flex-direction: row;
+  justify-content: center;
   align-items: center;
   position: relative;
+  flex-wrap: wrap;
 `;
 
 const FeaturesDisplay = styled.div`
   margin: 4em 0;
+  ${breakpoints.lessThan("66")`
+    margin: 2em 0;
+  `}
   > div {
     padding: 4em 0;
     position: relative;
   }
+  ${breakpoints.lessThan("58")`
+    > div {
+      padding: 2em 0;
+    }
+  `};
   h2 {
     line-height: 1.5;
     display: inline-block;
   }
   .featureInfo {
     flex: 2;
-    padding: 0 2em 0 0;
+    /* padding: 0 2em 0 0; */
     order: 1;
   }
   .featureTitle {
@@ -467,7 +474,10 @@ const FeaturesDisplay = styled.div`
   }
   .featureDescription {
     color: ${({ theme }) => theme.colors.textPrimary};
-    font-size: 1.25em;
+    font-size: 1.25rem;
+    ${breakpoints.lessThan("74")`
+      font-size: 1rem;
+    `}
   }
   .featureGraph {
     flex: 3;
@@ -496,6 +506,24 @@ const FeaturesDisplay = styled.div`
   canvas {
     width: 100% !important;
   }
+  ${breakpoints.lessThan("58")`
+    .featureInfo, .featureGraph {
+      flex-basis: 100%;
+    }
+    .featureInfo {
+      margin-bottom: 2em;
+      text-align: center;
+    }
+    .featureTechnical {
+      margin: 1em auto;
+      float: none;
+      display: inline-flex;
+      margin-top: 1em;
+    }
+    .featureGraph {
+      max-width: 40em;
+    }
+  `}
 `;
 
 const FeaturesHeaderWrap = styled.div`
@@ -519,6 +547,9 @@ const FeaturesHeader = styled.div`
     text-align: center;
     color: ${({ theme }) => theme.colors.textPrimary};
     font-size: 1.25em;
+    ${breakpoints.lessThan("74")`
+      font-size: 1rem;
+    `}
   }
 `;
 
@@ -544,12 +575,26 @@ const PeriodLabels = styled.div`
     }
     ${breakpoints.lessThan("66")`
       flex-basis: 100%;
+      background: none;
+      border: none;
+      padding: 0.5em 0;
+      margin: 0;
+      box-shadow: none;
       margin-right: 0;
       &:last-child {
         margin-bottom: 0;
       }
     `}
   }
+  ${breakpoints.lessThan("66")`
+    box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.3);
+    background: ${({ theme }) => theme.colors.darkBodyOverlay};
+    border-radius: 0.5em;
+    border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlayBorder};
+    margin: 2em auto;
+    max-width: 80%;
+    font-size: 0.875rem;
+  `}
 `;
 
 const DanceabilityDisplay = styled.div`
@@ -563,13 +608,16 @@ const DanceabilityDisplay = styled.div`
 const EnergyDisplay = styled.div`
   background: ${({ theme }) => theme.colors.spanishViolet10p};
   min-height: 400px;
-  .featureInfo {
-    order: 2;
-    padding: 0 0 0 2em;
-  }
-  .featureGraph {
-    order: 1;
-  }
+  ${breakpoints.greaterThan("58")`
+    .featureInfo {
+      order: 2;
+      padding: 0 0 0 2em;
+    }
+    .featureGraph {
+      order: 1;
+    }
+  `}
+
   h2 {
     border-bottom: 0.125em solid ${({ theme }) => theme.colors.spanishViolet};
   }
@@ -586,13 +634,15 @@ const ValenceDisplay = styled.div`
 const TempoDisplay = styled.div`
   background: ${({ theme }) => theme.colors.seaGreen10p};
   min-height: 400px;
-  .featureInfo {
-    order: 2;
-    padding: 0 0 0 2em;
-  }
-  .featureGraph {
-    order: 1;
-  }
+  ${breakpoints.greaterThan("58")`
+    .featureInfo {
+      order: 2;
+      padding: 0 0 0 2em;
+    }
+    .featureGraph {
+      order: 1;
+    }
+  `}
   h2 {
     border-bottom: 0.125em solid ${({ theme }) => theme.colors.seaGreen};
   }

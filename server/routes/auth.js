@@ -26,7 +26,7 @@ const jwt = require("jsonwebtoken");
 // Services
 const getUserInfo = require("../services/getUserInfo");
 const generateRandomString = require("../utils/generateRandomString");
-const createStandardUserData = require("../services/createStandardUser");
+const createStandardUser = require("../services/createStandardUser");
 
 // Database
 const db = require("../db/firebase");
@@ -62,6 +62,7 @@ router.get("/login/callback", async (req, res) => {
   if (state === null || state !== storedState) {
     res.redirect(
       HOME_REDIRECT_URI +
+        "?" +
         queryString.stringify({
           error: "state_mismatch",
         })
@@ -71,21 +72,6 @@ router.get("/login/callback", async (req, res) => {
     res.clearCookie(SPOTIFY_AUTH_STATE_KEY);
 
     // Spotify API request to get Auth Code
-    const authRequestOptions = {
-      url: SPOTIFY_GET_AUTH_TOKEN_URL,
-      form: {
-        code: code,
-        redirect_uri: AUTH_REDIRECT_URI,
-        grant_type: "authorization_code",
-      },
-      headers: {
-        Authorization:
-          "Basic " +
-          new Buffer.from(CLIENT_ID + ":" + CLIENT_SECRET).toString("base64"),
-      },
-      json: true,
-    };
-
     const authRequestConfig = {
       headers: {
         Authorization:
@@ -146,11 +132,10 @@ router.get("/login/callback", async (req, res) => {
         // New user
         console.log(`NEW USER with id: ${userInfo._id}`);
 
+        let userData;
+
         // Create initial user datastore
-        const userData = await createStandardUserData(
-          requestConfigAuthHeader,
-          userInfo
-        );
+        userData = await createStandardUser(requestConfigAuthHeader, userInfo);
 
         userData.lastLogin = userInfo.createdAt;
         userData.lastUpdated = userInfo.createdAt;
@@ -167,15 +152,29 @@ router.get("/login/callback", async (req, res) => {
           accessTokenIssuedAt: userInfo.createdAt,
         };
 
-        // Save full new user to firestore
-        userRef.set(userData);
+        try {
+          // Save full new user to firestore
+          userRef.set(userData);
+        } catch (error) {
+          res.redirect(
+            HOME_REDIRECT_URI +
+              "?" +
+              queryString.stringify({
+                error: "database_error",
+              })
+          );
+        }
 
-        // Add one to user count aggregation
-        // TODO: more aggregation analysis
-        await db
-          .collection(STATS)
-          .doc(USERS)
-          .update({ count: firebase.firestore.FieldValue.increment(1) });
+        try {
+          // Add one to user count aggregation
+          // TODO: more aggregation analysis
+          await db
+            .collection(STATS)
+            .doc(USERS)
+            .update({ count: firebase.firestore.FieldValue.increment(1) });
+        } catch (error) {
+          console.log(error);
+        }
       } else {
         // Existing user, update with new Spotify refresh token
         const tokens = {
@@ -184,22 +183,26 @@ router.get("/login/callback", async (req, res) => {
           accessTokenIssuedAt: Date.now(),
         };
         console.log(`EXISTING USER with id: ${userInfo._id}`);
-        await userRef.update({
-          tokens: tokens,
-          lastLogin: Date.now(),
-        });
+        try {
+          await userRef.update({
+            tokens: tokens,
+            lastLogin: Date.now(),
+          });
+        } catch (error) {
+          console.log(error);
+        }
       }
-
+      // Login successful
       // TODO: redirect back to URL from state
-      res.redirect(HOME_REDIRECT_URI + "/");
+      res.redirect(HOME_REDIRECT_URI);
     } catch (error) {
       // TODO: better error handling
-      console.log(`authResponse error: ` + error);
+      console.log(`Authentication error: ` + error);
       res.redirect(
         HOME_REDIRECT_URI +
-          "/" +
+          "?" +
           queryString.stringify({
-            error: "invalid_token",
+            error: "authentication_error",
           })
       );
     }

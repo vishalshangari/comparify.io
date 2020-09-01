@@ -27,7 +27,7 @@ module.exports = (authHeader) => {
       // Return tracks to be saved and next fetch URL
       return { tracks: userSavedTrackIDs, next: next };
     } catch (error) {
-      console.error(error);
+      throw error;
     }
   };
 
@@ -40,7 +40,7 @@ module.exports = (authHeader) => {
         const nextTracks = await getAllTracks(next);
         return tracks.concat(...nextTracks);
       } catch (error) {
-        console.error(error);
+        throw error;
       }
     }
     return tracks;

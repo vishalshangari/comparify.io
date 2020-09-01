@@ -19,46 +19,53 @@ import {
 import round5x from "../../../utils/round5x";
 import { Bar } from "react-chartjs-2";
 import { IoMdInformationCircle } from "react-icons/io";
+import { TiChevronRight } from "react-icons/ti";
+import AudioFeaturesComparison from "../AudioFeaturesComparison";
+import ErrorComp from "../../shared/ErrorComp";
+import { ObscurityComparisonDataType } from "../ObscurityComparison/models";
+import {
+  AudioFeaturesComparisonDataType,
+  AudioFeaturesState,
+} from "../AudioFeaturesComparison/models";
+import ObscurityComparison from "../ObscurityComparison";
+import ProfileSnippet from "../../shared/ProfileSnippet";
+import { APIError } from "../../../models";
+import DiscoverTogether from "../DiscoverTogether";
+
+function getPromiseResult<T>(result: PromiseSettledResult<T>) {
+  if (result.status !== `fulfilled`) {
+    return undefined;
+  }
+  return result.value;
+}
 
 type ComparifyProps = {
   pageID: string;
 };
 
-type UserInfo = {
+export type UserInfo = {
   _id: string;
   country: string;
   createdAt: number;
   displayName: string;
   profileImageUrl: string;
 };
+
 type ComparisonDataForPeriod<DataItem> = {
   shared: null | DataItem[];
   creatorUnique: null | DataItem[];
   visitorUnique: null | DataItem[];
 };
 
-type ComparisonData<DataItem> = {
+export type ComparisonData<DataItem> = {
   now?: ComparisonDataForPeriod<DataItem>;
   recent?: ComparisonDataForPeriod<DataItem>;
   allTime?: ComparisonDataForPeriod<DataItem>;
 };
 
-type AudioFeatureDataForComparison = {
-  visitor: number[];
-  creator: number[];
-};
-
-type AudioFeaturesComparison = {
-  valence: AudioFeatureDataForComparison;
-  energy: AudioFeatureDataForComparison;
-  danceability: AudioFeatureDataForComparison;
-  tempo: AudioFeatureDataForComparison;
-};
-
-type AudioFeaturesState = keyof AudioFeaturesComparison;
-
 const Comparify = ({ pageID }: ComparifyProps) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [apiError, setApiError] = useState<null | APIError>(null);
   const [creatorUserInfo, setCreatorUserInfo] = useState<null | UserInfo>(null);
   const [visitorUserInfo, setVisitorUserInfo] = useState<null | UserInfo>(null);
   const [
@@ -70,13 +77,21 @@ const Comparify = ({ pageID }: ComparifyProps) => {
     setArtistsComparisonData,
   ] = useState<null | ComparisonData<LoadedArtist>>(null);
   const [
+    artistsComparisonRawData,
+    setArtistsComparisonRawData,
+  ] = useState<null | ComparisonData<string>>(null);
+  const [
     tracksComparisonData,
     setTracksComparisonData,
   ] = useState<null | ComparisonData<LoadedTrack>>(null);
   const [
+    tracksComparisonRawData,
+    setTracksComparisonRawData,
+  ] = useState<null | ComparisonData<string>>(null);
+  const [
     audioFeaturesComparisonData,
     setAudioFeaturesComparisonData,
-  ] = useState<null | AudioFeaturesComparison>(null);
+  ] = useState<null | AudioFeaturesComparisonDataType>(null);
   const audioFeatures: AudioFeaturesState[] = [
     "valence",
     "energy",
@@ -86,6 +101,10 @@ const Comparify = ({ pageID }: ComparifyProps) => {
   const [audioFeaturesState, setAudioFeaturesState] = useState<
     AudioFeaturesState
   >("valence");
+  const [
+    obscurityComparisonData,
+    setObscurityComparisonData,
+  ] = useState<null | ObscurityComparisonDataType>(null);
 
   useEffect(() => {
     const getComparisonData = async () => {
@@ -98,6 +117,7 @@ const Comparify = ({ pageID }: ComparifyProps) => {
             artistsComparison,
             tracksComparison,
             audioFeaturesComparison,
+            obscurityComparison,
           },
         } = await axios.get(`${DEV_URL}/api/comparify/${pageID}`, {
           withCredentials: true,
@@ -125,7 +145,7 @@ const Comparify = ({ pageID }: ComparifyProps) => {
           tracksComparison.now.visitorUnique
         );
 
-        const comparisonDisplayData = await Promise.all([
+        const comparisonDisplayData = await Promise.allSettled([
           sharedAllTimeArtists, // result[0]
           creatorUniqueAllTimeArtists,
           visitorUniqueAllTimeArtists,
@@ -134,19 +154,23 @@ const Comparify = ({ pageID }: ComparifyProps) => {
           visitorUniqueNowTracks,
         ]);
 
+        setArtistsComparisonRawData(artistsComparison);
+
         setArtistsComparisonData({
           allTime: {
-            shared: comparisonDisplayData[0],
-            creatorUnique: comparisonDisplayData[1],
-            visitorUnique: comparisonDisplayData[2],
+            shared: getPromiseResult(comparisonDisplayData[0]),
+            creatorUnique: getPromiseResult(comparisonDisplayData[1]),
+            visitorUnique: getPromiseResult(comparisonDisplayData[2]),
           },
         });
 
+        setTracksComparisonRawData(tracksComparison);
+
         setTracksComparisonData({
           now: {
-            shared: comparisonDisplayData[3],
-            creatorUnique: comparisonDisplayData[4],
-            visitorUnique: comparisonDisplayData[5],
+            shared: getPromiseResult(comparisonDisplayData[3]),
+            creatorUnique: getPromiseResult(comparisonDisplayData[4]),
+            visitorUnique: getPromiseResult(comparisonDisplayData[5]),
           },
         });
 
@@ -155,529 +179,466 @@ const Comparify = ({ pageID }: ComparifyProps) => {
         setGenresComparisonData(genresComparison);
         setAudioFeaturesComparisonData(audioFeaturesComparison);
         setAudioFeaturesState("valence");
+        setObscurityComparisonData(obscurityComparison);
         setIsLoading(false);
       } catch (error) {
         console.error(error);
+        setApiError({
+          isError: true,
+          status: error.response.data.status,
+          message: error.response.data.message,
+        });
       }
     };
     getComparisonData();
   }, [pageID]);
 
-  const handleAudioFeatureClick = (feature: AudioFeaturesState) => {
-    setAudioFeaturesState(feature);
-  };
-
-  const generateAudioFeaturesChartData = (feature: AudioFeaturesState) =>
-    audioFeaturesComparisonData
-      ? {
-          labels: ["all-time", "recent", "now"],
-          datasets: [
-            {
-              label: "You",
-              backgroundColor: colors.iris90p,
-              borderColor: colors.iris,
-              borderWidth: 1,
-              data: audioFeaturesComparisonData[feature].visitor,
-            },
-            {
-              label: creatorUserInfo?.displayName.split(" ")[0],
-              backgroundColor: colors.neonGreen90p,
-              borderColor: colors.neonGreen,
-              borderWidth: 1,
-              data: audioFeaturesComparisonData[feature].creator,
-            },
-          ],
-        }
-      : {};
+  if (apiError) {
+    return (
+      <ComparifyDisplayWrap>
+        <ErrorComp art>
+          <span>{apiError.message}</span>
+        </ErrorComp>
+      </ComparifyDisplayWrap>
+    );
+  }
 
   return (
     <ComponentWithLoadingState label={false} loading={isLoading}>
       <ComparifyDisplayWrap>
-        <UserProfilesGroup>
-          {/* Group 1: Names */}
+        {!creatorUserInfo || !visitorUserInfo ? (
+          <ErrorComp art>
+            <span>
+              There was an error loading the requested users' data. Please try
+              again.
+            </span>
+          </ErrorComp>
+        ) : (
+          <>
+            <UserProfilesGroup>
+              {/* Group 1: Names */}
 
-          <ProfileSnippet>
-            {visitorUserInfo ? (
-              <>
+              <ProfileSnippet>
                 <div className="profileImage">
-                  <img src={visitorUserInfo.profileImageUrl} />
+                  <img src={visitorUserInfo?.profileImageUrl} />
                 </div>
-                <div className="userName">{visitorUserInfo.displayName}</div>
-              </>
-            ) : (
-              <div className="profileError">
-                Oops, there was an error loading this user's profile.
-              </div>
-            )}
-          </ProfileSnippet>
+                <a
+                  href={`spotify:user:${visitorUserInfo?._id}`}
+                  className="userName"
+                >
+                  {visitorUserInfo?.displayName}
+                </a>
+              </ProfileSnippet>
 
-          <NameSeparator>
-            <BsX />
-          </NameSeparator>
+              <NameSeparator>
+                <BsX />
+              </NameSeparator>
 
-          <ProfileSnippet>
-            {creatorUserInfo ? (
-              <>
+              <ProfileSnippet>
                 <div className="profileImage">
-                  <img src={creatorUserInfo.profileImageUrl} />
+                  <img src={creatorUserInfo?.profileImageUrl} />
                 </div>
-                <div className="userName">{creatorUserInfo.displayName}</div>
-              </>
-            ) : (
-              <div className="profileError">
-                Oops, there was an error loading this user's profile.
+
+                <a
+                  href={`spotify:user:${creatorUserInfo?._id}`}
+                  className="userName"
+                >
+                  {creatorUserInfo?.displayName}
+                </a>
+              </ProfileSnippet>
+            </UserProfilesGroup>
+            <GenresGroup>
+              <div className="clippedHeading">
+                <h2>Top Genres</h2>
               </div>
-            )}
-          </ProfileSnippet>
-        </UserProfilesGroup>
-
-        <GenresGroup>
-          <h2>Top Genres</h2>
-          {genresComparisonData && genresComparisonData.allTime ? (
-            <GenresGrid>
-              <UserGenres>
-                <div className="sectionHeader">
-                  <span>
-                    {visitorUserInfo?.displayName.split(" ")[0]}'s others
-                  </span>
-                </div>
-                <div className="genresDisplayContainer">
-                  {genresComparisonData.allTime.visitorUnique ? (
-                    genresComparisonData.allTime.visitorUnique
-                      .slice(0, 5)
-                      .map((genre, idx) => (
-                        <div key={idx} className="genreItem">
-                          {genre}
-                        </div>
-                      ))
-                  ) : (
-                    <span className="error">
-                      Nothing to show{" "}
-                      <span role="img" aria-label="emoji">
-                        🤔
-                      </span>
-                    </span>
-                  )}
-                </div>
-              </UserGenres>
-              <SharedGenres>
-                <div className="sectionHeader">
-                  <span>
-                    <span role="img" aria-label="emoji">
-                      ⚡️
-                    </span>{" "}
-                    In common{" "}
-                    <span role="img" aria-label="emoji">
-                      ⚡️
-                    </span>
-                  </span>
-                </div>
-                <div className="genresDisplayContainer">
-                  {genresComparisonData.allTime.shared ? (
-                    genresComparisonData.allTime.shared
-                      .slice(0, 10)
-                      .map((genre, idx) => (
-                        <div key={idx} className="genreItem">
-                          {genre}
-                        </div>
-                      ))
-                  ) : (
-                    <span className="error">
-                      No genres in common{" "}
-                      <span role="img" aria-label="emoji">
-                        😅
-                      </span>
-                    </span>
-                  )}
-                </div>
-              </SharedGenres>
-              <UserGenres>
-                <div className="sectionHeader">
-                  <span>
-                    {creatorUserInfo?.displayName.split(" ")[0]}'s others
-                  </span>
-                </div>
-                <div className="genresDisplayContainer">
-                  {genresComparisonData.allTime.creatorUnique ? (
-                    genresComparisonData.allTime.creatorUnique
-                      .slice(0, 5)
-                      .map((genre, idx) => (
-                        <div key={idx} className="genreItem">
-                          {genre}
-                        </div>
-                      ))
-                  ) : (
-                    <span className="error">
-                      Nothing to show{" "}
-                      <span role="img" aria-label="emoji">
-                        🤔
-                      </span>
-                    </span>
-                  )}
-                </div>
-              </UserGenres>
-            </GenresGrid>
-          ) : (
-            <div className="error">
-              Oops, there was an error loading this data.
-            </div>
-          )}
-        </GenresGroup>
-        <Separator />
-
-        <ArtistsGroup>
-          <h2>Top Artists</h2>
-          {artistsComparisonData && artistsComparisonData.allTime ? (
-            <ArtistsGrid>
-              <UserArtists>
-                <div className="sectionHeader">
-                  <span>
-                    {visitorUserInfo?.displayName.split(" ")[0]}'s others
-                  </span>
-                </div>
-                <div
-                  className={
-                    artistsComparisonData.allTime.visitorUnique &&
-                    artistsComparisonData.allTime.visitorUnique.length < 4
-                      ? `artistsDisplayContainer`
-                      : `artistsDisplayGridContainer`
-                  }
-                >
-                  {artistsComparisonData.allTime.visitorUnique ? (
-                    artistsComparisonData.allTime.visitorUnique
-                      .slice(0, 6)
-                      .map((artist, idx) => (
-                        <ArtistItem href={artist.href} title={artist.name}>
-                          <div className="image">
-                            <img
-                              src={artist.images![0].url}
-                              alt={artist.name}
-                            />
-                          </div>
-                          <div className="infoOverlay"></div>
-                          <div className="linkOverlay">
-                            <GoLinkExternal />
-                          </div>
-                          <div className="info">
-                            <div className="name">{artist.name}</div>
-                          </div>
-                        </ArtistItem>
-                      ))
-                  ) : (
-                    <span className="error">
-                      Nothing to see here{" "}
-                      <span role="img" aria-label="emoji">
-                        👀
-                      </span>
-                    </span>
-                  )}
-                </div>
-              </UserArtists>
-              <SharedArtists>
-                <div className="sectionHeader">
-                  <span>
-                    <span role="img" aria-label="emoji">
-                      ⚡️
-                    </span>{" "}
-                    In common{" "}
-                    <span role="img" aria-label="emoji">
-                      ⚡️
-                    </span>
-                  </span>
-                </div>
-                <div
-                  className={
-                    artistsComparisonData.allTime.shared &&
-                    artistsComparisonData.allTime.shared.length < 4
-                      ? `artistsDisplayContainer`
-                      : `artistsDisplayGridContainer`
-                  }
-                >
-                  {artistsComparisonData.allTime.shared ? (
-                    artistsComparisonData.allTime.shared
-                      .slice(0, 12)
-                      .map((artist, idx) => (
-                        <ArtistItem href={artist.href} title={artist.name}>
-                          <div className="image">
-                            <img
-                              src={artist.images![0].url}
-                              alt={artist.name}
-                            />
-                          </div>
-                          <div className="infoOverlay"></div>
-                          <div className="linkOverlay">
-                            <GoLinkExternal />
-                          </div>
-                          <div className="info">
-                            <div className="name">{artist.name}</div>
-                          </div>
-                        </ArtistItem>
-                      ))
-                  ) : (
-                    <span className="error">
-                      No artists in common{" "}
-                      <span role="img" aria-label="emoji">
-                        😕
-                      </span>
-                    </span>
-                  )}
-                </div>
-              </SharedArtists>
-              <UserArtists>
-                <div className="sectionHeader">
-                  <span>
-                    {creatorUserInfo?.displayName.split(" ")[0]}'s others
-                  </span>
-                </div>
-                <div
-                  className={
-                    artistsComparisonData.allTime.creatorUnique &&
-                    artistsComparisonData.allTime.creatorUnique.length < 4
-                      ? `artistsDisplayContainer`
-                      : `artistsDisplayGridContainer`
-                  }
-                >
-                  {artistsComparisonData.allTime.creatorUnique ? (
-                    artistsComparisonData.allTime.creatorUnique
-                      .slice(0, 6)
-                      .map((artist, idx) => (
-                        <ArtistItem href={artist.href} title={artist.name}>
-                          <div className="image">
-                            <img
-                              src={artist.images![0].url}
-                              alt={artist.name}
-                            />
-                          </div>
-                          <div className="infoOverlay"></div>
-                          <div className="linkOverlay">
-                            <GoLinkExternal />
-                          </div>
-                          <div className="info">
-                            <div className="name">{artist.name}</div>
-                          </div>
-                        </ArtistItem>
-                      ))
-                  ) : (
-                    <span className="error">
-                      Nothing to see here{" "}
-                      <span role="img" aria-label="emoji">
-                        👀
-                      </span>
-                    </span>
-                  )}
-                </div>
-              </UserArtists>
-            </ArtistsGrid>
-          ) : (
-            <div className="dataLoadError">
-              Oops, there was an error loading analysis of artists.
-            </div>
-          )}
-        </ArtistsGroup>
-        <Separator />
-
-        <TracksGroup>
-          {tracksComparisonData && tracksComparisonData.now ? (
-            <TracksGrid>
-              <CommonTracks>
-                <h2>Now Playing</h2>
-
-                {tracksComparisonData.now.shared ? (
-                  <>
+              {genresComparisonData && genresComparisonData.allTime ? (
+                <GenresGrid>
+                  <UserGenres>
                     <div className="sectionHeader">
                       <span>
-                        Tracks you both{" "}
-                        <span role="img" aria-label="emoji">
-                          💜
-                        </span>{" "}
-                        recently
+                        {visitorUserInfo?.displayName.split(" ")[0]}'s others
                       </span>
                     </div>
-                    <CommonTracksGridWrap>
-                      <CommonTracksGrid
-                        length={tracksComparisonData.now.shared.length}
-                      >
-                        {tracksComparisonData.now.shared
+                    <div className="genresDisplayContainer">
+                      {genresComparisonData.allTime.visitorUnique &&
+                      genresComparisonData.allTime.visitorUnique.length > 0 ? (
+                        genresComparisonData.allTime.visitorUnique
+                          .slice(0, 5)
+                          .map((genre, idx) => (
+                            <div key={idx} className="genreItem">
+                              {genre}
+                            </div>
+                          ))
+                      ) : (
+                        <span className="noResultsError">
+                          Nothing to show{" "}
+                          <span role="img" aria-label="emoji">
+                            🤔
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  </UserGenres>
+                  <SharedGenres>
+                    <div className="sectionHeader">
+                      <span>
+                        <span role="img" aria-label="emoji">
+                          ⚡️
+                        </span>{" "}
+                        In common{" "}
+                        <span role="img" aria-label="emoji">
+                          ⚡️
+                        </span>
+                      </span>
+                    </div>
+                    <div className="genresDisplayContainer">
+                      {genresComparisonData.allTime.shared &&
+                      genresComparisonData.allTime.shared.length > 0 ? (
+                        genresComparisonData.allTime.shared
                           .slice(0, 10)
-                          .map((item, idx) => (
-                            <TrackItemWrapper key={idx} {...item} />
-                          ))}
-                      </CommonTracksGrid>
-                    </CommonTracksGridWrap>
-                  </>
-                ) : (
-                  <div className="noCommonTracks">
-                    Doesn't look like you are loving any of the same tracks
-                    recently.
-                  </div>
-                )}
-              </CommonTracks>
-              <VisitorTracks>
-                {tracksComparisonData.now.visitorUnique ? (
-                  <>
+                          .map((genre, idx) => (
+                            <div key={idx} className="genreItem">
+                              {genre}
+                            </div>
+                          ))
+                      ) : (
+                        <span className="error">
+                          No genres in common{" "}
+                          <span role="img" aria-label="emoji">
+                            😅
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  </SharedGenres>
+                  <UserGenres>
+                    <div className="sectionHeader">
+                      <span>
+                        {creatorUserInfo?.displayName.split(" ")[0]}'s others
+                      </span>
+                    </div>
+                    <div className="genresDisplayContainer">
+                      {genresComparisonData.allTime.creatorUnique &&
+                      genresComparisonData.allTime.creatorUnique.length > 0 ? (
+                        genresComparisonData.allTime.creatorUnique
+                          .slice(0, 5)
+                          .map((genre, idx) => (
+                            <div key={idx} className="genreItem">
+                              {genre}
+                            </div>
+                          ))
+                      ) : (
+                        <span className="noResultsError">
+                          Nothing to show{" "}
+                          <span role="img" aria-label="emoji">
+                            🤔
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  </UserGenres>
+                </GenresGrid>
+              ) : (
+                <ErrorComp>
+                  Oops, there was an error loading analysis of genres.
+                </ErrorComp>
+              )}
+            </GenresGroup>
+            <Separator />
+            <ArtistsGroup>
+              <div className="clippedHeading">
+                <h2>Top Artists</h2>
+              </div>
+              {artistsComparisonData && artistsComparisonData.allTime ? (
+                <ArtistsGrid>
+                  <UserArtists>
+                    <div className="sectionHeader">
+                      <span>
+                        {visitorUserInfo?.displayName.split(" ")[0]}'s others
+                      </span>
+                    </div>
+                    <div
+                      className={
+                        artistsComparisonData.allTime.visitorUnique &&
+                        artistsComparisonData.allTime.visitorUnique.length < 4
+                          ? `artistsDisplayContainer`
+                          : `artistsDisplayGridContainer`
+                      }
+                    >
+                      {artistsComparisonData.allTime.visitorUnique ? (
+                        artistsComparisonData.allTime.visitorUnique
+                          .slice(0, 6)
+                          .map((artist, idx) => (
+                            <ArtistItem href={artist.href} title={artist.name}>
+                              <div className="image">
+                                <img
+                                  src={artist.images![0].url}
+                                  alt={artist.name}
+                                />
+                              </div>
+                              <div className="infoOverlay"></div>
+                              <div className="linkOverlay">
+                                <GoLinkExternal />
+                              </div>
+                              <div className="info">
+                                <div className="name">{artist.name}</div>
+                              </div>
+                            </ArtistItem>
+                          ))
+                      ) : (
+                        <span className="noResultsError">
+                          Nothing to see here{" "}
+                          <span role="img" aria-label="emoji">
+                            👀
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  </UserArtists>
+                  <SharedArtists>
+                    <div className="sectionHeader">
+                      <span>
+                        <span role="img" aria-label="emoji">
+                          ⚡️
+                        </span>{" "}
+                        In common{" "}
+                        <span role="img" aria-label="emoji">
+                          ⚡️
+                        </span>
+                      </span>
+                    </div>
+                    <div
+                      className={
+                        artistsComparisonData.allTime.shared &&
+                        artistsComparisonData.allTime.shared.length < 4
+                          ? `artistsDisplayContainer`
+                          : `artistsDisplayGridContainer`
+                      }
+                    >
+                      {artistsComparisonData.allTime.shared ? (
+                        artistsComparisonData.allTime.shared
+                          .slice(0, 12)
+                          .map((artist, idx) => (
+                            <ArtistItem href={artist.href} title={artist.name}>
+                              <div className="image">
+                                <img
+                                  src={artist.images![0].url}
+                                  alt={artist.name}
+                                />
+                              </div>
+                              <div className="infoOverlay"></div>
+                              <div className="linkOverlay">
+                                <GoLinkExternal />
+                              </div>
+                              <div className="info">
+                                <div className="name">{artist.name}</div>
+                              </div>
+                            </ArtistItem>
+                          ))
+                      ) : (
+                        <span className="error">
+                          No artists in common{" "}
+                          <span role="img" aria-label="emoji">
+                            😕
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  </SharedArtists>
+                  <UserArtists>
+                    <div className="sectionHeader">
+                      <span>
+                        {creatorUserInfo?.displayName.split(" ")[0]}'s others
+                      </span>
+                    </div>
+                    <div
+                      className={
+                        artistsComparisonData.allTime.creatorUnique &&
+                        artistsComparisonData.allTime.creatorUnique.length < 4
+                          ? `artistsDisplayContainer`
+                          : `artistsDisplayGridContainer`
+                      }
+                    >
+                      {artistsComparisonData.allTime.creatorUnique ? (
+                        artistsComparisonData.allTime.creatorUnique
+                          .slice(0, 6)
+                          .map((artist, idx) => (
+                            <ArtistItem href={artist.href} title={artist.name}>
+                              <div className="image">
+                                <img
+                                  src={artist.images![0].url}
+                                  alt={artist.name}
+                                />
+                              </div>
+                              <div className="infoOverlay"></div>
+                              <div className="linkOverlay">
+                                <GoLinkExternal />
+                              </div>
+                              <div className="info">
+                                <div className="name">{artist.name}</div>
+                              </div>
+                            </ArtistItem>
+                          ))
+                      ) : (
+                        <span className="noResultsError">
+                          Nothing to see here{" "}
+                          <span role="img" aria-label="emoji">
+                            👀
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  </UserArtists>
+                </ArtistsGrid>
+              ) : (
+                <ErrorComp>
+                  Oops, there was an error loading analysis of artists.
+                </ErrorComp>
+              )}
+            </ArtistsGroup>
+            <Separator />
+            <TracksGroup>
+              {tracksComparisonData && tracksComparisonData.now ? (
+                <TracksGrid>
+                  <CommonTracks>
+                    <div className="clippedHeading">
+                      <h2>Now Playing</h2>
+                    </div>
+
+                    {
+                      tracksComparisonData.now.shared &&
+                      tracksComparisonData.now.shared.length > 0 ? (
+                        <>
+                          <div className="sectionHeader">
+                            <span>
+                              Tracks you both{" "}
+                              <span role="img" aria-label="emoji">
+                                💜
+                              </span>{" "}
+                              recently
+                            </span>
+                          </div>
+                          <CommonTracksGridWrap>
+                            <CommonTracksGrid
+                              length={tracksComparisonData.now.shared.length}
+                            >
+                              {tracksComparisonData.now.shared
+                                .slice(0, 10)
+                                .map((item, idx) => (
+                                  <TrackItemWrapper key={idx} {...item} />
+                                ))}
+                            </CommonTracksGrid>
+                          </CommonTracksGridWrap>
+                        </>
+                      ) : null
+                      // <div className="noCommonTracks">
+                      //   Doesn't look like you are loving any of the same tracks
+                      //   recently.
+                      // </div>
+                    }
+                  </CommonTracks>
+                  <VisitorTracks>
                     <div className="sectionHeader">
                       <span>Your top tracks</span>
                     </div>
-                    <UserTracksGrid>
-                      {tracksComparisonData.now.visitorUnique
-                        .slice(0, 10)
-                        .map((item, idx) => (
-                          <TrackItemWrapper key={idx} {...item} />
-                        ))}
-                    </UserTracksGrid>
-                  </>
-                ) : (
-                  <div className="noUserTracks">
-                    Couldn't find anything here...{" "}
-                    <span role="img" aria-label="emoji">
-                      😯
-                    </span>
-                  </div>
-                )}
-              </VisitorTracks>
-              <CreatorTracks>
-                {tracksComparisonData.now.creatorUnique ? (
-                  <>
+                    {tracksComparisonData.now.visitorUnique &&
+                    tracksComparisonData.now.visitorUnique.length > 0 ? (
+                      <>
+                        <UserTracksGrid>
+                          {tracksComparisonData.now.visitorUnique
+                            .slice(0, 10)
+                            .map((item, idx) => (
+                              <TrackItemWrapper key={idx} {...item} />
+                            ))}
+                        </UserTracksGrid>
+                      </>
+                    ) : (
+                      <div className="noResultsError">
+                        Couldn't find anything here...{" "}
+                        <span role="img" aria-label="emoji">
+                          😯
+                        </span>
+                      </div>
+                    )}
+                  </VisitorTracks>
+                  <CreatorTracks>
                     <div className="sectionHeader">
                       <span>
                         {creatorUserInfo?.displayName.split(" ")[0]}'s top
                         tracks
                       </span>
                     </div>
-                    <UserTracksGrid>
-                      {tracksComparisonData.now.creatorUnique
-                        .slice(0, 10)
-                        .map((item, idx) => (
-                          <TrackItemWrapper key={idx} {...item} />
-                        ))}
-                    </UserTracksGrid>
-                  </>
-                ) : (
-                  <div className="noUserTracks">
-                    Couldn't find anything here...{" "}
+                    {tracksComparisonData.now.creatorUnique &&
+                    tracksComparisonData.now.creatorUnique.length > 0 ? (
+                      <>
+                        <UserTracksGrid>
+                          {tracksComparisonData.now.creatorUnique
+                            .slice(0, 10)
+                            .map((item, idx) => (
+                              <TrackItemWrapper key={idx} {...item} />
+                            ))}
+                        </UserTracksGrid>
+                      </>
+                    ) : (
+                      <div className="noResultsError">
+                        Couldn't find anything here...{" "}
+                        <span role="img" aria-label="emoji">
+                          😯
+                        </span>
+                      </div>
+                    )}
+                  </CreatorTracks>
+                </TracksGrid>
+              ) : (
+                <ErrorComp>
+                  Oops, there was an error loading analysis of tracks.
+                </ErrorComp>
+              )}
+            </TracksGroup>
+            <Separator />
+            <AudioFeaturesComparison
+              audioFeaturesComparisonData={audioFeaturesComparisonData}
+              creatorUserInfo={creatorUserInfo!}
+              visitorUserInfo={visitorUserInfo!}
+            />
+            <ObscurityComparison
+              obscurityComparisonData={obscurityComparisonData}
+              creatorUserInfo={creatorUserInfo!}
+              visitorUserInfo={visitorUserInfo!}
+            />
+            <Separator />
+            <DiscoverTogether
+              genresComparison={genresComparisonData}
+              artistsComparison={artistsComparisonRawData}
+              tracksComparison={tracksComparisonRawData}
+            />
+            <Separator />
+            {tracksComparisonData &&
+            artistsComparisonData &&
+            genresComparisonData &&
+            obscurityComparisonData ? (
+              <ActionsGroup>
+                <div className="sectionHeader">
+                  <span>
+                    Like what you see?{" "}
                     <span role="img" aria-label="emoji">
-                      😯
+                      😏
                     </span>
-                  </div>
-                )}
-              </CreatorTracks>
-            </TracksGrid>
-          ) : (
-            <div className="dataLoadError">
-              Oops, there was an error loading analysis of tracks.
-            </div>
-          )}
-        </TracksGroup>
-        <Separator />
-
-        <AudioFeaturesGroup>
-          <div className="clippedHeading">
-            <h2>Music Characterization</h2>
-          </div>
-          <AudioFeaturesOptions state={audioFeaturesState}>
-            {audioFeatures.map((feature, idx) => (
-              <AudioFeaturesButton
-                key={idx}
-                onClick={() => handleAudioFeatureClick(feature)}
-                active={audioFeaturesState === feature ? true : false}
-              >
-                {feature === `valence` ? `happiness` : feature}
-              </AudioFeaturesButton>
-            ))}
-          </AudioFeaturesOptions>
-          {audioFeaturesComparisonData ? (
-            <AudioFeaturesChart>
-              <AudioFeatureDescription>
-                <div className="featureInfo">
-                  <div className="featureDescription">
-                    {audioFeatureDescriptions[audioFeaturesState].desc}
-                  </div>
-                  <div className="featureTechnical">
-                    <div className="icon">
-                      <IoMdInformationCircle />
-                    </div>{" "}
-                    <p>
-                      {" "}
-                      {audioFeatureDescriptions[audioFeaturesState].measurement}
-                    </p>
-                  </div>
+                  </span>
                 </div>
-              </AudioFeatureDescription>
-              <AudioFeaturesChartInner>
-                <Bar
-                  datasetKeyProvider={Math.random}
-                  data={generateAudioFeaturesChartData(audioFeaturesState)}
-                  options={{
-                    scales: {
-                      xAxes: [
-                        {
-                          ticks: {
-                            fontColor: colors.grey1,
-                            fontSize: 16,
-                            fontFamily: "'open sans', sans-serif",
-                            fontStyle: "bold",
-                          },
-                          gridLines: {
-                            display: false,
-                          },
-                        },
-                      ],
-                      yAxes: [
-                        {
-                          ticks: {
-                            min: round5x(
-                              Math.min(
-                                ...audioFeaturesComparisonData[
-                                  audioFeaturesState
-                                ].creator,
-                                ...audioFeaturesComparisonData[
-                                  audioFeaturesState
-                                ].visitor
-                              ) - 20
-                            ),
-                            max: round5x(
-                              Math.max(
-                                ...audioFeaturesComparisonData[
-                                  audioFeaturesState
-                                ].creator,
-                                ...audioFeaturesComparisonData[
-                                  audioFeaturesState
-                                ].visitor
-                              ) + 5
-                            ),
-                            fontColor: colors.grey1,
-                            stepSize: 5,
-                          },
-                          gridLines: {
-                            color: "rgb(255,255,255,0.1)",
-                            zeroLineColor: "rgb(255,255,255,0.1)",
-                          },
-                        },
-                      ],
-                    },
-                    tooltips: {
-                      displayColors: false,
-                    },
-                    legend: {
-                      display: true,
-                      position: `bottom`,
-                      labels: {
-                        fontSize: 16,
-                        fontColor: colors.grey1,
-                        fontFamily: "'open sans', sans-serif",
-                        padding: 20,
-                      },
-                    },
-                  }}
-                />
-              </AudioFeaturesChartInner>
-            </AudioFeaturesChart>
-          ) : (
-            <div className="dataLoadError">
-              Oops, there was an error loading analysis of moods.
-            </div>
-          )}
-        </AudioFeaturesGroup>
+                <MakeAPage>
+                  <span className="title">
+                    Get your own <span className="brand">Comparify</span> page
+                  </span>
+                </MakeAPage>
+
+                <span className="description">
+                  An easy, beautiful, and free way to compare taste in music.
+                </span>
+              </ActionsGroup>
+            ) : null}{" "}
+          </>
+        )}
       </ComparifyDisplayWrap>
     </ComponentWithLoadingState>
   );
@@ -704,132 +665,46 @@ const commonItemsDisplayBackgroundAnimated = css`
   animation: ${gradientAnimation} 10s ease infinite;
 `;
 
-// Audio Features
+// Actions
 
-const AudioFeaturesOptions = styled.div<{ state: AudioFeaturesState }>`
-  display: flex;
-  /* border-top-right-radius: 1em;
-  border-top-left-radius: 1em; */
-  overflow: hidden;
-  /* border: 1px solid ${({ theme }) =>
-    theme.colors.darkBodyOverlayBorder};
-  border-bottom: none; */
-  transition: 0.4s ease all;
-  border-bottom: 6px solid
-    ${({ state, theme: { colors } }) =>
-      state === `valence`
-        ? colors.straw
-        : state === `energy`
-        ? colors.spanishViolet
-        : state === `danceability`
-        ? colors.blueCityBlue
-        : state === `tempo`
-        ? colors.seaGreen
-        : colors.darkBodyOverlay};
-`;
-
-const AudioFeaturesButton = styled.button<{ active: boolean }>`
-  flex: 1;
-  font-size: 2rem;
-  padding: 1em;
-  font-family: "roboto slab", "open sans", "sans-serif";
-  font-weight: 700;
-  text-transform: capitalize;
-  &:nth-child(1) {
-    /* background: ${({ theme, active }) =>
-      active ? theme.colors.straw : `transparent`}; */
-    color: ${({ theme, active }) =>
-      active ? theme.colors.straw : theme.colors.textTertiary};
-  }
-  &:nth-child(2) {
-    /* background: ${({ theme, active }) =>
-      active ? theme.colors.spanishViolet : `transparent`}; */
-    color: ${({ theme, active }) =>
-      active ? theme.colors.spanishViolet : theme.colors.textTertiary};
-  }
-  &:nth-child(3) {
-    /* background: ${({ theme, active }) =>
-      active ? theme.colors.blueCityBlue : `transparent`}; */
-    color: ${({ theme, active }) =>
-      active ? theme.colors.blueCityBlue : theme.colors.textTertiary};
-  }
-  &:nth-child(4) {
-    /* background: ${({ theme, active }) =>
-      active ? theme.colors.seaGreen : `transparent`}; */
-    color: ${({ theme, active }) =>
-      active ? theme.colors.seaGreen : theme.colors.textTertiary};
-  }
-  &:hover {
-    ${({ active, theme }) =>
-      active ? `` : `color: ${theme.colors.textPrimary}`}
-  }
-  &:focus {
-    outline: none;
-  }
-  transition: 0.4s ease all;
-`;
-
-const AudioFeaturesChart = styled.div`
-  padding: 4em;
-  border-bottom-left-radius: 1em;
-  border-bottom-right-radius: 1em;
-  display: flex;
-  align-items: center;
-  background: ${({ theme }) =>
-    `linear-gradient(180deg, rgba(29,31,33,1) 0%, ${theme.colors.darkBodyOverlay} 100%)`};
-  box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.3);
-  border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlayBorder};
-  border-top: none;
-`;
-
-const AudioFeaturesChartInner = styled.div`
-  flex: 3;
-  padding-left: 2em;
-`;
-
-const AudioFeatureDescription = styled.div`
-  flex: 2;
-  .featureDescription {
-    color: ${({ theme }) => theme.colors.textPrimary};
-    font-size: 1.25em;
-  }
-  .featureTechnical {
-    margin-top: 1em;
-    float: left;
-    color: ${({ theme }) => theme.colors.textPrimary};
-    background: ${({ theme }) => theme.colors.darkBodyOverlayBorder};
-    padding: 1em;
-    border-radius: 0.5em;
-    display: flex;
-    align-items: center;
-    .icon {
-      font-size: 1.5em;
-      display: flex;
-      align-items: center;
-      color: ${({ theme }) => theme.colors.textPrimary};
-      margin-right: 0.5em;
-    }
-    ${breakpoints.lessThan("74")`
-        font-size: 0.875rem;
-    `}
-  }
-`;
-
-const AudioFeaturesGroup = styled.div`
+const ActionsGroup = styled.div`
   margin-top: 4em;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  .clippedHeading {
-    display: inline-block;
-    margin: 0 auto;
-    ${commonItemsDisplayBackgroundAnimated};
-    -webkit-text-fill-color: transparent;
-    -webkit-background-clip: text;
-    background-clip: text;
-    h2 {
-      margin-bottom: 0;
-      display: inline-block;
+  align-items: center;
+  .sectionHeader {
+    margin-bottom: 1em;
+  }
+  .description {
+    margin-top: 1em;
+  }
+`;
+
+const MakeAPage = styled.button`
+  border-radius: 0.25em;
+  padding: 2em 4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.textPrimary};
+  ${commonItemsDisplayBackgroundAnimated};
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+  transition: 0.2s ease color;
+  .brand {
+    font-family: "roboto slab", "open sans", "sans-serif";
+    font-weight: 700;
+  }
+  .title {
+    display: block;
+    font-size: 2rem;
+    color: ${({ theme }) => theme.colors.textPrimary};
+  }
+  :hover {
+    background: ${({ theme }) => theme.colors.textPrimary};
+    .title {
+      color: ${({ theme }) => theme.colors.mainAccent};
+      text-shadow: none;
     }
   }
 `;
@@ -838,14 +713,11 @@ const AudioFeaturesGroup = styled.div`
 
 const TracksGroup = styled.div`
   margin-top: 4em;
-  && .sectionHeader {
-    color: ${({ theme }) => theme.colors.textPrimary};
-    font-weight: 700;
-  }
 `;
 
 const VisitorTracks = styled.div`
   grid-area: visitor;
+  position: relative;
   padding: 1em;
   ${TrackItem} {
     box-shadow: 2px 2px ${({ theme }) => theme.colors.iris};
@@ -853,6 +725,7 @@ const VisitorTracks = styled.div`
 `;
 
 const CreatorTracks = styled.div`
+  position: relative;
   grid-area: creator;
   padding: 1em;
   ${TrackItem} {
@@ -912,9 +785,6 @@ const CommonTracksGrid = styled.div<{ length: number }>`
 
 const CommonTracks = styled.div`
   grid-area: common;
-  && .sectionHeader {
-    margin-bottom: 0.625em;
-  }
 `;
 
 // Artists
@@ -939,6 +809,10 @@ const ArtistsGrid = styled.div`
 
 const ArtistsGroup = styled.div`
   margin-top: 4em;
+  .artistsDisplayContainer,
+  .artistsDisplayGridContainer {
+    position: relative;
+  }
   .artistsDisplayContainer {
     padding: 1em;
     justify-content: center;
@@ -991,7 +865,7 @@ const UserArtists = styled.div`
     grid-auto-rows: 6em;
   }
   && .sectionHeader {
-    margin-bottom: 0;
+    margin-bottom: 0.5em;
   }
   &:first-child {
     ${ArtistItem} {
@@ -1009,18 +883,20 @@ const SharedArtists = styled.div`
   .artistsDisplayContainer,
   .artistsDisplayGridContainer {
     ${commonItemsDisplayBackgroundAnimated};
+    position: relative;
+    flex-basis: 4rem;
   }
-  && .sectionHeader {
-    margin-bottom: 0.625em;
+  .error {
+    position: absolute;
+    left: 50%;
+    top: 1rem;
+    transform: translateX(-50%);
   }
 `;
 
 // Genres
 
 const SharedGenres = styled.div`
-  && .sectionHeader {
-    margin-bottom: 0.625em;
-  }
   .genresDisplayContainer {
     ${commonItemsDisplayBackgroundAnimated};
   }
@@ -1032,7 +908,7 @@ const SharedGenres = styled.div`
 
 const UserGenres = styled.div`
   && .sectionHeader {
-    margin-bottom: 0;
+    margin-bottom: 0.3125em;
   }
   &:first-child {
     /* .genresDisplayContainer {
@@ -1079,6 +955,7 @@ const GenresGroup = styled.div`
     padding: 1em;
     text-align: center;
     border-radius: 1em;
+    position: relative;
   }
   .genreItem {
     display: inline-block;
@@ -1093,49 +970,6 @@ const GenresGroup = styled.div`
   }
 `;
 // Profile Display
-
-const ProfileSnippet = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5em;
-  border-radius: 1em;
-
-  .profileImage {
-    flex: 0 0 4.5em;
-    margin-right: 2em;
-    height: 4.5em;
-    border-radius: 50%;
-    overflow: hidden;
-    img {
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
-    }
-  }
-  .userName {
-    color: ${({ theme }) => theme.colors.textPrimary};
-    font-size: 2rem;
-    font-weight: 700;
-  }
-  &:last-child {
-    background: ${({ theme }) => theme.colors.neonGreen10p};
-    box-shadow: 4px 4px 0 0 ${({ theme }) => theme.colors.neonGreen};
-  }
-  &:first-child {
-    box-shadow: 4px 4px 0 0 ${({ theme }) => theme.colors.iris};
-    background: ${({ theme }) => theme.colors.iris10p};
-    /* .userName {
-      order: 1;
-      text-align: right;
-    }
-    .profileImage {
-      order: 2;
-      margin-left: 1em;
-      margin-right: 0;
-    } */
-  }
-`;
 
 const NameSeparator = styled.div`
   display: flex;
@@ -1155,22 +989,38 @@ const Separator = styled.div`
   height: 1px;
   width: 80%;
   border-top: 2px dashed ${({ theme }) => theme.colors.darkBodyOverlayBorder};
-  margin: 4.5em auto 0;
+  margin: 5em auto 0;
 `;
 
 const ComparifyDisplayWrap = styled.div`
   .sectionHeader {
     text-align: center;
     font-size: 2rem;
-    margin-bottom: 0.5em;
+    margin-bottom: 1em;
     color: ${({ theme }) => theme.colors.textPrimary};
     font-weight: 700;
   }
   h2 {
     font-family: "roboto slab", "open sans", "sans-serif";
-    font-size: 5em;
+    font-size: 5rem;
     text-align: center;
+    line-height: 1.2;
     margin-bottom: 0.5em;
+  }
+  .clippedHeading {
+    ${commonItemsDisplayBackgroundAnimated};
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .noResultsError {
+    padding: 1em;
+    background: ${({ theme }) => theme.colors.errorRed};
+    border-radius: 0.5em;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
 `;
 

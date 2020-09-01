@@ -33,6 +33,7 @@ module.exports = Object.freeze({
   GET_TRACKS_URL: "https://api.spotify.com/v1/tracks",
   GET_ARTISTS_URL: "https://api.spotify.com/v1/artists",
   GET_AUDIO_FEATURES_URL: "https://api.spotify.com/v1/audio-features",
+  GET_RECOMMENDATIONS_URL: "https://api.spotify.com/v1/recommendations",
 
   // Server config
   PORT: port,
@@ -40,11 +41,13 @@ module.exports = Object.freeze({
   AUTH_REDIRECT_URI: isDev
     ? "http://localhost:3001/api/auth/login/callback"
     : "https://spotify-compare-app.herokuapp.com/api/auth/login/callback",
-  HOME_REDIRECT_URI: isDev ? "http://localhost:3000" : "",
+  HOME_REDIRECT_URI: isDev ? "http://localhost:3000/" : "",
   COMPARIFY_TOKEN_COOKIE_KEY: "comparifyToken",
   COOKIE_DOMAIN: isDev ? "" : "https://spotify-compare-app.herokuapp.com",
   MAX_COOKIE_AGE: 604800000, // One week, should be same as JWT expiration
   SERVER_PRIVATE_KEY: "serverPrivateAPIKey",
+  ACCESS_TOKEN_REFRESH_PERIOD: 3420000, // Just less than one hour
+  PRIVATE_TOKEN_ENDPOINTS_ENDPOINT: "NMkfJd901xz0uKmuT67sE0pXJFROc1OLvmVsdE7z",
 
   RESPONSE_CODES: RESPONSE_CODES,
   ERROR_CODES: ERROR_CODES,
@@ -55,6 +58,19 @@ module.exports = Object.freeze({
   // Others
   ALPHANUMERIC:
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+  FEATURES: [
+    "danceability",
+    "energy",
+    "key",
+    "loudness",
+    "mode",
+    "speechiness",
+    "acousticness",
+    "instrumentalness",
+    "liveness",
+    "valence",
+    "tempo",
+  ],
 
   // DB config
   USERS: "users",
