@@ -13,6 +13,7 @@ import media from "styled-media-query";
 import { Transition } from "react-transition-group";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { Theme } from "../../theme";
+import useWindowSize from "../../hooks/useWindowSize";
 
 type SplashProps = {
   img: HTMLImageElement;
@@ -28,9 +29,10 @@ const Splash = ({ img }: SplashProps) => {
   const [titleEntered, setTitleEntered] = useState(false);
   const [subtitleEntered, setSubtitleEntered] = useState(false);
   const [allTitlesEntered, setAllTitlesEntered] = useState(false);
+  const size = useWindowSize();
 
   return (
-    <SplashWrap>
+    <SplashWrap style={{ height: size?.height }}>
       <SplashGlobalStyle />
       <Transition
         in={!splashLoading}
@@ -268,7 +270,7 @@ const SplashBackground = styled.div<{ state: string }>`
 
 const SplashWrap = styled.div`
   width: 100vw;
-  height: 100vh;
+
   min-height: 800px;
   overflow: hidden;
   position: relative;
