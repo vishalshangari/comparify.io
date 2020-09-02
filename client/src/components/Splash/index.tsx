@@ -320,6 +320,9 @@ const SplashWrap = styled.div`
     ${FrontActionButtonLabel} {
       font-size: 0.75rem;
     }
+    ${FrontSubtitle} {
+      line-height: 1.5;
+    }
   `}
 `;
 

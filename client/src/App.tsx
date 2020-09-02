@@ -79,7 +79,7 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <AuthProvider>
-          <FullSiteWrap style={{ height: size?.height }}>
+          <FullSiteWrap style={{ minHeight: size?.height }}>
             <Router />
           </FullSiteWrap>
         </AuthProvider>
