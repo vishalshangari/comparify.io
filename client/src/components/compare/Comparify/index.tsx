@@ -1073,8 +1073,8 @@ const ComparifyDisplayWrap = styled.div`
     font-family: "roboto slab", "open sans", "sans-serif";
     font-size: 5rem;
     text-align: center;
+    display: inline;
     line-height: 1.2;
-    margin-bottom: 0.5em;
     ${breakpoints.lessThan("66")`
       font-size: 3.5rem;
     `}
@@ -1083,6 +1083,9 @@ const ComparifyDisplayWrap = styled.div`
     `}
   }
   .clippedHeading {
+    margin-bottom: 1em;
+    text-align: center;
+    color: ${({ theme }) => theme.colors.textPrimary};
     ${commonItemsDisplayBackgroundAnimated};
     -webkit-text-fill-color: transparent;
     -webkit-background-clip: text;

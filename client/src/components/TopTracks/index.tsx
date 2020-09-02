@@ -315,7 +315,6 @@ const TracksDisplay = styled(Element)`
   && {
     display: block;
   }
-  min-height: 300px;
   ${breakpoints.lessThan("74")`
     .dataItemHeader {
       flex-wrap: wrap;
