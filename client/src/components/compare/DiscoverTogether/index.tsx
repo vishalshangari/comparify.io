@@ -13,6 +13,7 @@ import Loader from "../../Loader";
 import { TiArrowShuffle } from "react-icons/ti";
 import { APIError } from "../../../models";
 import ErrorComp from "../../shared/ErrorComp";
+import { breakpoints } from "../../../theme";
 
 const DiscoverTogether = ({
   genresComparison,
@@ -191,6 +192,13 @@ const TracksGrid = styled.div<{ loadState: boolean }>`
   display: grid;
   overflow: visible;
   grid-template-columns: repeat(4, 1fr);
+  ${breakpoints.lessThan("66")`
+    grid-template-columns: 1fr 1fr;
+  `};
+  ${breakpoints.lessThan("38")`
+    grid-template-columns: 1fr;
+    font-size: 0.875rem;
+  `}
   grid-gap: 1em;
   position: relative;
   ${TracksShuffleOverlay} {
@@ -211,6 +219,9 @@ const ShuffleButton = styled.button`
   display: inline-block;
   margin-top: 2em;
   padding: 1.25em 5em;
+  ${breakpoints.lessThan("48")`
+    padding: 0.75em 3em;
+  `};
   display: flex;
   align-items: center;
   justify-content: center;

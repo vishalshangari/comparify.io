@@ -701,8 +701,21 @@ const MakeAPage = styled.button`
   .title {
     display: block;
     font-size: 2rem;
+    ${breakpoints.lessThan("48")`
+      font-size: 1.5rem;
+    `};
+    ${breakpoints.lessThan("30")`
+      font-size: 1.125rem;
+    `};
     color: ${({ theme }) => theme.colors.textPrimary};
   }
+
+  ${breakpoints.lessThan("48")`
+    padding: 1.5em 3em;
+  `};
+  ${breakpoints.lessThan("30")`
+    padding: 1em 2em;
+  `};
   :hover {
     background: ${({ theme }) => theme.colors.textPrimary};
     .title {
@@ -746,12 +759,29 @@ const TracksGrid = styled.div`
   grid-template-areas:
     ". common common ."
     "visitor visitor creator creator";
+
+  ${breakpoints.lessThan("74")`
+    grid-template-areas:
+      "common common common common"
+      "visitor visitor creator creator"
+  `};
+
+  ${breakpoints.lessThan("48")`
+    grid-template-areas:
+      "common common common common"
+      "visitor visitor visitor visitor"
+      "creator creator creator creator"
+
+  `};
 `;
 
 const UserTracksGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   grid-template-columns: 1fr 1fr;
+  ${breakpoints.lessThan("74")`
+    grid-template-columns: 1fr;
+  `}
 `;
 
 const commonTracksGridDisplayStyles = css`
@@ -772,6 +802,8 @@ const commonTracksNonGridDisplayStyles = css`
 `;
 
 const CommonTracksGridWrap = styled.div`
+  max-width: 700px;
+  margin: 0 auto;
   display: block;
   ${commonItemsDisplayBackgroundAnimated};
   border-radius: 1em;
@@ -798,6 +830,7 @@ const CommonTracks = styled.div`
 const ArtistsGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 40% 1fr;
+  grid-template-areas: "visitor shared creator";
   grid-gap: 2em;
   ${ArtistItem} {
     /* box-shadow: none; */
@@ -811,6 +844,13 @@ const ArtistsGrid = styled.div`
     flex-direction: column;
     justify-content: center;
   }
+  ${breakpoints.lessThan("58")`
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+      "shared"
+      "visitor"
+      "creator";
+  `}
 `;
 
 const ArtistsGroup = styled.div`
@@ -844,44 +884,25 @@ const ArtistsGroup = styled.div`
     grid-gap: 1em;
     grid-template-columns: repeat(auto-fill, minmax(8em, 1fr));
     grid-auto-rows: 8em;
-    /* > a {
-      width: calc(25% - 0.75em);
-      padding-top: calc(25% - 0.75em);
-      margin-left: 1em;
-
-      display: inline-block;
-      .image {
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
-      .infoOverlay {
-        content: "";
-      }
-      &:first-child {
-        margin-left: 0;
-      }
-      &:nth-child(4n + 1) {
-        margin-left: 0;
-      }
-    } */
   }
 `;
 
 const UserArtists = styled.div`
   .artistsDisplayGridContainer {
-    grid-template-columns: repeat(auto-fill, minmax(6em, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(6em, 1fr));
     grid-auto-rows: 6em;
   }
   && .sectionHeader {
     margin-bottom: 0.5em;
   }
   &:first-child {
+    grid-area: visitor;
     ${ArtistItem} {
       box-shadow: 2px 2px ${({ theme }) => theme.colors.iris};
     }
   }
   &:last-child {
+    grid-area: creator;
     ${ArtistItem} {
       box-shadow: 2px 2px ${({ theme }) => theme.colors.neonGreen};
     }
@@ -889,6 +910,9 @@ const UserArtists = styled.div`
 `;
 
 const SharedArtists = styled.div`
+  grid-area: shared;
+  max-width: 700px;
+  margin: 0 auto;
   .artistsDisplayContainer,
   .artistsDisplayGridContainer {
     ${commonItemsDisplayBackgroundAnimated};
@@ -906,6 +930,7 @@ const SharedArtists = styled.div`
 // Genres
 
 const SharedGenres = styled.div`
+  grid-area: shared;
   .genresDisplayContainer {
     ${commonItemsDisplayBackgroundAnimated};
   }
@@ -913,9 +938,14 @@ const SharedGenres = styled.div`
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
+  ${breakpoints.lessThan("66")`
+    max-width: 700px;
+    margin: 0 auto;
+  `};
 `;
 
 const UserGenres = styled.div`
+  margin: 0 auto;
   && .sectionHeader {
     margin-bottom: 0.3125em;
   }
@@ -926,6 +956,7 @@ const UserGenres = styled.div`
       border: 1px solid ${({ theme }) =>
       theme.colors.iris};
     } */
+    grid-area: visitor;
     .genreItem {
       border: none;
       background: ${({ theme }) => theme.colors.iris10p};
@@ -933,6 +964,7 @@ const UserGenres = styled.div`
     }
   }
   &:last-child {
+    grid-area: creator;
     /* .genresDisplayContainer {
       background: ${({ theme }) =>
       theme.colors.neonGreen10p};
@@ -949,7 +981,16 @@ const UserGenres = styled.div`
 
 const GenresGrid = styled.div`
   display: grid;
+  grid-template-areas: "visitor shared creator";
   grid-template-columns: 1fr 30% 1fr;
+  ${breakpoints.lessThan("66")`
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+      "shared"
+      "visitor"
+      "creator";
+
+  `};
   grid-gap: 2em;
   > div {
     display: flex;
@@ -979,6 +1020,9 @@ const GenresGroup = styled.div`
     &:hover {
       transform: scale(1.05);
     }
+    ${breakpoints.lessThan("66")`
+      font-size: 1rem;
+    `};
   }
 `;
 // Profile Display
@@ -1033,7 +1077,10 @@ const ComparifyDisplayWrap = styled.div`
     margin-bottom: 0.5em;
     ${breakpoints.lessThan("66")`
       font-size: 3.5rem;
-  `}
+    `}
+    ${breakpoints.lessThan("42")`
+      font-size: 2.75rem;
+    `}
   }
   .clippedHeading {
     ${commonItemsDisplayBackgroundAnimated};

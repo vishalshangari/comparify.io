@@ -100,6 +100,9 @@ const UserObscurityInner = styled.div`
 const ObscurityGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
+  ${breakpoints.lessThan("48")`
+    grid-template-columns: 1fr;
+  `}
   grid-gap: 2em;
 `;
 

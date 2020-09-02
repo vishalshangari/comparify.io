@@ -11,6 +11,7 @@ import round5x from "../../../utils/round5x";
 import { colors, breakpoints } from "../../../theme";
 import { IoMdInformationCircle } from "react-icons/io";
 import { Bar } from "react-chartjs-2";
+import { useMedia } from "react-use";
 
 const AudioFeatresComparison = ({
   audioFeaturesComparisonData,
@@ -23,6 +24,7 @@ const AudioFeatresComparison = ({
   const handleAudioFeatureClick = (feature: AudioFeaturesState) => {
     setAudioFeaturesState(feature);
   };
+  const isSmall = useMedia("(max-width: 42em)");
 
   const generateAudioFeaturesChartData = (feature: AudioFeaturesState) =>
     audioFeaturesComparisonData
@@ -85,6 +87,7 @@ const AudioFeatresComparison = ({
               datasetKeyProvider={Math.random}
               data={generateAudioFeaturesChartData(audioFeaturesState)}
               options={{
+                maintainAspectRatio: isSmall ? false : true,
                 scales: {
                   xAxes: [
                     {
@@ -160,6 +163,14 @@ export default AudioFeatresComparison;
 
 const AudioFeaturesOptions = styled.div<{ state: AudioFeaturesState }>`
   display: flex;
+  flex-wrap: wrap;
+  ${breakpoints.lessThan("58")`
+    border-top-left-radius: 1em;
+    border-top-right-radius: 1em;
+    background: ${({ theme }) => theme.colors.darkBodyOverlay};
+    overflow: hidden;
+    margin-top: 1em;
+  `};
   /* border-top-right-radius: 1em;
   border-top-left-radius: 1em; */
   overflow: hidden;
@@ -182,6 +193,15 @@ const AudioFeaturesOptions = styled.div<{ state: AudioFeaturesState }>`
 
 const AudioFeaturesButton = styled.button<{ active: boolean }>`
   flex: 1;
+  ${breakpoints.lessThan("48")`
+    flex: 0 0 50%;
+  `}
+  ${breakpoints.lessThan("58")`
+    font-size: 1.5rem;
+  `}
+  ${breakpoints.lessThan("30")`
+    font-size: 1.125rem;
+  `}
   font-size: 2rem;
   padding: 1em;
   font-family: "roboto slab", "open sans", "sans-serif";
@@ -222,10 +242,17 @@ const AudioFeaturesButton = styled.button<{ active: boolean }>`
 `;
 
 const AudioFeaturesChart = styled.div`
+  canvas {
+    width: 100% !important;
+  }
   padding: 4em;
+  ${breakpoints.lessThan("66")`
+    padding: 2em;
+  `}
   border-bottom-left-radius: 1em;
   border-bottom-right-radius: 1em;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   background: ${({ theme }) =>
     `linear-gradient(180deg, rgba(29,31,33,1) 0%, ${theme.colors.darkBodyOverlay} 100%)`};
@@ -244,6 +271,12 @@ const AudioFeatureDescription = styled.div`
   .featureDescription {
     color: ${({ theme }) => theme.colors.textPrimary};
     font-size: 1.25em;
+    ${breakpoints.lessThan("66")`
+      font-size: 1rem;
+    `}
+    ${breakpoints.lessThan("30")`
+    font-size: 0.875rem;
+  `}
   }
   .featureTechnical {
     margin-top: 1em;
@@ -265,10 +298,17 @@ const AudioFeatureDescription = styled.div`
         font-size: 0.875rem;
     `}
   }
+  ${breakpoints.lessThan("66")`
+    flex-basis: 100%;
+    margin-bottom: 2em;
+  `}
 `;
 
 const AudioFeaturesGroup = styled.div`
   margin-top: 4em;
+  ${breakpoints.lessThan("66")`
+    margin-top: 2em;
+  `}
   display: flex;
   flex-direction: column;
   justify-content: center;
