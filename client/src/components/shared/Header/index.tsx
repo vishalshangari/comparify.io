@@ -25,6 +25,63 @@ const Header = ({
   const isAuthenticated = authState.status === RESPONSE_CODES.AUTHENTICATED;
   const [isMobileNavExpanded, setIsMobileNavExpanded] = useState(false);
 
+  const responsiveNav = (
+    <>
+      <Navigation>
+        <ul>
+          <li>
+            <a className="nav" href="/">
+              Compare
+            </a>
+          </li>
+          <li>
+            {isAuthenticated ? (
+              <a className="nav" href="/">
+                My Account
+              </a>
+            ) : (
+              <a className="nav" href="/">
+                Login
+              </a>
+            )}
+          </li>
+        </ul>
+        {logoOnlyNav ? null : (
+          <ComparifyLogo color={theme.colors.textPrimary} size="1.5rem" />
+        )}
+        <MobileNavExpand
+          onClick={() => setIsMobileNavExpanded((prev) => !prev)}
+        >
+          {isMobileNavExpanded ? <VscClose /> : <HiMenu />}
+        </MobileNavExpand>
+      </Navigation>
+      <Transition in={isMobileNavExpanded} timeout={500}>
+        {(state) => (
+          <MobileNavigation state={state}>
+            <ul>
+              <li>
+                <a className="nav" href="/">
+                  Compare
+                </a>
+              </li>
+              <li>
+                {isAuthenticated ? (
+                  <a className="nav" href="/">
+                    My Account
+                  </a>
+                ) : (
+                  <a className="nav" href="/">
+                    Login
+                  </a>
+                )}
+              </li>
+            </ul>
+          </MobileNavigation>
+        )}
+      </Transition>
+    </>
+  );
+
   return (
     <HeaderWrap>
       <HeaderInner>
@@ -32,84 +89,12 @@ const Header = ({
           {pageTitle ? <h1>{pageTitle}</h1> : ` `}
         </StatefulPageTitle>
 
-        {standardNav ? (
-          <>
-            <Navigation>
-              <ul>
-                <li>
-                  <a className="nav" href="/">
-                    Compare
-                  </a>
-                </li>
-                <li>
-                  {isAuthenticated ? (
-                    <a className="nav" href="/">
-                      My Account
-                    </a>
-                  ) : (
-                    <a className="nav" href="/">
-                      Login
-                    </a>
-                  )}
-                </li>
-              </ul>
-              <ComparifyLogo color={theme.colors.textPrimary} size="1.5rem" />
-              <MobileNavExpand
-                onClick={() => setIsMobileNavExpanded((prev) => !prev)}
-              >
-                {isMobileNavExpanded ? <VscClose /> : <HiMenu />}
-              </MobileNavExpand>
-            </Navigation>
-            <Transition in={isMobileNavExpanded} timeout={500}>
-              {(state) => (
-                <MobileNavigation state={state}>
-                  <ul>
-                    <li>
-                      <a className="nav" href="/">
-                        Compare
-                      </a>
-                    </li>
-                    <li>
-                      {isAuthenticated ? (
-                        <a className="nav" href="/">
-                          My Account
-                        </a>
-                      ) : (
-                        <a className="nav" href="/">
-                          Login
-                        </a>
-                      )}
-                    </li>
-                  </ul>
-                </MobileNavigation>
-              )}
-            </Transition>
-          </>
-        ) : null}
+        {standardNav ? responsiveNav : null}
 
         {logoOnlyNav ? (
           <LogoOnlyNavWrap>
             <ComparifyLogo color={theme.colors.textPrimary} size="1.5rem" />
-            <Navigation>
-              <ul>
-                <li>
-                  <a className="nav" href="/">
-                    Compare
-                  </a>
-                </li>
-                <li>
-                  {isAuthenticated ? (
-                    <a className="nav" href="/">
-                      My Account
-                    </a>
-                  ) : (
-                    <a className="nav" href="/">
-                      Login
-                    </a>
-                  )}
-                </li>
-              </ul>
-            </Navigation>
+            {responsiveNav}
           </LogoOnlyNavWrap>
         ) : null}
       </HeaderInner>
@@ -245,6 +230,7 @@ const Navigation = styled.div`
 const LogoOnlyNavWrap = styled.div`
   display: flex;
   width: 100%;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding: 1em 0;
@@ -252,6 +238,12 @@ const LogoOnlyNavWrap = styled.div`
     ul {
       margin-right: 0;
     }
+  }
+  .logoWrap {
+    flex: 1;
+  }
+  ${MobileNavigation} {
+    flex-basis: 100%;
   }
 `;
 

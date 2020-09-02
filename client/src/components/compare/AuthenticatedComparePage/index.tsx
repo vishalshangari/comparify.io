@@ -15,7 +15,7 @@ const AuthenticatedComparePage = () => {
   const { comparifyPageID } = useParams();
   const [showComparison, setShowComparison] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
-  const [enableCompareButton, setEnableCompareButton] = useState(false);
+  const [, setEnableCompareButton] = useState(false);
   const comparifyPage = useComparifyPage(comparifyPageID);
 
   return (
@@ -92,20 +92,6 @@ const ComparifyDisplayLoadGroup = styled.div<{ state: string }>`
     state === "entered"
       ? `opacity: 1; transform: scale(1);`
       : `transform: scale(0.7); opacity: 0;`};
-  /* ${({ state }) => (state === "exiting" || state === `exited` ? `` : ``)}; */
-`;
-
-const ComparePageBreadcrumb = styled.div`
-  font-size: 1.75rem;
-  margin-bottom: 1em;
-  letter-spacing: 1px;
-  opacity: 0.5;
-  font-weight: 300;
-  font-family: "roboto slab", "open sans", "sans-serif";
-  color: ${({ theme }) => theme.colors.textTertiary};
-  span {
-    color: ${({ theme }) => theme.colors.textPrimary};
-  }
 `;
 
 const ComparePageWrapper = styled(StandardInnerContentWrapper)`

@@ -8,14 +8,14 @@ type ComparifyLogo = {
 
 const ComparifyLogo = ({ color, size }: ComparifyLogo) => {
   return (
-    <LogoContainer color={color} size={size} className="logoWrap">
+    <LogoContainer logoColor={color} size={size} className="logoWrap">
       <a href="/">Comparify</a>
     </LogoContainer>
   );
 };
 
 const LogoContainer = styled.div<{
-  color: string;
+  logoColor: string;
   size: string;
 }>`
   -webkit-user-select: none; /* Chrome all / Safari all */
@@ -24,7 +24,7 @@ const LogoContainer = styled.div<{
   a {
     transition: 0.2s ease all;
     opacity: 0.7;
-    color: ${({ color }) => color};
+    color: ${({ logoColor: color }) => color};
     font-size: ${({ size }) => size};
     font-family: "Roboto Slab", serif;
     &:hover {

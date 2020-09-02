@@ -278,21 +278,36 @@ export const TrackItem = styled.a`
         rgba(0, 0, 0, 0) 0%,
         ${({ theme }) => theme.colors.darkBodyOverlay} 100%
       );
+      ${breakpoints.lessThan("38")`
+        background: none;
+      `}
     }
+    ${breakpoints.lessThan("38")`
+      padding: 0.5em 0.5em 0.5em 0;
+    `}
   }
   .name {
     color: ${({ theme }) => theme.colors.textPrimary};
     font-weight: 700;
     white-space: nowrap;
+    ${breakpoints.lessThan("38")`
+      white-space: normal;
+    `}
   }
   .artists {
     color: ${({ theme }) => theme.colors.textTertiary};
     white-space: nowrap;
+    ${breakpoints.lessThan("38")`
+      white-space: normal;
+    `}
   }
   .album {
     color: ${({ theme }) => theme.colors.textTertiary};
     opacity: 0.5;
     white-space: nowrap;
+    ${breakpoints.lessThan("38")`
+      white-space: normal;
+    `}
   }
 `;
 

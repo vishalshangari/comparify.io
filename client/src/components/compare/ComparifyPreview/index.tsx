@@ -6,6 +6,8 @@ import styled from "styled-components";
 import ErrorComp from "../../shared/ErrorComp";
 import ContentLoader from "react-content-loader";
 import { APIError } from "../../../models";
+import { breakpoints } from "../../../theme";
+import { useMedia } from "react-use";
 
 type SpotifyProfileImage = {
   height: null | number;
@@ -25,21 +27,38 @@ type ComparifyPreviewProps = {
   setShowPreview: (val: boolean) => void;
 };
 
-const ComparifyProfilePlaceholder = () => (
-  <ContentLoader
-    speed={2}
-    width={550}
-    height={560}
-    viewBox="0 0 280 560"
-    backgroundColor="#1a1c1e"
-    foregroundColor="#212325"
-  >
-    <rect x="0" y="0" rx="10" ry="10" width="280" height="40" />
-    <rect x="0" y="50" rx="10" ry="10" width="280" height="280" />
-    <rect x="0" y="360" rx="10" ry="10" width="280" height="80" />
-    <rect x="40" y="480" rx="10" ry="10" width="200" height="80" />
-  </ContentLoader>
-);
+const ComparifyProfilePlaceholder = () => {
+  const isSmall = useMedia("(max-width: 42em)");
+  return isSmall ? (
+    <ContentLoader
+      speed={2}
+      width={550}
+      height={460}
+      viewBox="0 0 240 460"
+      backgroundColor="#1a1c1e"
+      foregroundColor="#212325"
+    >
+      <rect x="0" y="0" rx="10" ry="10" width="240" height="30" />
+      <rect x="0" y="40" rx="10" ry="10" width="240" height="240" />
+      <rect x="0" y="300" rx="10" ry="10" width="240" height="60" />
+      <rect x="0" y="400" rx="10" ry="10" width="240" height="60" />
+    </ContentLoader>
+  ) : (
+    <ContentLoader
+      speed={2}
+      width={550}
+      height={560}
+      viewBox="0 0 280 560"
+      backgroundColor="#1a1c1e"
+      foregroundColor="#212325"
+    >
+      <rect x="0" y="0" rx="10" ry="10" width="280" height="40" />
+      <rect x="0" y="50" rx="10" ry="10" width="280" height="280" />
+      <rect x="0" y="360" rx="10" ry="10" width="280" height="80" />
+      <rect x="40" y="480" rx="10" ry="10" width="200" height="80" />
+    </ContentLoader>
+  );
+};
 
 const ComparifyPreview = ({
   comparifyPage,
@@ -104,7 +123,9 @@ const ComparifyPreview = ({
             </ProfileImage>
           ) : null}
 
-          <ProfileName>{profileData.name}</ProfileName>
+          <ProfileName>
+            <h1>{profileData.name}</h1>
+          </ProfileName>
           <CompareBtnWrap>
             <CompareBtn onClick={() => setShowPreview(false)}>
               Comparify
@@ -185,6 +206,7 @@ const ComparePageBreadcrumb = styled.div`
   font-family: "roboto slab", "open sans", "sans-serif";
   color: ${({ theme }) => theme.colors.textTertiary};
   span {
+    font-weight: 500;
     color: ${({ theme }) => theme.colors.textPrimary};
   }
 `;
@@ -200,21 +222,47 @@ const ProfileWrap = styled.div`
 const ProfileImage = styled.div`
   border-radius: 1em;
   overflow: hidden;
-  width: 280px;
-  max-width: 100%;
-  height: 280px;
+  height: 16em;
+  max-width: 80%;
+  width: 16em;
+  margin-bottom: 2em;
   img {
+    height: 100%;
+    width: 100%;
     object-fit: cover;
   }
+  ${breakpoints.lessThan("38")`
+    height: 14em;
+    width: 14em;
+  `};
+  ${breakpoints.lessThan("30")`
+    height: 12em;
+    width: 12em;
+  `};
 `;
 
 const ProfileName = styled.div`
-  margin: 0.5em 0;
-  font-family: "roboto slab", "open sans", "sans-serif";
-  font-size: 5rem;
-  color: ${({ theme }) => theme.colors.textPrimary};
-  font-weight: 700;
-  text-align: center;
+  margin: 0.5em 0 2em;
+  h1 {
+    font-family: "open sans", "sans-serif";
+    font-size: 5rem;
+    letter-spacing: -2px;
+    color: ${({ theme }) => theme.colors.textPrimary};
+    font-weight: 700;
+    text-align: center;
+    ${breakpoints.lessThan("58")`
+      font-size: 4rem;
+    `};
+    ${breakpoints.lessThan("48")`
+      font-size: 3.5rem;
+    `};
+    ${breakpoints.lessThan("38")`
+      font-size: 3rem;
+    `};
+    ${breakpoints.lessThan("30")`
+      ont-size: 2.5rem;
+    `};
+  }
 `;
 
 export default ComparifyPreview;
