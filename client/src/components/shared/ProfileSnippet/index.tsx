@@ -1,15 +1,17 @@
 import styled from "styled-components";
+import { breakpoints } from "../../../theme";
 
 export default styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5em;
-  border-radius: 1em;
+  padding: 0.75em;
+  font-size: 2rem;
+  border-radius: 0.5em;
   .profileImage {
-    flex: 0 0 4.5em;
-    margin-right: 2em;
-    height: 4.5em;
+    flex: 0 0 2.25em;
+    margin-right: 1em;
+    height: 2.25em;
     border-radius: 50%;
     overflow: hidden;
     img {
@@ -20,7 +22,6 @@ export default styled.div`
   }
   .userName {
     color: ${({ theme }) => theme.colors.textPrimary};
-    font-size: 2rem;
     font-weight: 700;
     &:hover {
       text-decoration: underline;
@@ -43,4 +44,12 @@ export default styled.div`
       margin-right: 0;
     } */
   }
+  ${breakpoints.lessThan("66")`
+    font-size: 1.5rem;
+    .userName {
+    }
+    .profileImage {
+
+    }
+  `}
 `;

@@ -679,6 +679,9 @@ const ActionsGroup = styled.div`
   .description {
     margin-top: 1em;
   }
+  ${breakpoints.lessThan("66")`
+    margin-top: 2em;
+  `}
 `;
 
 const MakeAPage = styled.button`
@@ -713,6 +716,9 @@ const MakeAPage = styled.button`
 
 const TracksGroup = styled.div`
   margin-top: 4em;
+  ${breakpoints.lessThan("66")`
+    margin-top: 2em;
+  `}
 `;
 
 const VisitorTracks = styled.div`
@@ -809,6 +815,9 @@ const ArtistsGrid = styled.div`
 
 const ArtistsGroup = styled.div`
   margin-top: 4em;
+  ${breakpoints.lessThan("66")`
+    margin-top: 2em;
+  `}
   .artistsDisplayContainer,
   .artistsDisplayGridContainer {
     position: relative;
@@ -951,6 +960,9 @@ const GenresGrid = styled.div`
 
 const GenresGroup = styled.div`
   margin-top: 4em;
+  ${breakpoints.lessThan("66")`
+    margin-top: 2em;
+  `}
   .genresDisplayContainer {
     padding: 1em;
     text-align: center;
@@ -982,6 +994,13 @@ const NameSeparator = styled.div`
 const UserProfilesGroup = styled.div`
   display: grid;
   grid-template-columns: 1fr 10% 1fr;
+  ${breakpoints.lessThan("48")`
+    grid-template-columns: 1fr;
+    ${NameSeparator} {
+      margin: 0.25em 0;
+      font-size: 2rem;
+    }
+  `}
   margin-bottom: 2em;
 `;
 
@@ -990,6 +1009,9 @@ const Separator = styled.div`
   width: 80%;
   border-top: 2px dashed ${({ theme }) => theme.colors.darkBodyOverlayBorder};
   margin: 5em auto 0;
+  ${breakpoints.lessThan("66")`
+    margin-top: 2.5em;
+  `}
 `;
 
 const ComparifyDisplayWrap = styled.div`
@@ -999,6 +1021,9 @@ const ComparifyDisplayWrap = styled.div`
     margin-bottom: 1em;
     color: ${({ theme }) => theme.colors.textPrimary};
     font-weight: 700;
+    ${breakpoints.lessThan("66")`
+      font-size: 1.5rem;
+    `}
   }
   h2 {
     font-family: "roboto slab", "open sans", "sans-serif";
@@ -1006,6 +1031,9 @@ const ComparifyDisplayWrap = styled.div`
     text-align: center;
     line-height: 1.2;
     margin-bottom: 0.5em;
+    ${breakpoints.lessThan("66")`
+      font-size: 3.5rem;
+  `}
   }
   .clippedHeading {
     ${commonItemsDisplayBackgroundAnimated};

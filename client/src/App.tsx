@@ -9,6 +9,8 @@ import Loader from "./components/Loader";
 
 import { ERROR_CODES, RESPONSE_CODES } from "./constants";
 
+import useWindowSize from "./hooks/useWindowSize";
+
 let DEV_URL = "";
 if (process.env.NODE_ENV === `development`) {
   DEV_URL = "http://localhost:3001";
@@ -71,12 +73,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 };
 
 const App = () => {
+  const size = useWindowSize();
   return (
     <>
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <AuthProvider>
-          <FullSiteWrap>
+          <FullSiteWrap style={{ height: size?.height }}>
             <Router />
           </FullSiteWrap>
         </AuthProvider>
@@ -88,7 +91,7 @@ const App = () => {
 const FullSiteWrap = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 200px;
 `;
 
 // const Create = () => {
