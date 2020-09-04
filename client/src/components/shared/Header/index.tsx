@@ -136,17 +136,21 @@ export const PageTitle = styled.div<{ loading?: boolean }>`
 `;
 
 const MobileNavigation = styled.div<{ state: string }>`
-  display: none;
+  position: absolute;
+  z-index: 4;
   flex-basis: 100%;
   overflow: hidden;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 1em 3%;
+  height: 100vh;
+  width: 100%;
+  top: 100%;
+  left: 0;
   transition: 0.5s ease all;
   ${({ state }) =>
     state === "entered" || state === `entering`
-      ? `max-height: 10em;`
-      : `max-height: 0;`}
-  ${breakpoints.lessThan("66")`
-    display: block;
-  `};
+      ? `height: 100vh; opacity: 1;`
+      : `height: 0; opacity: 0;`}
   justify-content: flex-end;
   ul {
     margin: 1em 0;
@@ -168,6 +172,9 @@ const MobileNavigation = styled.div<{ state: string }>`
     font-weight: 600;
     text-align: center;
   }
+  ${breakpoints.greaterThan("66")`
+    display: none;
+  `};
 `;
 
 const MobileNavExpand = styled.button`
