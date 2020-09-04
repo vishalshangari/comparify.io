@@ -49,11 +49,17 @@ const Header = ({
         {logoOnlyNav ? null : (
           <ComparifyLogo color={theme.colors.textPrimary} size="1.5rem" />
         )}
-        <MobileNavExpand
+        <MobileNavExpandBtn
           onClick={() => setIsMobileNavExpanded((prev) => !prev)}
         >
-          {isMobileNavExpanded ? <VscClose /> : <HiMenu />}
-        </MobileNavExpand>
+          {/* {isMobileNavExpanded ? <VscClose /> : <HiMenu />} */}
+          <MobileNavigationHamburger isMobileNavExpanded={isMobileNavExpanded}>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </MobileNavigationHamburger>
+        </MobileNavExpandBtn>
       </Navigation>
       <Transition in={isMobileNavExpanded} timeout={500}>
         {(state) => (
@@ -177,19 +183,85 @@ const MobileNavigation = styled.div<{ state: string }>`
   `};
 `;
 
-const MobileNavExpand = styled.button`
+const MobileNavExpandBtn = styled.button`
   margin-left: 1em;
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 0.5em;
-  font-size: 1.5rem;
+  height: 3.25em;
+  width: 4em;
+  padding: 0.75em;
+
+  /* font-size: 1.5rem; */
   border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlay};
   border-radius: 0.25em;
   background: ${({ theme }) => theme.colors.mainContentBg};
   ${breakpoints.lessThan("66")`
     display: inline-flex;
   `};
+`;
+
+const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  -webkit-transform: rotate(0deg);
+  -moz-transform: rotate(0deg);
+  -o-transform: rotate(0deg);
+  transform: rotate(0deg);
+  -webkit-transition: 0.5s ease-in-out;
+  -moz-transition: 0.5s ease-in-out;
+  -o-transition: 0.5s ease-in-out;
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
+  span {
+    display: block;
+    position: absolute;
+    height: 0.125em;
+    width: 100%;
+    background: ${({ theme }) => theme.colors.textPrimary};
+    border-radius: 0.125em;
+    opacity: 1;
+    left: 0;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+    -webkit-transition: 0.25s ease-in-out;
+    -moz-transition: 0.25s ease-in-out;
+    -o-transition: 0.25s ease-in-out;
+    transition: 0.25s ease-in-out;
+    &:nth-child(1) {
+      top: 0em;
+      ${({ isMobileNavExpanded }) =>
+        isMobileNavExpanded ? `top: 0.8125em; width: 0%; left: 50%;` : ``}
+    }
+    &:nth-child(2) {
+      top: 0.8125em;
+      ${({ isMobileNavExpanded }) =>
+        isMobileNavExpanded
+          ? `-webkit-transform: rotate(45deg);
+            -moz-transform: rotate(45deg);
+            -o-transform: rotate(45deg);
+            transform: rotate(45deg);`
+          : ``}
+    }
+    &:nth-child(3) {
+      top: 0.8125em;
+      ${({ isMobileNavExpanded }) =>
+        isMobileNavExpanded
+          ? `-webkit-transform: rotate(-45deg);
+            -moz-transform: rotate(-45deg);
+            -o-transform: rotate(-45deg);
+            transform: rotate(-45deg);`
+          : ``}
+    }
+    &:nth-child(4) {
+      top: 1.625em;
+      ${({ isMobileNavExpanded }) =>
+        isMobileNavExpanded ? `top: 0.8125em; width: 0%; left: 50%;` : ``}
+    }
+  }
 `;
 
 const Navigation = styled.div`

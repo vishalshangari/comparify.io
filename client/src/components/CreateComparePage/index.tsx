@@ -94,6 +94,8 @@ const CreateComparePage = () => {
                   <input
                     name="comparify"
                     placeholder="enter a name..."
+                    autoCapitalize={"none"}
+                    autoCorrect={"off"}
                     onChange={() => setIsCreateButtonDisabled(true)}
                     ref={register({
                       required: true,
@@ -118,16 +120,16 @@ const CreateComparePage = () => {
                   />
                 </InputWrap>
               </CreateFormInputDisplay>
-              <FormError>
-                {errors?.comparify?.message ? (
-                  <span>{errors.comparify.message}</span>
-                ) : null}
-              </FormError>
               <CreateBtnWrap>
                 <CreateBtn disabled={isCreateButtonDisabled} type="submit">
                   Create
                 </CreateBtn>
               </CreateBtnWrap>
+              <FormError>
+                {errors?.comparify?.message ? (
+                  <span>{errors.comparify.message}</span>
+                ) : null}
+              </FormError>
             </form>
             <CreateFormRequirements>
               Name must be two or more alphanumeric characters
@@ -174,18 +176,17 @@ const CreateComparePage = () => {
 const CreateFormRequirements = styled.div`
   text-align: center;
   color: ${({ theme }) => theme.colors.textTertiary};
-  margin-top: 2em;
   ${breakpoints.lessThan("48")`
     font-size: 0.875rem;
   `}
 `;
 
 const FormError = styled.div`
-  min-height: 2.5em;
+  margin: 2em 0;
   ${breakpoints.lessThan("48")`
     font-size: 0.875rem;
+    margin: 1.5em 0;
   `}
-  margin: 2em 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,7 +325,12 @@ const CreateForm = styled.div`
   justify-content: center;
 `;
 
-const CreateBtnWrap = styled.div``;
+const CreateBtnWrap = styled.div`
+  margin-top: 3em;
+  ${breakpoints.lessThan("48")`
+    margin-top: 1.5em;
+  `}
+`;
 
 const CreateBtn = styled.button`
   padding: 0.5em 1em 0.625em;
