@@ -190,7 +190,7 @@ const MobileNavExpandBtn = styled.button`
   justify-content: center;
   height: 3.25em;
   width: 4em;
-  padding: 0.75em;
+  padding: 0 0.75em;
 
   /* font-size: 1.5rem; */
   border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlay};
