@@ -141,6 +141,7 @@ const ComparifyPreview = ({
 
 const CompareBtn = styled.button`
   padding: 0.5em 1em 0.625em;
+  border-radius: 0.25em;
   border: 0;
   font-family: "roboto slab", "open sans", "sans-serif";
   font-size: 1.75rem;
@@ -159,10 +160,11 @@ const CompareBtn = styled.button`
   transition-property: color;
   -webkit-transition-duration: 0.3s;
   transition-duration: 0.3s;
-  &:enabled:before {
+  &:before {
     content: "";
     position: absolute;
     z-index: -1;
+    border-radius: 0.25em;
     top: 0;
     bottom: 0;
     left: 0;
