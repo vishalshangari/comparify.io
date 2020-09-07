@@ -136,6 +136,17 @@ const Description = styled.div`
 `;
 const ObscurityScoreDisplay = styled.div`
   grid-area: obscurity;
+  .dataItemInner {
+    display: flex;
+    flex-direction: column;
+  }
+  .flexGrow {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 const ScoreDisplay = styled.div`
   text-align: center;

@@ -194,7 +194,7 @@ router.get("/login/callback", async (req, res) => {
       }
       // Login successful
       // TODO: redirect back to URL from state
-      res.redirect(HOME_REDIRECT_URI);
+      res.redirect(HOME_REDIRECT_URI + "/");
     } catch (error) {
       // TODO: better error handling
       console.log(`Authentication error: ` + error);
