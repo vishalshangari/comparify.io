@@ -7,7 +7,10 @@ import ErrorComp from "../../shared/ErrorComp";
 import ContentLoader from "react-content-loader";
 import { APIError } from "../../../models";
 import { breakpoints } from "../../../theme";
+import * as QueryString from "query-string";
 import { useMedia } from "react-use";
+import { MdShare } from "react-icons/md";
+import { Transition } from "react-transition-group";
 
 type SpotifyProfileImage = {
   height: null | number;
@@ -23,8 +26,8 @@ type SpotifyUserProfile = {
 
 type ComparifyPreviewProps = {
   comparifyPage: ComparifyPage;
-  setEnableCompareButton: (val: boolean) => void;
   setShowPreview: (val: boolean) => void;
+  isAuthenticated?: boolean;
 };
 
 const ComparifyProfilePlaceholder = () => {
@@ -62,14 +65,30 @@ const ComparifyProfilePlaceholder = () => {
 
 const ComparifyPreview = ({
   comparifyPage,
-  setEnableCompareButton,
   setShowPreview,
+  isAuthenticated,
 }: ComparifyPreviewProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [apiError, setApiError] = useState<null | APIError>(null);
   const [profileData, setProfileData] = useState<null | SpotifyUserProfile>(
     null
   );
+  const [showCopyAlert, setShowCopyAlert] = useState(false);
+  const [currentUserID, setCurrentUserID] = useState<null | string>(null);
+
+  const copyToClipboard = (text: string) => {
+    var dummy = document.createElement("textarea");
+    document.body.appendChild(dummy);
+    dummy.value = text;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
+  };
+
+  const handleCopyClick = () => {
+    copyToClipboard(`https://www.comparify.io/${comparifyPage.id}`);
+    setShowCopyAlert(true);
+  };
 
   useEffect(() => {
     const getUserProfile = async () => {
@@ -79,6 +98,13 @@ const ComparifyPreview = ({
             comparifyPage.data!.creator._id
           }`
         );
+        const { data: userData } = await axios.get(
+          `${DEV_URL}/api/get/current-user-id`,
+          {
+            withCredentials: true,
+          }
+        );
+        setCurrentUserID(userData.id);
         setProfileData(data);
       } catch (error) {
         console.log(error);
@@ -90,12 +116,10 @@ const ComparifyPreview = ({
         setIsLoading(false);
       }
       setIsLoading(false);
-      setEnableCompareButton(true);
     };
     getUserProfile();
-  }, [comparifyPage, setEnableCompareButton]);
+  }, [comparifyPage]);
 
-  console.log(apiError);
   if (apiError) {
     return (
       <ErrorComp art>
@@ -109,37 +133,126 @@ const ComparifyPreview = ({
   }
 
   return (
-    <ProfileWrap>
-      {isLoading ? (
-        <ComparifyProfilePlaceholder />
-      ) : profileData ? (
-        <>
-          <ComparePageBreadcrumb>
-            comparify.io/<span>{comparifyPage.id}</span>
-          </ComparePageBreadcrumb>
-          {profileData.images && profileData.images.length > 0 ? (
-            <ProfileImage>
-              <img alt={profileData.name} src={profileData.images[0].url} />
-            </ProfileImage>
-          ) : null}
+    <>
+      <Transition
+        in={showCopyAlert}
+        timeout={1500}
+        onEntered={() => setTimeout(() => setShowCopyAlert(false), 1000)}
+      >
+        {(state) => (
+          <CopyToClipboardAlert state={state}>
+            Link copied to clipboard!
+          </CopyToClipboardAlert>
+        )}
+      </Transition>
+      <ProfileWrap>
+        {isLoading ? (
+          <ComparifyProfilePlaceholder />
+        ) : profileData ? (
+          <>
+            <ComparePageBreadcrumb>
+              comparify.io/<span>{comparifyPage.id}</span>
+            </ComparePageBreadcrumb>
+            {profileData.images && profileData.images.length > 0 ? (
+              <ProfileImage>
+                <img alt={profileData.name} src={profileData.images[0].url} />
+              </ProfileImage>
+            ) : null}
 
-          <ProfileName>
-            <h1>{profileData.name}</h1>
-          </ProfileName>
-          <CompareBtnWrap>
-            <CompareBtn onClick={() => setShowPreview(false)}>
-              Comparify
-            </CompareBtn>
-          </CompareBtnWrap>
-        </>
-      ) : (
-        `Oops, there was an error loading this profile 🤕`
-      )}
-    </ProfileWrap>
+            <ProfileName>
+              <h1>{profileData.name}</h1>
+              {/* <h1>{currentUserID}</h1> */}
+            </ProfileName>
+
+            {comparifyPage.data!.creator._id === currentUserID ? (
+              <CurrentUserPageDisplay>
+                <h3>This is your Comparify page.</h3>
+                <AnimatedActionBtn onClick={handleCopyClick}>
+                  <span className="icon">
+                    <MdShare />
+                  </span>
+                  Share
+                </AnimatedActionBtn>
+              </CurrentUserPageDisplay>
+            ) : (
+              <CompareBtnWrap>
+                {isAuthenticated ? (
+                  <AnimatedActionBtn onClick={() => setShowPreview(false)}>
+                    Comparify
+                  </AnimatedActionBtn>
+                ) : (
+                  <AnimatedActionBtn
+                    // href={`${DEV_URL}/api/auth/login?redir=${comparifyPage.id}`}
+                    href={`${DEV_URL}/api/auth/login?${QueryString.stringify({
+                      redir: comparifyPage.id,
+                      compare: true,
+                    })}`}
+                  >
+                    Log-in with Spotify &amp; Comparify
+                  </AnimatedActionBtn>
+                )}
+              </CompareBtnWrap>
+            )}
+          </>
+        ) : (
+          `Oops, there was an error loading this profile 🤕`
+        )}
+      </ProfileWrap>
+    </>
   );
 };
 
-const CompareBtn = styled.button`
+const CopyToClipboardAlert = styled.div<{ state: string }>`
+  position: absolute;
+  display: inline-block;
+  top: 1em;
+  left: 50%;
+  border-radius: 0.25em;
+  transition: 0.5s ease all;
+  transform: translateX(-50%);
+  background: ${({ theme }) => theme.colors.mainAccent50p};
+  color: ${({ theme }) => theme.colors.textPrimary};
+  padding: 1em;
+  ${({ state }) =>
+    state === `entering` || state === `entered`
+      ? `top: 1em; opacity: 1`
+      : `top: 0; transform: translate(-50%, -100%); opacity: 0`};
+`;
+
+const CurrentUserPageDisplay = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  h3 {
+    margin-bottom: 1.5em;
+    font-family: "open sans", "sans-serif";
+    color: ${({ theme }) => theme.colors.textSecondary};
+    font-weight: 500;
+    font-size: 1.75rem;
+    ${breakpoints.lessThan("58")`
+      font-size: 1.75rem;
+    `};
+    ${breakpoints.lessThan("48")`
+      font-size: 1.5rem;
+    `};
+    ${breakpoints.lessThan("38")`
+      font-size: 1.25rem;
+    `};
+    ${breakpoints.lessThan("30")`
+      font-size: 1rem;
+    `};
+  }
+`;
+
+export const AnimatedActionBtn = styled.a`
+  .icon {
+    font-size: 1em;
+    margin-right: 0.5em;
+    color: #fff;
+    display: flex;
+    align-items: center;
+  }
   padding: 0.5em 1em 0.625em;
   border-radius: 0.25em;
   border: 0;
@@ -149,7 +262,8 @@ const CompareBtn = styled.button`
   font-weight: 500;
   letter-spacing: 1px;
   outline: 0;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   vertical-align: middle;
   -webkit-transform: perspective(1px) translateZ(0);
   transform: perspective(1px) translateZ(0);
@@ -199,7 +313,7 @@ const CompareBtnWrap = styled.div`
   overflow: hidden;
 `;
 
-const ComparePageBreadcrumb = styled.div`
+export const ComparePageBreadcrumb = styled.div`
   font-size: 1.75rem;
   margin-bottom: 1em;
   letter-spacing: 1px;
@@ -262,7 +376,7 @@ const ProfileName = styled.div`
       font-size: 3rem;
     `};
     ${breakpoints.lessThan("30")`
-      ont-size: 2.5rem;
+      font-size: 2.5rem;
     `};
   }
 `;

@@ -36,9 +36,11 @@ const Header = ({
           </li>
           <li>
             {isAuthenticated ? (
-              <a className="nav" href="/">
-                My Account
-              </a>
+              <>
+                <a className="nav" href="/">
+                  My Account
+                </a>
+              </>
             ) : (
               <a className="nav" href="/">
                 Login
@@ -142,16 +144,17 @@ export const PageTitle = styled.div<{ loading?: boolean }>`
 `;
 
 const MobileNavigation = styled.div<{ state: string }>`
-  position: absolute;
+  position: fixed;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 0px;
   z-index: 4;
   flex-basis: 100%;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.7);
   padding: 1em 3%;
-  height: 100vh;
-  width: 100%;
-  top: 100%;
-  left: 0;
+  height: 100%;
   transition: 0.5s ease all;
   ${({ state }) =>
     state === "entered" || state === `entering`

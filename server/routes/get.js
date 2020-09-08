@@ -84,6 +84,22 @@ const oldGetPublicUserInfoId = () => {
 };
 
 router.get(
+  "/current-user-id",
+  catchAsync(async (req, res, next) => {
+    if (req.cookies["comparifyToken"]) {
+      const { _id: userId } = jwt.verify(
+        req.cookies["comparifyToken"],
+        process.env.JWT_SECRET
+      );
+      res.send({ id: userId });
+      console.log(userId);
+    } else {
+      res.send({ id: "" });
+    }
+  })
+);
+
+router.get(
   "/public/user-info/:id",
   catchAsync(async (req, res, next) => {
     const userID = req.params.id;

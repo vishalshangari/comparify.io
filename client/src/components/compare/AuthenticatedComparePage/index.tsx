@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import Header from "../../shared/Header";
 import Footer from "../../shared/Footer";
 import ComponentWithLoadingState from "../../shared/ComponentWithLoadingState";
@@ -9,14 +9,25 @@ import useComparifyPage from "../../../hooks/useComparifyPage";
 import Comparify from "../Comparify";
 import styled from "styled-components";
 import { Transition } from "react-transition-group";
-import ComparifyPreview from "../ComparifyPreview";
+import * as QueryString from "query-string";
+import { ComparePageBreadcrumb } from "../ComparifyPreview";
+import ComparifyPreview, { AnimatedActionBtn } from "../ComparifyPreview";
+import { NoComparifyPage } from "../UnauthenticatedComparePage";
 
 const AuthenticatedComparePage = () => {
   const { comparifyPageID } = useParams();
+  const location = useLocation();
   const [showComparison, setShowComparison] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
-  const [, setEnableCompareButton] = useState(false);
   const comparifyPage = useComparifyPage(comparifyPageID);
+
+  const performComparison = QueryString.parse(location.search);
+
+  useEffect(() => {
+    if (performComparison["compare"] === "true") {
+      setShowPreview(false);
+    }
+  }, [performComparison]);
 
   return (
     <>
@@ -36,18 +47,23 @@ const AuthenticatedComparePage = () => {
                   loading={comparifyPage === null}
                 >
                   {comparifyPage && comparifyPage.exists ? (
-                    <>
-                      <ComparifyPreview
-                        comparifyPage={comparifyPage}
-                        setEnableCompareButton={setEnableCompareButton}
-                        setShowPreview={setShowPreview}
-                      />
-                    </>
+                    <ComparifyPreview
+                      isAuthenticated
+                      comparifyPage={comparifyPage}
+                      setShowPreview={setShowPreview}
+                    />
                   ) : (
-                    <h2>
-                      No such page exists yet! {comparifyPageID}; want to claim
-                      it?
-                    </h2>
+                    <NoComparifyPage>
+                      <ComparePageBreadcrumb>
+                        comparify.io/<span>{comparifyPageID}</span>
+                      </ComparePageBreadcrumb>
+                      <h1>This Comparify page does not exist.</h1>
+                      <AnimatedActionBtn
+                        href={`/create?name=${comparifyPageID}`}
+                      >
+                        Claim this page
+                      </AnimatedActionBtn>
+                    </NoComparifyPage>
                   )}
                 </ComponentWithLoadingState>
               </ComparifyPreviewLoadGroup>
@@ -81,8 +97,6 @@ const ComparifyPreviewLoadGroup = styled.div<{ state: string }>`
     state === "entered" || state === `entering`
       ? `opacity: 1;`
       : `transform: scale(0.8); opacity: 0;`};
-  /* ${({ state }) =>
-    state === "exiting" ? `transform: scale(0.7); opacity: 0;` : ``}; */
 `;
 
 const ComparifyDisplayLoadGroup = styled.div<{ state: string }>`

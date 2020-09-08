@@ -33,8 +33,18 @@ const db = require("../db/firebase");
 const firebase = require("firebase");
 
 router.get("/login", (req, res) => {
+  const redirectURL = req.query.redir || null;
+  const performComparisonOnRedirect = req.query.compare || null;
   // Set auth request state cookie
-  const state = generateRandomString(16);
+  const stateGen = generateRandomString(16);
+  const state = Buffer.from(
+    JSON.stringify({
+      stateGen: stateGen,
+      redir: redirectURL,
+      performComparison: performComparisonOnRedirect,
+    })
+  ).toString("base64");
+
   res.cookie(SPOTIFY_AUTH_STATE_KEY, state);
 
   // Request authorization
@@ -68,6 +78,7 @@ router.get("/login/callback", async (req, res) => {
         })
     );
   } else {
+    const decodedState = JSON.parse(Buffer.from(state, "base64").toString());
     // Clear state cookie, no longer needed
     res.clearCookie(SPOTIFY_AUTH_STATE_KEY);
 
@@ -194,7 +205,14 @@ router.get("/login/callback", async (req, res) => {
       }
       // Login successful
       // TODO: redirect back to URL from state
-      res.redirect(HOME_REDIRECT_URI + "/");
+
+      res.redirect(
+        HOME_REDIRECT_URI +
+          (decodedState.redir || "") +
+          (decodedState.performComparison
+            ? `?` + queryString.stringify({ compare: true })
+            : "")
+      );
     } catch (error) {
       // TODO: better error handling
       console.log(`Authentication error: ` + error);

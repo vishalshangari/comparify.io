@@ -13,13 +13,10 @@ import media from "styled-media-query";
 import { Transition } from "react-transition-group";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { Theme } from "../../theme";
+import { DEV_URL } from "../../constants";
 import useWindowSize from "../../hooks/useWindowSize";
 
-type SplashProps = {
-  img: HTMLImageElement;
-};
-
-const Splash = ({ img }: SplashProps) => {
+const Splash = () => {
   // If retina display query needed for bg
   // const isHighPixelDensity = useMedia(
   //   "(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)"
@@ -102,7 +99,7 @@ const Splash = ({ img }: SplashProps) => {
         <Transition in={allTitlesEntered} timeout={1000}>
           {(state) => (
             <FrontActionButtonWrap state={state}>
-              <ActionButton>
+              <ActionButton href={`${DEV_URL}/api/auth/login`}>
                 <span>GET STARTED</span> <IoIosArrowDroprightCircle />
               </ActionButton>
               <FrontActionButtonLabel>
@@ -138,7 +135,7 @@ const FrontActionButtonLabel = styled.div`
   }
 `;
 
-const ActionButton = styled.button`
+const ActionButton = styled.a`
   border: 0;
   outline: 0;
   z-index: 3;

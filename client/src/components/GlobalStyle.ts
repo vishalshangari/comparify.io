@@ -15,8 +15,12 @@ const GlobalStyle = createGlobalStyle<{ theme: Theme }>`
   p{margin:0;}
   cite {font-style:normal;}
   fieldset{border-width:0; padding:0; margin:0;}
+  html {
+    height: 100%;
+  }
 
   body {
+    height: 100%;
     background: black;
     // background: ${({ theme }) => theme.colors.bodyBg};
     font-family: ${({ theme }) => theme.fonts.main}, sans-serif;

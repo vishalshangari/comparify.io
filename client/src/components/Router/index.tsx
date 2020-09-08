@@ -18,6 +18,7 @@ import AuthenticatedComparePage from "../compare/AuthenticatedComparePage";
 import UnauthenticatedComparePage from "../compare/UnauthenticatedComparePage";
 import DiscoverTogether from "../compare/DiscoverTogether";
 import FormTest from "../FormTest";
+import FourZeroFour from "../FourZeroFour";
 
 export interface PrivateRouteProps extends RouteProps {
   isAuthenticated: boolean;
@@ -57,9 +58,10 @@ const Router = () => {
   return (
     <BrowserRouter>
       <Switch>
-        {/* <Route path="/create" exact component={Create} /> */}
-        <Route path="/splash" exact component={Splash} />
-        <Route path="/home" exact component={Home} />=
+        <Route path="/" exact>
+          {isAuthenticated ? <Redirect to="/home" /> : <Splash />}
+        </Route>
+        <Route path="/home" exact component={Home} />
         <Route path="/login" exact component={Login} />
         <Route path="/create" exact component={CreateComparePage} />
         <Route path="/auth" component={Test} />
@@ -68,7 +70,7 @@ const Router = () => {
         <Route path="/private" exact>
           {isAuthenticated ? <TestPrivateRoute /> : <Redirect to="/login" />}
         </Route>
-        <Route path="/:comparifyPageID">
+        <Route path="/:comparifyPageID([a-zA-Z0-9]+)">
           {isAuthenticated ? (
             <AuthenticatedComparePage />
           ) : (
@@ -82,6 +84,7 @@ const Router = () => {
           exact
           component={TestPrivateRoute}
         /> */}
+        <Route path="*" component={FourZeroFour} />
         <Route path="*" component={Test} />
       </Switch>
     </BrowserRouter>

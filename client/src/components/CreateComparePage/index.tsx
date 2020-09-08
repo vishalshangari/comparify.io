@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled, { keyframes, css } from "styled-components";
 import Header from "../shared/Header";
 import Footer from "../shared/Footer";
@@ -13,6 +13,8 @@ import debounce from "lodash/debounce";
 import { useForm } from "react-hook-form";
 import AwesomeDebouncePromise from "awesome-debounce-promise";
 import { breakpoints } from "../../theme";
+import * as QueryString from "query-string";
+import { useLocation } from "react-router-dom";
 
 type FormData = {
   comparify: string;
@@ -23,11 +25,31 @@ const alphaNumericPattern = RegExp("^[a-zA-Z0-9]+$");
 // TODO: Only show create options if authenticated user & does not have existing page
 // Create API endpoint to check if user has comparifyPage
 const CreateComparePage = () => {
+  const location = useLocation();
   const [apiError, setApiError] = useState<null | string>(null);
   const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
-  const { register, handleSubmit, errors } = useForm<FormData>({
+  const { register, handleSubmit, errors, trigger, setValue } = useForm<
+    FormData
+  >({
     mode: "onChange",
   });
+  const autoFillValue = QueryString.parse(location.search);
+  console.log(typeof autoFillValue.name);
+
+  useEffect(() => {
+    const triggerValidationOnForm = async () => {
+      await trigger("comparify");
+    };
+    if (autoFillValue.name) {
+      setValue(
+        "comparify",
+        typeof autoFillValue.name === "string"
+          ? autoFillValue.name
+          : autoFillValue.name?.join("")
+      );
+      triggerValidationOnForm();
+    }
+  }, []);
 
   const onSubmit = handleSubmit(async ({ comparify }) => {
     console.log("submitted name: ", comparify);
@@ -95,6 +117,7 @@ const CreateComparePage = () => {
                     name="comparify"
                     placeholder="enter a name..."
                     autoCapitalize={"none"}
+                    autoFocus
                     autoCorrect={"off"}
                     onChange={() => setIsCreateButtonDisabled(true)}
                     ref={register({
