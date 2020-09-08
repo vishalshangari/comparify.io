@@ -55,12 +55,20 @@ const Header = ({
           onClick={() => setIsMobileNavExpanded((prev) => !prev)}
         >
           {/* {isMobileNavExpanded ? <VscClose /> : <HiMenu />} */}
-          <MobileNavigationHamburger isMobileNavExpanded={isMobileNavExpanded}>
+          {/* <MobileNavigationHamburger isMobileNavExpanded={isMobileNavExpanded}>
             <span></span>
             <span></span>
             <span></span>
             <span></span>
-          </MobileNavigationHamburger>
+          </MobileNavigationHamburger> */}
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              display: "block",
+              background: "tomato",
+            }}
+          ></div>
         </MobileNavExpandBtn>
       </Navigation>
       <Transition in={isMobileNavExpanded} timeout={500}>
@@ -144,22 +152,19 @@ export const PageTitle = styled.div<{ loading?: boolean }>`
 `;
 
 const MobileNavigation = styled.div<{ state: string }>`
-  position: fixed;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-  top: 0px;
   z-index: 4;
   flex-basis: 100%;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.7);
-  padding: 1em 3%;
-  height: 100%;
-  transition: 0.5s ease all;
+  padding: 1em 0;
+  width: 100%;
+  top: 100%;
+  left: 0;
+  transition: 0.5s ease-in-out all;
   ${({ state }) =>
     state === "entered" || state === `entering`
-      ? `height: 100vh; opacity: 1;`
-      : `height: 0; opacity: 0;`}
+      ? `max-height: 800px; opacity: 1;`
+      : `max-height: 0px; padding: 0; opacity: 0;`}
   justify-content: flex-end;
   ul {
     margin: 1em 0;
@@ -194,8 +199,6 @@ const MobileNavExpandBtn = styled.button`
   height: 3.25em;
   width: 4em;
   padding: 0 0.75em;
-
-  /* font-size: 1.5rem; */
   border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlay};
   border-radius: 0.25em;
   background: ${({ theme }) => theme.colors.mainContentBg};
