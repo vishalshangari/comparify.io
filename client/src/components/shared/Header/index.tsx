@@ -68,7 +68,9 @@ const Header = ({
               display: "block",
               background: "tomato",
             }}
-          ></div>
+          >
+            a
+          </div>
         </MobileNavExpandBtn>
       </Navigation>
       <Transition in={isMobileNavExpanded} timeout={500}>
