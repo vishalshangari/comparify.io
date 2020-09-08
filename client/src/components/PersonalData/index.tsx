@@ -13,7 +13,13 @@ import Header from "../shared/Header";
 import fetchUserSavedData from "../../utils/fetchUserSavedData";
 import { APIError } from "../../models";
 import ErrorComp from "../shared/ErrorComp";
+import { ComparifyPage } from "../../hooks/useComparifyPage";
 import filterTopGenresForDisplay from "../../utils/filterTopGenresForDisplay";
+import { AnimatedActionBtn } from "../compare/ComparifyPreview";
+import copyToClipboard from "../../utils/copyToClipboard";
+import { MdShare } from "react-icons/md";
+import { Transition } from "react-transition-group";
+import CopyToClipboardAlert from "../shared/CopyToClipboardAlert";
 
 export type Genre = {
   name: string;
@@ -35,6 +41,7 @@ export type TopGenresDataType = {
 
 type UserInfo = null | {
   names: string[];
+  profileImageUrl: string;
 };
 
 type AristTrackType = {
@@ -76,7 +83,12 @@ const PersonalData = () => {
   const [topTracks, setTopTracks] = useState<TopTracksType>(null);
   const [topArtists, setTopArtists] = useState<TopArtistsType>(null);
   const [featureScores, setFeatureScores] = useState<FeatureScores>(null);
+  const [
+    userComparifyPage,
+    setUserComparifyPage,
+  ] = useState<null | ComparifyPage>(null);
   const [pageTitle, setPageTitle] = useState(`Loading...`);
+  const [showCopyAlert, setShowCopyAlert] = useState(false);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -96,6 +108,7 @@ const PersonalData = () => {
               : null,
         };
         setUserInfo(userData.userInfo);
+        setUserComparifyPage(userData.comparifyPage);
         setPageTitle(`Hi, ${userData.userInfo.names[0]}`);
         setTopGenres(filteredTopGenres);
         setObscurityScore(Math.floor(userData.obscurityScore));
@@ -116,6 +129,11 @@ const PersonalData = () => {
     getUserData();
   }, []);
 
+  const handleCopyClick = () => {
+    copyToClipboard(`https://www.comparify.io/${userComparifyPage?.id}`);
+    setShowCopyAlert(true);
+  };
+
   if (apiError) {
     return (
       <>
@@ -135,9 +153,54 @@ const PersonalData = () => {
 
   return (
     <>
+      <Transition
+        in={showCopyAlert}
+        timeout={1500}
+        onEntered={() => setTimeout(() => setShowCopyAlert(false), 1000)}
+      >
+        {(state) => (
+          <CopyToClipboardAlert state={state}>
+            Link copied to clipboard
+          </CopyToClipboardAlert>
+        )}
+      </Transition>
       <Header standardNav={true} pageTitle={pageTitle} loading={loading} />
       <PersonalDataWrapper>
         <ComponentWithLoadingState label={false} loading={loading}>
+          <UserComparifyPagePreview>
+            <div className="dataItemInner">
+              <ComparifyPagePreviewDisplay>
+                <div className="profileImage">
+                  <img src={userInfo?.profileImageUrl} />
+                </div>
+                {userComparifyPage?.exists && userComparifyPage?.id ? (
+                  <div className="comparifyURLDisplay">
+                    {`comparify.io/`}
+                    <span>{`${userComparifyPage.id}`}</span>
+                  </div>
+                ) : (
+                  <div className="noComparifyPageDisplay">
+                    You don't have a Comparify page yet.
+                  </div>
+                )}
+              </ComparifyPagePreviewDisplay>
+            </div>
+            <div className="comparifyPageActions">
+              {userComparifyPage?.exists ? (
+                <>
+                  <AnimatedActionBtn onClick={handleCopyClick}>
+                    <span className="icon">
+                      <MdShare />
+                    </span>
+                    Share
+                  </AnimatedActionBtn>
+                  <AnimatedActionBtn>Preview</AnimatedActionBtn>
+                </>
+              ) : (
+                <AnimatedActionBtn>Create</AnimatedActionBtn>
+              )}
+            </div>
+          </UserComparifyPagePreview>
           <PersonalDataInner position="top">
             <TopGenres data={topGenres} />
             <Obscurity score={obscurityScore} />
@@ -152,6 +215,131 @@ const PersonalData = () => {
     </>
   );
 };
+
+const ComparifyPagePreviewDisplay = styled.div`
+  display: flex;
+  align-items: center;
+  .profileImage {
+    flex: 0 0 5em;
+    margin-right: 1em;
+    height: 5em;
+    border-radius: 50%;
+    overflow: hidden;
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+  .comparifyURLDisplay {
+    overflow-wrap: anywhere;
+    font-size: 2rem;
+    line-height: 1;
+    letter-spacing: 1px;
+    font-weight: 300;
+    font-family: "roboto slab", "open sans", "sans-serif";
+    color: ${({ theme }) => theme.colors.textTertiary};
+    span {
+      font-weight: 500;
+      color: ${({ theme }) => theme.colors.textPrimary};
+    }
+  }
+  .noComparifyPageDisplay {
+    font-size: 2rem;
+  }
+  ${breakpoints.lessThan("85")`
+    .comparifyURLDisplay {
+      font-size: 1.5rem;
+    }
+  `}
+  ${breakpoints.lessThan("74")`
+    .comparifyURLDisplay {
+      font-size: 1.375rem;
+      span {
+        display: block;
+        margin-top: 0.25em;
+      }
+    }
+    .noComparifyPageDisplay {
+      font-size: 1.75rem;
+    }
+  `}
+  ${breakpoints.lessThan("58")`
+    .comparifyURLDisplay {
+      font-size: 1.25rem;
+    }
+  `}
+  ${breakpoints.lessThan("48")`
+    .comparifyURLDisplay {
+      font-size: 2rem;
+    }
+    .noComparifyPageDisplay {
+      font-size: 1.5rem;
+    }
+  `}
+  ${breakpoints.lessThan("42")`
+    .comparifyURLDisplay {
+      font-size: 1.5rem;
+    }
+  `}
+  ${breakpoints.lessThan("38")`
+    .noComparifyPageDisplay {
+      font-size: 1.25rem;
+    }
+  `}
+  ${breakpoints.lessThan("33")`
+    .comparifyURLDisplay {
+      font-size: 1.25rem;
+    }
+  `}
+`;
+
+const UserComparifyPagePreview = styled.div`
+  width: 94%;
+  margin: 0 auto 4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  > div {
+    margin-right: 2em;
+  }
+  > div:last-child {
+    margin-right: 0;
+  }
+  .comparifyPageActions {
+    display: flex;
+    a:first-child {
+      margin-right: 1em;
+    }
+  }
+  ${breakpoints.lessThan("66")`
+    margin: 0 auto 2em;
+  `}
+  ${breakpoints.lessThan("48")`
+    flex-wrap: wrap;
+    > div {
+      flex-basis: 100%;
+      margin: 0;
+    }
+    > div:last-child {
+      margin-top: 1em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    && .dataItemInner {
+      padding: 1em;
+    }
+    && ${AnimatedActionBtn} {
+      font-size: 1.25em;
+    }
+  `}
+  ${breakpoints.lessThan("58")`
+    && ${AnimatedActionBtn} {
+      font-size: 1.5em;
+    }
+  `}
+`;
 
 const topGridLayout = css`
   grid-template-areas: "genres genres genres genres genres genres genres obscurity obscurity obscurity obscurity obscurity";
@@ -193,18 +381,6 @@ const PersonalDataInner = styled.div<{ position?: string }>`
     justify-content: space-between;
     margin-bottom: 1.5em;
   }
-  .dataItemInner {
-    padding: 2em;
-    flex-grow: 1;
-    box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.3);
-    background: ${({ theme }) => theme.colors.darkBodyOverlay};
-    border-radius: 0.5em;
-    border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlayBorder};
-    &:hover {
-      border: 1px solid rgb(255, 255, 255, 0.25);
-    }
-    transition: 0.2s ease all;
-  }
 `;
 
 const PersonalDataWrapper = styled.div`
@@ -242,6 +418,18 @@ const PersonalDataWrapper = styled.div`
       font-size: 2.75rem;
     }
   `}
+  .dataItemInner {
+    padding: 2em;
+    flex-grow: 1;
+    box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.3);
+    background: ${({ theme }) => theme.colors.darkBodyOverlay};
+    border-radius: 0.5em;
+    border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlayBorder};
+    &:hover {
+      border: 1px solid rgb(255, 255, 255, 0.25);
+    }
+    transition: 0.2s ease all;
+  }
 `;
 
 export default PersonalData;

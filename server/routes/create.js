@@ -44,6 +44,7 @@ router.post("/", async (req, res) => {
         comparifyPage: {
           exists: true,
           ref: db.collection(DB_COMPARIFYPAGE_COLLECTION).doc(pageName),
+          id: pageName,
         },
       });
 

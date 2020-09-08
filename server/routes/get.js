@@ -151,6 +151,10 @@ router.get(
         audioFeatures,
         obscurityScore,
       },
+      comparifyPage: {
+        exists: comparifyPageExists = false,
+        id: comparifyPageID = null,
+      } = { exists: false, ref: null },
     } = userDoc.data();
 
     const names = userInfo.displayName.split(" ");
@@ -158,6 +162,7 @@ router.get(
     const responseData = {
       userInfo: {
         names: names,
+        profileImageUrl: userInfo.profileImageUrl,
       },
       obscurityScore: obscurityScore,
       topTracks: topTracks,
@@ -171,6 +176,10 @@ router.get(
         shortTerm: topArtistsAndGenres.shortTerm.topGenres,
         mediumTerm: topArtistsAndGenres.mediumTerm.topGenres,
         longTerm: topArtistsAndGenres.longTerm.topGenres,
+      },
+      comparifyPage: {
+        exists: comparifyPageExists,
+        id: comparifyPageID,
       },
     };
     // console.log(responseData);

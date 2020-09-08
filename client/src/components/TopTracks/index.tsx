@@ -72,7 +72,6 @@ const TopTracksWrapper = ({ tracks }: TopTracksProps) => {
       const getPromiseResult = (
         result: PromiseSettledResult<LoadedTrack[]>
       ) => {
-        console.log(result);
         if (result.status !== `fulfilled`) {
           return {
             isError: true,

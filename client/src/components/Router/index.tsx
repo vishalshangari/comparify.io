@@ -19,6 +19,7 @@ import UnauthenticatedComparePage from "../compare/UnauthenticatedComparePage";
 import DiscoverTogether from "../compare/DiscoverTogether";
 import FormTest from "../FormTest";
 import FourZeroFour from "../FourZeroFour";
+import CompareRouter from "../CompareRouter";
 
 export interface PrivateRouteProps extends RouteProps {
   isAuthenticated: boolean;
@@ -64,6 +65,8 @@ const Router = () => {
         <Route path="/home" exact component={Home} />
         <Route path="/login" exact component={Login} />
         <Route path="/create" exact component={CreateComparePage} />
+        <Route path="/compareTest" exact component={CompareRouter} />
+
         <Route path="/auth" component={Test} />
         <Route path="/formTest" exact component={FormTest} />
         <Route path="/test" component={DiscoverTogether} />

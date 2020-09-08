@@ -11,6 +11,8 @@ import * as QueryString from "query-string";
 import { useMedia } from "react-use";
 import { MdShare } from "react-icons/md";
 import { Transition } from "react-transition-group";
+import copyToClipboard from "../../../utils/copyToClipboard";
+import CopyToClipboardAlert from "../../shared/CopyToClipboardAlert";
 
 type SpotifyProfileImage = {
   height: null | number;
@@ -76,15 +78,6 @@ const ComparifyPreview = ({
   const [showCopyAlert, setShowCopyAlert] = useState(false);
   const [currentUserID, setCurrentUserID] = useState<null | string>(null);
 
-  const copyToClipboard = (text: string) => {
-    var dummy = document.createElement("textarea");
-    document.body.appendChild(dummy);
-    dummy.value = text;
-    dummy.select();
-    document.execCommand("copy");
-    document.body.removeChild(dummy);
-  };
-
   const handleCopyClick = () => {
     copyToClipboard(`https://www.comparify.io/${comparifyPage.id}`);
     setShowCopyAlert(true);
@@ -141,7 +134,7 @@ const ComparifyPreview = ({
       >
         {(state) => (
           <CopyToClipboardAlert state={state}>
-            Link copied to clipboard!
+            Link copied to clipboard
           </CopyToClipboardAlert>
         )}
       </Transition>
@@ -201,23 +194,6 @@ const ComparifyPreview = ({
     </>
   );
 };
-
-const CopyToClipboardAlert = styled.div<{ state: string }>`
-  position: absolute;
-  display: inline-block;
-  top: 1em;
-  left: 50%;
-  border-radius: 0.25em;
-  transition: 0.5s ease all;
-  transform: translateX(-50%);
-  background: ${({ theme }) => theme.colors.mainAccent50p};
-  color: ${({ theme }) => theme.colors.textPrimary};
-  padding: 1em;
-  ${({ state }) =>
-    state === `entering` || state === `entered`
-      ? `top: 1em; opacity: 1`
-      : `top: 0; transform: translate(-50%, -100%); opacity: 0`};
-`;
 
 const CurrentUserPageDisplay = styled.div`
   display: flex;

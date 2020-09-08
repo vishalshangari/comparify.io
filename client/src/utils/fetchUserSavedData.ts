@@ -37,6 +37,7 @@ export default async () => {
       topArtists,
       obscurityScore,
       featureScores: userFeatureScores,
+      comparifyPage,
     },
   } = await axios.get(`${DEV_URL}/api/get/saved-data`, {
     withCredentials: true,
@@ -49,5 +50,6 @@ export default async () => {
     topArtists: topArtists,
     obscurityScore: obscurityScore,
     userFeatureScores: userFeatureScores,
+    comparifyPage: comparifyPage,
   };
 };

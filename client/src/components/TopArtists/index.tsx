@@ -77,7 +77,6 @@ const TopArtistsWrapper = ({ artists }: TopArtistsProps) => {
       const getPromiseResult = (
         result: PromiseSettledResult<LoadedArtist[]>
       ) => {
-        console.log(result);
         if (result.status !== `fulfilled`) {
           return {
             isError: true,

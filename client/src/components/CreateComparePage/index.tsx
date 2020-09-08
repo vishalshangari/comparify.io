@@ -14,7 +14,10 @@ import { useForm } from "react-hook-form";
 import AwesomeDebouncePromise from "awesome-debounce-promise";
 import { breakpoints } from "../../theme";
 import * as QueryString from "query-string";
-import { useLocation } from "react-router-dom";
+import { useLocation, Redirect } from "react-router-dom";
+import ComponentWithLoadingState from "../shared/ComponentWithLoadingState";
+import fetchUserSavedData from "../../utils/fetchUserSavedData";
+import { ComparifyPage } from "../../hooks/useComparifyPage";
 
 type FormData = {
   comparify: string;
@@ -27,6 +30,11 @@ const alphaNumericPattern = RegExp("^[a-zA-Z0-9]+$");
 const CreateComparePage = () => {
   const location = useLocation();
   const [apiError, setApiError] = useState<null | string>(null);
+  const [
+    userComparifyPage,
+    setUserComparifyPage,
+  ] = useState<null | ComparifyPage>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
   const { register, handleSubmit, errors, trigger, setValue } = useForm<
     FormData
@@ -37,6 +45,23 @@ const CreateComparePage = () => {
   console.log(typeof autoFillValue.name);
 
   useEffect(() => {
+    const checkIfUserHasComparifyPage = async () => {
+      const userData = await fetchUserSavedData();
+      if (userData.comparifyPage.exists) {
+        setUserComparifyPage({
+          exists: true,
+          id: userData.comparifyPage.id,
+        });
+        setIsLoading(false);
+      } else {
+        setUserComparifyPage({
+          exists: false,
+          id: undefined,
+        });
+        setIsLoading(false);
+      }
+    };
+    checkIfUserHasComparifyPage();
     const triggerValidationOnForm = async () => {
       await trigger("comparify");
     };
@@ -99,97 +124,101 @@ const CreateComparePage = () => {
     return false;
   };
 
-  return (
+  return userComparifyPage?.exists ? (
+    <Redirect to={`/${userComparifyPage.id}`} />
+  ) : (
     <>
       <Header standardNav={true} pageTitle={"Create"} />
       <StandardMainContentWrapper>
-        <CreateWrap>
-          {/* <CreateSplash>
+        <ComponentWithLoadingState label={false} loading={isLoading}>
+          <CreateWrap>
+            {/* <CreateSplash>
             <p>What do you want to name your page?</p>
           </CreateSplash> */}
 
-          <CreateForm>
-            <form onSubmit={onSubmit} autoComplete={"off"}>
-              <CreateFormInputDisplay>
-                <FormPrefix>comparify.io/</FormPrefix>
-                <InputWrap>
-                  <input
-                    name="comparify"
-                    placeholder="enter a name..."
-                    autoCapitalize={"none"}
-                    autoFocus
-                    autoCorrect={"off"}
-                    onChange={() => setIsCreateButtonDisabled(true)}
-                    ref={register({
-                      required: true,
-                      validate: {
-                        minLength: (value) =>
-                          value.length > 1 ||
-                          "Name must be at least two characters long",
-                        chars: (value) => {
-                          return (
-                            checkAlphaNumeric(value) ||
-                            "Page name must only contain alphanumeric characters"
-                          );
+            <CreateForm>
+              <form onSubmit={onSubmit} autoComplete={"off"}>
+                <CreateFormInputDisplay>
+                  <FormPrefix>comparify.io/</FormPrefix>
+                  <InputWrap>
+                    <input
+                      name="comparify"
+                      placeholder="enter a name..."
+                      autoCapitalize={"none"}
+                      autoFocus
+                      autoCorrect={"off"}
+                      onChange={() => setIsCreateButtonDisabled(true)}
+                      ref={register({
+                        required: true,
+                        validate: {
+                          minLength: (value) =>
+                            value.length > 1 ||
+                            "Name must be at least two characters long",
+                          chars: (value) => {
+                            return (
+                              checkAlphaNumeric(value) ||
+                              "Page name must only contain alphanumeric characters"
+                            );
+                          },
+                          existence: AwesomeDebouncePromise(async (value) => {
+                            return (
+                              (await validateName(value)) ||
+                              "This name is already taken, please try a different one"
+                            );
+                          }, 750),
                         },
-                        existence: AwesomeDebouncePromise(async (value) => {
-                          return (
-                            (await validateName(value)) ||
-                            "This name is already taken, please try a different one"
-                          );
-                        }, 750),
-                      },
-                    })}
-                  />
-                </InputWrap>
-              </CreateFormInputDisplay>
-              <CreateBtnWrap>
-                <CreateBtn disabled={isCreateButtonDisabled} type="submit">
-                  Create
-                </CreateBtn>
-              </CreateBtnWrap>
-              <FormError>
-                {errors?.comparify?.message ? (
-                  <span>{errors.comparify.message}</span>
-                ) : null}
-              </FormError>
-            </form>
-            <CreateFormRequirements>
-              Name must be two or more alphanumeric characters
-              (lowercase/uppercase letters and/or numbers).
-            </CreateFormRequirements>
-          </CreateForm>
-          <CreateInfo>
-            <DescriptionBoxGrid>
-              <DescriptionBoxInner>
-                <div className="descriptionIcon">
-                  <MdCompare />{" "}
-                </div>
-                <div className="descriptionText">
-                  Compare your taste in music with your friends and people
-                  around the world
-                </div>
-              </DescriptionBoxInner>
-              <DescriptionBoxInner>
-                <div className="descriptionIcon">
-                  <MdPersonAdd />
-                </div>
-                <div className="descriptionText">
-                  Create your own, unique, comparify.io page that can be shared
-                  with anyone easily
-                </div>
-              </DescriptionBoxInner>
-              <DescriptionBoxInner>
-                <div className="descriptionIcon">
-                  <ImMusic />
-                </div>
-                <div className="descriptionText">
-                  Discover new music from personalized recommendations
-                </div>
-              </DescriptionBoxInner>
-            </DescriptionBoxGrid>
-          </CreateInfo>
-        </CreateWrap>
+                      })}
+                    />
+                  </InputWrap>
+                </CreateFormInputDisplay>
+                <CreateBtnWrap>
+                  <CreateBtn disabled={isCreateButtonDisabled} type="submit">
+                    Create
+                  </CreateBtn>
+                </CreateBtnWrap>
+                <FormError>
+                  {errors?.comparify?.message ? (
+                    <span>{errors.comparify.message}</span>
+                  ) : null}
+                </FormError>
+              </form>
+              <CreateFormRequirements>
+                Name must be two or more alphanumeric characters
+                (lowercase/uppercase letters and/or numbers).
+              </CreateFormRequirements>
+            </CreateForm>
+            <CreateInfo>
+              <DescriptionBoxGrid>
+                <DescriptionBoxInner>
+                  <div className="descriptionIcon">
+                    <MdCompare />{" "}
+                  </div>
+                  <div className="descriptionText">
+                    Compare your taste in music with your friends and people
+                    around the world
+                  </div>
+                </DescriptionBoxInner>
+                <DescriptionBoxInner>
+                  <div className="descriptionIcon">
+                    <MdPersonAdd />
+                  </div>
+                  <div className="descriptionText">
+                    Create your own, unique, comparify.io page that can be
+                    shared with anyone easily
+                  </div>
+                </DescriptionBoxInner>
+                <DescriptionBoxInner>
+                  <div className="descriptionIcon">
+                    <ImMusic />
+                  </div>
+                  <div className="descriptionText">
+                    Discover new music from personalized recommendations
+                  </div>
+                </DescriptionBoxInner>
+              </DescriptionBoxGrid>
+            </CreateInfo>
+          </CreateWrap>
+        </ComponentWithLoadingState>
       </StandardMainContentWrapper>
       <Footer />
     </>
