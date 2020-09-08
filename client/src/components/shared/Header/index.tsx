@@ -55,22 +55,12 @@ const Header = ({
           onClick={() => setIsMobileNavExpanded((prev) => !prev)}
         >
           {/* {isMobileNavExpanded ? <VscClose /> : <HiMenu />} */}
-          {/* <MobileNavigationHamburger isMobileNavExpanded={isMobileNavExpanded}>
+          <MobileNavigationHamburger isMobileNavExpanded={isMobileNavExpanded}>
             <span></span>
             <span></span>
             <span></span>
             <span></span>
-          </MobileNavigationHamburger> */}
-          <div
-            style={{
-              height: "100%",
-              width: "100%",
-              display: "block",
-              background: "tomato",
-            }}
-          >
-            a
-          </div>
+          </MobileNavigationHamburger>
         </MobileNavExpandBtn>
       </Navigation>
       <Transition in={isMobileNavExpanded} timeout={500}>
@@ -213,6 +203,7 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
   width: 100%;
   height: 100%;
   position: relative;
+  top: 0;
   -webkit-transform: rotate(0deg);
   -moz-transform: rotate(0deg);
   -o-transform: rotate(0deg);
