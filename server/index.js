@@ -17,6 +17,7 @@ const db = require("./db/firebase");
 const profile = require("./routes/profile");
 // const generate = require("./routes/generate");
 const create = require("./routes/create");
+const deletePage = require("./routes/delete");
 const get = require("./routes/get");
 const auth = require("./routes/auth");
 const logout = require("./routes/logout");
@@ -187,6 +188,8 @@ if (!isDev && cluster.isMaster) {
   // app.use("/api/generate", generate);
 
   app.use("/api/create", create);
+
+  app.use("/api/delete", deletePage);
 
   app.use("/api/get", get);
 

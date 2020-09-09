@@ -10,14 +10,17 @@ import StandardMainContentWrapper from "../shared/StandardMainContentWrapper";
 import { MdCompare, MdPersonAdd } from "react-icons/md";
 import { ImMusic } from "react-icons/im";
 import debounce from "lodash/debounce";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import AwesomeDebouncePromise from "awesome-debounce-promise";
-import { breakpoints } from "../../theme";
+import { breakpoints, theme } from "../../theme";
 import * as QueryString from "query-string";
-import { useLocation, Redirect } from "react-router-dom";
+import { useLocation, Redirect, useHistory } from "react-router-dom";
 import ComponentWithLoadingState from "../shared/ComponentWithLoadingState";
 import fetchUserSavedData from "../../utils/fetchUserSavedData";
 import { ComparifyPage } from "../../hooks/useComparifyPage";
+import { Transition } from "react-transition-group";
+import SlidingAlert from "../shared/SlidingAlert";
+import { BarLoader } from "react-spinners";
 
 type FormData = {
   comparify: string;
@@ -29,6 +32,7 @@ const alphaNumericPattern = RegExp("^[a-zA-Z0-9]+$");
 // Create API endpoint to check if user has comparifyPage
 const CreateComparePage = () => {
   const location = useLocation();
+  let history = useHistory();
   const [apiError, setApiError] = useState<null | string>(null);
   const [
     userComparifyPage,
@@ -36,23 +40,24 @@ const CreateComparePage = () => {
   ] = useState<null | ComparifyPage>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
-  const { register, handleSubmit, errors, trigger, setValue } = useForm<
+  const [autoFill, setAutoFill] = useState<null | string | string[]>(null);
+  const { register, handleSubmit, errors, trigger, control } = useForm<
     FormData
   >({
     mode: "onChange",
   });
+  const [isCreating, setIsCreating] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [slidingErrorMessage, setSlidingErrorMessage] = useState<null | string>(
+    null
+  );
   const autoFillValue = QueryString.parse(location.search);
-  console.log(typeof autoFillValue.name);
 
   useEffect(() => {
     const checkIfUserHasComparifyPage = async () => {
       const userData = await fetchUserSavedData();
       if (userData.comparifyPage.exists) {
-        setUserComparifyPage({
-          exists: true,
-          id: userData.comparifyPage.id,
-        });
-        setIsLoading(false);
+        history.push(`/${userData.comparifyPage.id}`);
       } else {
         setUserComparifyPage({
           exists: false,
@@ -62,32 +67,19 @@ const CreateComparePage = () => {
       }
     };
     checkIfUserHasComparifyPage();
-    const triggerValidationOnForm = async () => {
-      await trigger("comparify");
-    };
+    setAutoFill(autoFillValue.name || null);
     if (autoFillValue.name) {
-      setValue(
-        "comparify",
-        typeof autoFillValue.name === "string"
-          ? autoFillValue.name
-          : autoFillValue.name?.join("")
-      );
-      triggerValidationOnForm();
+      setTimeout(async () => {
+        await trigger("comparify");
+      }, 500);
     }
-  }, []);
+  }, [register, trigger]);
 
   const onSubmit = handleSubmit(async ({ comparify }) => {
-    console.log("submitted name: ", comparify);
+    setIsCreating(true);
+    setIsCreateButtonDisabled(true);
 
-    const comparifyPageRef = db
-      .collection(DB_COMPARIFYPAGE_COLLECTION)
-      .doc(comparify);
-
-    const comparifyPageDoc = await comparifyPageRef.get();
-
-    if (comparifyPageDoc.exists) {
-      setApiError("Sorry, this name is already taken.");
-    } else {
+    try {
       const res = await axios.post(
         `${DEV_URL}/api/create`,
         {
@@ -97,8 +89,14 @@ const CreateComparePage = () => {
           withCredentials: true,
         }
       );
-      console.log("yes, this is available!", res.data);
+      if (res.data.status === "201") {
+        history.push(`/${comparify}`);
+      }
+    } catch (error) {
+      setShowErrorAlert(true);
+      setSlidingErrorMessage(error.response.data.message);
     }
+    setIsCreating(false);
   });
 
   const validateName = async (name: string) => {
@@ -124,31 +122,33 @@ const CreateComparePage = () => {
     return false;
   };
 
-  return userComparifyPage?.exists ? (
-    <Redirect to={`/${userComparifyPage.id}`} />
-  ) : (
+  return (
     <>
+      <Transition
+        in={showErrorAlert}
+        timeout={1500}
+        onEntered={() => setTimeout(() => setShowErrorAlert(false), 1000)}
+      >
+        {(state) => (
+          <SlidingAlert error state={state}>
+            {slidingErrorMessage}
+          </SlidingAlert>
+        )}
+      </Transition>
       <Header standardNav={true} pageTitle={"Create"} />
       <StandardMainContentWrapper>
         <ComponentWithLoadingState label={false} loading={isLoading}>
           <CreateWrap>
-            {/* <CreateSplash>
-            <p>What do you want to name your page?</p>
-          </CreateSplash> */}
-
             <CreateForm>
               <form onSubmit={onSubmit} autoComplete={"off"}>
                 <CreateFormInputDisplay>
                   <FormPrefix>comparify.io/</FormPrefix>
                   <InputWrap>
-                    <input
-                      name="comparify"
-                      placeholder="enter a name..."
-                      autoCapitalize={"none"}
-                      autoFocus
-                      autoCorrect={"off"}
-                      onChange={() => setIsCreateButtonDisabled(true)}
-                      ref={register({
+                    <Controller
+                      control={control}
+                      defaultValue={autoFill}
+                      name={"comparify"}
+                      rules={{
                         required: true,
                         validate: {
                           minLength: (value) =>
@@ -167,11 +167,24 @@ const CreateComparePage = () => {
                             );
                           }, 750),
                         },
-                      })}
+                      }}
+                      render={({ onChange, value, onBlur, name }) => (
+                        <input
+                          name={name}
+                          placeholder={`enter a name...`}
+                          onBlur={onBlur}
+                          value={value ? value : ``}
+                          onChange={onChange}
+                          autoFocus
+                        />
+                      )}
                     />
                   </InputWrap>
                 </CreateFormInputDisplay>
-                <CreateBtnWrap>
+                <CreateBtnWrap isCreating={isCreating}>
+                  <div className="creatingLoader">
+                    <BarLoader color={theme.colors.mainAccent} />
+                  </div>
                   <CreateBtn disabled={isCreateButtonDisabled} type="submit">
                     Create
                   </CreateBtn>
@@ -179,6 +192,9 @@ const CreateComparePage = () => {
                 <FormError>
                   {errors?.comparify?.message ? (
                     <span>{errors.comparify.message}</span>
+                  ) : null}
+                  {errors.comparify?.type === "required" ? (
+                    <span>A page name is required</span>
                   ) : null}
                 </FormError>
               </form>
@@ -377,7 +393,16 @@ const CreateForm = styled.div`
   justify-content: center;
 `;
 
-const CreateBtnWrap = styled.div`
+const CreateBtnWrap = styled.div<{ isCreating: boolean }>`
+  position: relative;
+  .creatingLoader {
+    position: absolute;
+    top: calc(100% + 1em);
+    z-index: 3;
+    left: 50%;
+    transform: translateX(-50%);
+    ${({ isCreating }) => (isCreating ? "display: block;" : "display: none;")}
+  }
   margin-top: 3em;
   ${breakpoints.lessThan("48")`
     margin-top: 1.5em;
@@ -408,6 +433,9 @@ const CreateBtn = styled.button`
   transition-property: color;
   -webkit-transition-duration: 0.3s;
   transition-duration: 0.3s;
+  &:active {
+    opacity: 0.5;
+  }
   &:enabled:before {
     content: "";
     position: absolute;

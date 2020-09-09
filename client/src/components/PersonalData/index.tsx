@@ -19,7 +19,9 @@ import { AnimatedActionBtn } from "../compare/ComparifyPreview";
 import copyToClipboard from "../../utils/copyToClipboard";
 import { MdShare } from "react-icons/md";
 import { Transition } from "react-transition-group";
-import CopyToClipboardAlert from "../shared/CopyToClipboardAlert";
+import * as QueryString from "query-string";
+import SlidingAlert from "../shared/SlidingAlert";
+import { useLocation } from "react-router-dom";
 
 export type Genre = {
   name: string;
@@ -89,8 +91,15 @@ const PersonalData = () => {
   ] = useState<null | ComparifyPage>(null);
   const [pageTitle, setPageTitle] = useState(`Loading...`);
   const [showCopyAlert, setShowCopyAlert] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const location = useLocation();
+
+  const queryValue = QueryString.parse(location.search);
 
   useEffect(() => {
+    if (queryValue.deleted) {
+      setShowSuccessAlert(true);
+    }
     const getUserData = async () => {
       try {
         const userData = await fetchUserSavedData();
@@ -154,14 +163,23 @@ const PersonalData = () => {
   return (
     <>
       <Transition
+        in={showSuccessAlert}
+        timeout={1500}
+        onEntered={() => setTimeout(() => setShowSuccessAlert(false), 1000)}
+      >
+        {(state) => (
+          <SlidingAlert state={state}>
+            The page was successfully deleted.
+          </SlidingAlert>
+        )}
+      </Transition>
+      <Transition
         in={showCopyAlert}
         timeout={1500}
         onEntered={() => setTimeout(() => setShowCopyAlert(false), 1000)}
       >
         {(state) => (
-          <CopyToClipboardAlert state={state}>
-            Link copied to clipboard
-          </CopyToClipboardAlert>
+          <SlidingAlert state={state}>Link copied to clipboard</SlidingAlert>
         )}
       </Transition>
       <Header standardNav={true} pageTitle={pageTitle} loading={loading} />
@@ -194,10 +212,12 @@ const PersonalData = () => {
                     </span>
                     Share
                   </AnimatedActionBtn>
-                  <AnimatedActionBtn>Preview</AnimatedActionBtn>
+                  <AnimatedActionBtn href={`/${userComparifyPage.id}`}>
+                    Preview
+                  </AnimatedActionBtn>
                 </>
               ) : (
-                <AnimatedActionBtn>Create</AnimatedActionBtn>
+                <AnimatedActionBtn href={`/create`}>Create</AnimatedActionBtn>
               )}
             </div>
           </UserComparifyPagePreview>

@@ -148,15 +148,14 @@ const MobileNavigation = styled.div<{ state: string }>`
   flex-basis: 100%;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.7);
-  padding: 1em 0;
   width: 100%;
   top: 100%;
   left: 0;
   transition: 0.5s ease-in-out all;
   ${({ state }) =>
     state === "entered" || state === `entering`
-      ? `max-height: 800px; opacity: 1;`
-      : `max-height: 0px; padding: 0; opacity: 0;`}
+      ? `max-height: 10em; opacity: 1;`
+      : `max-height: 0px; opacity: 0;`}
   justify-content: flex-end;
   ul {
     margin: 1em 0;

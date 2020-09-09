@@ -6,13 +6,16 @@ import styled from "styled-components";
 import ErrorComp from "../../shared/ErrorComp";
 import ContentLoader from "react-content-loader";
 import { APIError } from "../../../models";
-import { breakpoints } from "../../../theme";
+import { breakpoints, theme } from "../../../theme";
 import * as QueryString from "query-string";
 import { useMedia } from "react-use";
-import { MdShare } from "react-icons/md";
+import { MdShare, MdDelete } from "react-icons/md";
 import { Transition } from "react-transition-group";
 import copyToClipboard from "../../../utils/copyToClipboard";
-import CopyToClipboardAlert from "../../shared/CopyToClipboardAlert";
+import SlidingAlert from "../../shared/SlidingAlert";
+import Modal from "react-modal";
+import Loader from "../../Loader";
+import { useHistory } from "react-router-dom";
 
 type SpotifyProfileImage = {
   height: null | number;
@@ -65,6 +68,8 @@ const ComparifyProfilePlaceholder = () => {
   );
 };
 
+Modal.setAppElement("#root");
+
 const ComparifyPreview = ({
   comparifyPage,
   setShowPreview,
@@ -76,11 +81,43 @@ const ComparifyPreview = ({
     null
   );
   const [showCopyAlert, setShowCopyAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [currentUserID, setCurrentUserID] = useState<null | string>(null);
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [slidingErrorMessage, setSlidingErrorMessage] = useState<null | string>(
+    null
+  );
+  let history = useHistory();
+
+  const openDeleteModal = () => {
+    setDeleteModalIsOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModalIsOpen(false);
+  };
 
   const handleCopyClick = () => {
     copyToClipboard(`https://www.comparify.io/${comparifyPage.id}`);
     setShowCopyAlert(true);
+  };
+
+  const modalStyles = {
+    overlay: {
+      backgroundColor: "rgba(0,0,0,0.75)",
+    },
+    content: {
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+      maxWidth: "90%",
+      backgroundColor: theme.colors.darkBodyOverlay,
+      border: `1px solid ${theme.colors.darkBodyOverlayBorder}`,
+    },
   };
 
   useEffect(() => {
@@ -125,17 +162,48 @@ const ComparifyPreview = ({
     );
   }
 
+  const handleDeleteClick = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await axios.delete(`${DEV_URL}/api/delete`, {
+        withCredentials: true,
+        data: {
+          comparifyPageName: comparifyPage.id,
+        },
+      });
+      console.log(res.data);
+      if (res.data.status === "200") {
+        history.push("/home?deleted=true");
+      }
+    } catch (error) {
+      setDeleteModalIsOpen(false);
+      setShowErrorAlert(true);
+      setSlidingErrorMessage(error.response.data.message);
+    }
+
+    setIsDeleting(false);
+  };
+
   return (
     <>
+      <Transition
+        in={showErrorAlert}
+        timeout={1500}
+        onEntered={() => setTimeout(() => setShowErrorAlert(false), 1000)}
+      >
+        {(state) => (
+          <SlidingAlert error state={state}>
+            {slidingErrorMessage}
+          </SlidingAlert>
+        )}
+      </Transition>
       <Transition
         in={showCopyAlert}
         timeout={1500}
         onEntered={() => setTimeout(() => setShowCopyAlert(false), 1000)}
       >
         {(state) => (
-          <CopyToClipboardAlert state={state}>
-            Link copied to clipboard
-          </CopyToClipboardAlert>
+          <SlidingAlert state={state}>Link copied to clipboard</SlidingAlert>
         )}
       </Transition>
       <ProfileWrap>
@@ -166,6 +234,57 @@ const ComparifyPreview = ({
                   </span>
                   Share
                 </AnimatedActionBtn>
+                <DeletePageBtn onClick={openDeleteModal}>
+                  <span className="icon">
+                    <MdDelete />
+                  </span>
+                  Delete
+                </DeletePageBtn>
+                <Modal
+                  isOpen={deleteModalIsOpen}
+                  onRequestClose={closeDeleteModal}
+                  contentLabel="Example Modal"
+                  shouldCloseOnOverlayClick
+                  style={modalStyles}
+                >
+                  <DeletingSpinner isDeleting={isDeleting}>
+                    <Loader label={false} />
+                  </DeletingSpinner>
+                  <p
+                    style={{
+                      fontWeight: 700,
+                      fontSize: "1.25em",
+                      marginBottom: "0.8em",
+                      textAlign: "center",
+                    }}
+                  >
+                    Are you sure you want to delete your Comparify page?
+                  </p>
+                  <p
+                    style={{
+                      color: theme.colors.textTertiary,
+                      textAlign: "center",
+                    }}
+                  >
+                    This action cannot be undone. You can, however, create a new
+                    page afterwards.
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <DeletePageBtn onClick={handleDeleteClick}>
+                      <span className="icon">
+                        <MdDelete />
+                      </span>
+                      Delete
+                    </DeletePageBtn>
+                    <CancelBtn onClick={closeDeleteModal}>Cancel</CancelBtn>
+                  </div>
+                </Modal>
               </CurrentUserPageDisplay>
             ) : (
               <CompareBtnWrap>
@@ -194,6 +313,57 @@ const ComparifyPreview = ({
     </>
   );
 };
+
+const DeletingSpinner = styled.div<{ isDeleting: boolean }>`
+  position: absolute;
+  z-index: 3;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: 0.5s ease all;
+  ${({ isDeleting }) =>
+    isDeleting ? `display: block; opacity: 1;` : `display: none;`}
+`;
+
+const CancelBtn = styled.a`
+  margin-left: 1em;
+  font-family: "open sans", "sans-serif";
+  font-size: 1.25rem;
+  &:hover {
+    text-decoration: underline;
+  }
+  margin-top: 1em;
+  display: inline-flex;
+`;
+
+const DeletePageBtn = styled.a`
+  margin-top: 1em;
+  .icon {
+    font-size: 1em;
+    margin-right: 0.5em;
+    display: flex;
+    align-items: center;
+  }
+  padding: 0.5em 1em 0.625em;
+  border-radius: 0.25em;
+  border: 0;
+  font-family: "open sans", "sans-serif";
+  font-size: 1.25rem;
+  font-weight: 700;
+  outline: 0;
+  display: inline-flex;
+  background: ${({ theme }) => theme.colors.darkBodyOverlayBorder};
+  &:hover {
+    background: ${({ theme }) => theme.colors.errorRed};
+  }
+  ${breakpoints.lessThan("66")`
+    background: ${({ theme }) => theme.colors.errorRed};
+    opacity: 0.8;
+  `}
+`;
 
 const CurrentUserPageDisplay = styled.div`
   display: flex;
@@ -225,7 +395,6 @@ export const AnimatedActionBtn = styled.a`
   .icon {
     font-size: 1em;
     margin-right: 0.5em;
-    color: #fff;
     display: flex;
     align-items: center;
   }
@@ -235,7 +404,6 @@ export const AnimatedActionBtn = styled.a`
   font-family: "open sans", "sans-serif";
   font-size: 1.75rem;
   font-weight: 700;
-  letter-spacing: 1px;
   outline: 0;
   display: inline-flex;
   align-items: center;
@@ -249,7 +417,7 @@ export const AnimatedActionBtn = styled.a`
   transition-property: color;
   -webkit-transition-duration: 0.3s;
   transition-duration: 0.3s;
-  ${breakpoints.greaterThan("66")`
+  ${breakpoints.greaterThan("58")`
     &:before {
       content: "";
       position: absolute;

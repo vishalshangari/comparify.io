@@ -16,13 +16,13 @@ const jwt = require("jsonwebtoken");
 // Database
 const db = require("../db/firebase");
 const firebase = require("firebase");
+const FieldValue = firebase.firestore.FieldValue;
 
 // Utils
 const catchAsync = require("../utils/catchAsync");
-const AppError = require("../models/AppError");
 
 // Create new page / page name already checked for existence client side
-router.post(
+router.delete(
   "/",
   catchAsync(async (req, res) => {
     const pageName = req.body.comparifyPageName;
@@ -32,54 +32,31 @@ router.post(
       process.env.JWT_SECRET
     );
 
-    const pageData = {
-      creator: { _id: creatorID, ref: db.collection(USERS).doc(creatorID) },
-      createdAt: Date.now(),
-    };
+    // Delete page (document) from comparifyPages collection
+    await db.collection(DB_COMPARIFYPAGE_COLLECTION).doc(pageName).delete();
 
-    const comparifyPageRef = db
-      .collection(DB_COMPARIFYPAGE_COLLECTION)
-      .doc(pageName);
+    // Delete page from user info
+    await db.collection(USERS).doc(creatorID).update({
+      comparifyPage: FieldValue.delete(),
+    });
 
-    const comparifyPageDoc = await comparifyPageRef.get();
-
-    if (comparifyPageDoc.exists) {
-      throw new AppError(
-        "This page already exists. Please try a different name.",
-        500
-      );
-    }
-
-    await comparifyPageRef.set(pageData);
-
-    await db
-      .collection(USERS)
-      .doc(creatorID)
-      .update({
-        comparifyPage: {
-          exists: true,
-          ref: db.collection(DB_COMPARIFYPAGE_COLLECTION).doc(pageName),
-          id: pageName,
-        },
-      });
-
-    res.status(201).send({
-      status: "201",
-      message: "Comparify page successfully created",
+    res.send({
+      status: "200",
+      message: "Comparify page successfully deleted",
     });
 
     // Stats
     await db
       .collection(STATS)
       .doc(DB_COMPARIFYPAGE_COLLECTION)
-      .update({ count: firebase.firestore.FieldValue.increment(1) });
+      .update({ count: FieldValue.increment(-1) });
   })
 );
 
 // Error handling
 router.use(function (err, req, res, next) {
   // LOG ERROR
-  console.log(`creation error: `, err);
+  console.log(`deletion error: `, err);
   let responseStatus, responseMessage;
 
   responseStatus = err.statusCode || 500;
