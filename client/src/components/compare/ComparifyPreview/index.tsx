@@ -232,10 +232,9 @@ export const AnimatedActionBtn = styled.a`
   padding: 0.5em 1em 0.625em;
   border-radius: 0.25em;
   border: 0;
-  font-family: "roboto slab", "open sans", "sans-serif";
+  font-family: "open sans", "sans-serif";
   font-size: 1.75rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 1px;
   outline: 0;
   display: inline-flex;
@@ -250,38 +249,40 @@ export const AnimatedActionBtn = styled.a`
   transition-property: color;
   -webkit-transition-duration: 0.3s;
   transition-duration: 0.3s;
-  &:before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    border-radius: 0.25em;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: ${({ theme }) => theme.colors.blueCityBlue};
-    -webkit-transform: scaleX(0);
-    transform: scaleX(0);
-    -webkit-transform-origin: 50%;
-    transform-origin: 50%;
-    -webkit-transition-property: transform;
-    transition-property: transform;
-    -webkit-transition-duration: 0.3s;
-    transition-duration: 0.3s;
-    -webkit-transition-timing-function: ease-out;
-    transition-timing-function: ease-out;
-  }
-  &:hover,
-  &:focus,
-  &:active {
-    color: white;
-  }
-  &:hover:before,
-  &:focus:before,
-  &:active:before {
-    -webkit-transform: scaleX(1);
-    transform: scaleX(1);
-  }
+  ${breakpoints.greaterThan("66")`
+    &:before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      border-radius: 0.25em;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: ${({ theme }) => theme.colors.blueCityBlue};
+      -webkit-transform: scaleX(0);
+      transform: scaleX(0);
+      -webkit-transform-origin: 50%;
+      transform-origin: 50%;
+      -webkit-transition-property: transform;
+      transition-property: transform;
+      -webkit-transition-duration: 0.3s;
+      transition-duration: 0.3s;
+      -webkit-transition-timing-function: ease-out;
+      transition-timing-function: ease-out;
+    }
+    &:hover,
+    &:focus,
+    &:active {
+      color: white;
+    }
+    &:hover:before,
+    &:focus:before,
+    &:active:before {
+      -webkit-transform: scaleX(1);
+      transform: scaleX(1);
+    }
+  `};
 `;
 
 const CompareBtnWrap = styled.div`

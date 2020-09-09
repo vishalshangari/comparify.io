@@ -336,7 +336,7 @@ const UserComparifyPagePreview = styled.div`
   `}
   ${breakpoints.lessThan("58")`
     && ${AnimatedActionBtn} {
-      font-size: 1.5em;
+      font-size: 1em;
     }
   `}
 `;

@@ -203,6 +203,7 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
   width: 100%;
   height: 100%;
   position: relative;
+  background: tomato;
   top: 0;
   -webkit-transform: rotate(0deg);
   -moz-transform: rotate(0deg);
