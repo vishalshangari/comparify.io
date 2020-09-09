@@ -398,6 +398,9 @@ const CreateBtnWrap = styled.div<{ isCreating: boolean }>`
   .creatingLoader {
     position: absolute;
     top: calc(100% + 1em);
+    ${breakpoints.lessThan("42")`
+      top: calc(100% + 0.5em)
+    `}
     z-index: 3;
     left: 50%;
     transform: translateX(-50%);

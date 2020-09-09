@@ -151,7 +151,7 @@ const MobileNavigation = styled.div<{ state: string }>`
   width: 100%;
   top: 100%;
   left: 0;
-  transition: 0.5s ease-in-out all;
+  transition: 0.3s ease-in-out all;
   ${({ state }) =>
     state === "entered" || state === `entering`
       ? `max-height: 10em; opacity: 1;`

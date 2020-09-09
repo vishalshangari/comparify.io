@@ -108,6 +108,7 @@ const ComparifyPreview = ({
       backgroundColor: "rgba(0,0,0,0.75)",
     },
     content: {
+      overflow: "hidden",
       top: "50%",
       left: "50%",
       right: "auto",

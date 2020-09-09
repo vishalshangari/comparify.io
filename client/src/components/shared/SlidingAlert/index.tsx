@@ -15,7 +15,7 @@ const SlidingAlert = ({ state, children, error }: SlidingAlertProps) => (
 );
 
 const StyledAlert = styled.div<{ state: string; error?: boolean }>`
-  position: absolute;
+  position: fixed;
   z-index: 12;
   display: inline-block;
   top: 1em;

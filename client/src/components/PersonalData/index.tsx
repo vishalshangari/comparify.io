@@ -339,11 +339,9 @@ const UserComparifyPagePreview = styled.div`
       align-items: center;
       justify-content: center;
     }
-    a:first-child {
-      margin-right: 1em;
-    }
-    a:last-child {
+    a:nth-child(2) {
       background: ${({ theme }) => theme.colors.darkBodyOverlayBorder};
+      margin-left: 1em;
     }
   }
   ${breakpoints.lessThan("66")`
