@@ -232,6 +232,7 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
     transition: 0.25s ease-in-out;
     &:nth-child(1) {
       top: 0em;
+      background: red !important;
       ${({ isMobileNavExpanded }) =>
         isMobileNavExpanded ? `top: 0.8125em; width: 0%; left: 50%;` : ``}
     }
