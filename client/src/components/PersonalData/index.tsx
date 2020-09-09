@@ -230,6 +230,10 @@ const ComparifyPagePreviewDisplay = styled.div`
       width: 100%;
       object-fit: cover;
     }
+    ${breakpoints.lessThan("42")`
+      flex: 0 0 3.5em;
+      height: 3.5em;
+  `}
   }
   .comparifyURLDisplay {
     overflow-wrap: anywhere;

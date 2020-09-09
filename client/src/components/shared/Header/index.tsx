@@ -189,9 +189,8 @@ const MobileNavExpandBtn = styled.button`
   display: none;
   align-items: center;
   justify-content: center;
-  height: 3.25em;
-  width: 4em;
-  padding: 0 0.75em;
+  height: 2.75em;
+  width: 3.25em;
   border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlay};
   border-radius: 0.25em;
   background: ${({ theme }) => theme.colors.mainContentBg};
@@ -202,13 +201,12 @@ const MobileNavExpandBtn = styled.button`
 `;
 
 const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
-  width: 100%;
-  height: 100%;
+  width: 2em;
+  height: 2.5em;
   display: block;
   position: absolute;
-  background: tomato !important;
-  top: 0;
-  left: 0;
+  top: 0.75em;
+  left: 0.625em;
   /* -webkit-transform: rotate(0deg);
   -moz-transform: rotate(0deg);
   -o-transform: rotate(0deg);
@@ -239,10 +237,10 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
       top: 0em;
       background: red !important;
       ${({ isMobileNavExpanded }) =>
-        isMobileNavExpanded ? `top: 0.8125em; width: 0%; left: 50%;` : ``}
+        isMobileNavExpanded ? `top: 0.6875em; width: 0%; left: 50%;` : ``}
     }
     &:nth-child(2) {
-      top: 0.8125em;
+      top: 0.6875em;
       ${({ isMobileNavExpanded }) =>
         isMobileNavExpanded
           ? `-webkit-transform: rotate(45deg);
@@ -252,7 +250,7 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
           : ``}
     }
     &:nth-child(3) {
-      top: 0.8125em;
+      top: 0.6875em;
       ${({ isMobileNavExpanded }) =>
         isMobileNavExpanded
           ? `-webkit-transform: rotate(-45deg);
@@ -262,9 +260,9 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
           : ``}
     }
     &:nth-child(4) {
-      top: 1.625em;
+      top: 1.375em;
       ${({ isMobileNavExpanded }) =>
-        isMobileNavExpanded ? `top: 0.8125em; width: 0%; left: 50%;` : ``}
+        isMobileNavExpanded ? `top: 0.6875em; width: 0%; left: 50%;` : ``}
     }
   }
 `;
