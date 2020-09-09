@@ -184,6 +184,7 @@ const MobileNavigation = styled.div<{ state: string }>`
 `;
 
 const MobileNavExpandBtn = styled.button`
+  position: relative;
   margin-left: 1em;
   display: none;
   align-items: center;
@@ -204,13 +205,14 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
   width: 100%;
   height: 100%;
   display: block;
-  position: relative;
+  position: absolute;
   background: tomato !important;
   top: 0;
-  -webkit-transform: rotate(0deg);
+  left: 0;
+  /* -webkit-transform: rotate(0deg);
   -moz-transform: rotate(0deg);
   -o-transform: rotate(0deg);
-  transform: rotate(0deg);
+  transform: rotate(0deg); */
   -webkit-transition: 0.5s ease-in-out;
   -moz-transition: 0.5s ease-in-out;
   -o-transition: 0.5s ease-in-out;

@@ -306,6 +306,7 @@ const UserComparifyPagePreview = styled.div`
   > div:last-child {
     margin-right: 0;
   }
+
   .comparifyPageActions {
     display: flex;
     a {
@@ -316,6 +317,9 @@ const UserComparifyPagePreview = styled.div`
     }
     a:first-child {
       margin-right: 1em;
+    }
+    a:last-child {
+      background: ${({ theme }) => theme.colors.darkBodyOverlayBorder};
     }
   }
   ${breakpoints.lessThan("66")`
