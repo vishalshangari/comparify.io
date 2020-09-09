@@ -235,10 +235,10 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
     &:nth-child(1) {
       top: 0em;
       ${({ isMobileNavExpanded }) =>
-        isMobileNavExpanded ? `top: 0.4375em; width: 0%; left: 50%;` : ``}
+        isMobileNavExpanded ? `top: 0.5625em; width: 0%; left: 50%;` : ``}
     }
     &:nth-child(2) {
-      top: 0.4375em;
+      top: 0.5625em;
       ${({ isMobileNavExpanded }) =>
         isMobileNavExpanded
           ? `-webkit-transform: rotate(45deg);
@@ -248,7 +248,7 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
           : ``}
     }
     &:nth-child(3) {
-      top: 0.4375em;
+      top: 0.5625em;
       ${({ isMobileNavExpanded }) =>
         isMobileNavExpanded
           ? `-webkit-transform: rotate(-45deg);
@@ -260,7 +260,7 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
     &:nth-child(4) {
       top: 1.125em;
       ${({ isMobileNavExpanded }) =>
-        isMobileNavExpanded ? `top: 0.4375em; width: 0%; left: 50%;` : ``}
+        isMobileNavExpanded ? `top: 0.5625em; width: 0%; left: 50%;` : ``}
     }
   }
 `;
