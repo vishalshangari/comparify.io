@@ -308,6 +308,12 @@ const UserComparifyPagePreview = styled.div`
   }
   .comparifyPageActions {
     display: flex;
+    a {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
     a:first-child {
       margin-right: 1em;
     }

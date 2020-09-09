@@ -194,6 +194,7 @@ const MobileNavExpandBtn = styled.button`
   border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlay};
   border-radius: 0.25em;
   background: ${({ theme }) => theme.colors.mainContentBg};
+  background: green;
   ${breakpoints.lessThan("66")`
     display: inline-flex;
   `};
@@ -202,8 +203,9 @@ const MobileNavExpandBtn = styled.button`
 const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
   width: 100%;
   height: 100%;
+  display: block;
   position: relative;
-  background: tomato;
+  background: tomato !important;
   top: 0;
   -webkit-transform: rotate(0deg);
   -moz-transform: rotate(0deg);
