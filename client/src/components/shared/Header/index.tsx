@@ -201,12 +201,12 @@ const MobileNavExpandBtn = styled.button`
 `;
 
 const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
-  width: 2em;
-  height: 2.5em;
+  width: 2.5em;
+  height: 2em;
   display: block;
   position: absolute;
-  top: 0.75em;
-  left: 0.625em;
+  top: 0.375em;
+  left: 0.375em;
   /* -webkit-transform: rotate(0deg);
   -moz-transform: rotate(0deg);
   -o-transform: rotate(0deg);
@@ -235,12 +235,11 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
     transition: 0.25s ease-in-out;
     &:nth-child(1) {
       top: 0em;
-      background: red !important;
       ${({ isMobileNavExpanded }) =>
-        isMobileNavExpanded ? `top: 0.6875em; width: 0%; left: 50%;` : ``}
+        isMobileNavExpanded ? `top: 0.9375em; width: 0%; left: 50%;` : ``}
     }
     &:nth-child(2) {
-      top: 0.6875em;
+      top: 0.9375em;
       ${({ isMobileNavExpanded }) =>
         isMobileNavExpanded
           ? `-webkit-transform: rotate(45deg);
@@ -250,7 +249,7 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
           : ``}
     }
     &:nth-child(3) {
-      top: 0.6875em;
+      top: 0.9375em;
       ${({ isMobileNavExpanded }) =>
         isMobileNavExpanded
           ? `-webkit-transform: rotate(-45deg);
@@ -260,9 +259,9 @@ const MobileNavigationHamburger = styled.div<{ isMobileNavExpanded: boolean }>`
           : ``}
     }
     &:nth-child(4) {
-      top: 1.375em;
+      top: 1.875em;
       ${({ isMobileNavExpanded }) =>
-        isMobileNavExpanded ? `top: 0.6875em; width: 0%; left: 50%;` : ``}
+        isMobileNavExpanded ? `top: 0.9375em; width: 0%; left: 50%;` : ``}
     }
   }
 `;
