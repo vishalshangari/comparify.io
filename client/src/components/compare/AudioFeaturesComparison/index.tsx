@@ -186,7 +186,12 @@ const MobileAudioFeaturesButton = styled.button<{ active: boolean }>`
   flex: 0 0 50%;
   border-radius: 1em;
   font-size: 1.5rem;
+  ${breakpoints.lessThan("38")`
+    flex: 0 0 100%;
+    font-size: 1rem;
+  `}
   ${breakpoints.lessThan("30")`
+
     font-size: 1rem;
   `}
   padding: 0.75em;
@@ -275,7 +280,7 @@ const AudioFeaturesButton = styled.button<{ active: boolean }>`
   ${breakpoints.lessThan("58")`
     font-size: 1.5rem;
   `}
-  ${breakpoints.lessThan("30")`
+  ${breakpoints.lessThan("38")`
     font-size: 1rem;
   `}
   font-size: 2rem;
@@ -340,7 +345,6 @@ const AudioFeaturesChart = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlayBorder};
   ${breakpoints.greaterThan("48")`
     border-top: none;
-    padding: 1em;
   `}
 `;
 

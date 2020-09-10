@@ -63,8 +63,7 @@ const PrivacyPolicy = () => {
             <h2>Contact</h2>
             <p>
               If you have any further questions and/or concerns, please contact{" "}
-              <a href={`mailto:admin@comparify.io`}>comparifymusic@gmail.com</a>
-              .
+              <a href={`mailto:admin@comparify.io`}>admin@comparify.io</a>.
             </p>
           </PrivacyWrapInner>
         </PrivacyWrap>

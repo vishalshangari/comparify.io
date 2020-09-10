@@ -797,7 +797,8 @@ const commonTracksNonGridDisplayStyles = css`
   align-items: center;
   > a {
     display: inline-flex;
-    flex-basis: 50%;
+    max-width: 26em;
+    flex-basis: 100%;
   }
 `;
 
