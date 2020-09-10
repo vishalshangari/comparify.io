@@ -187,7 +187,7 @@ const FeedbackForm = styled.form`
   input[type="text"],
   textarea {
     font-size: 1rem;
-    padding: 0.5em 1em;
+    padding: 0.5em;
     border: 0;
     outline: 0;
     border-radius: 0.25em;
