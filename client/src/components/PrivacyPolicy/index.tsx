@@ -3,7 +3,8 @@ import styled from "styled-components";
 import Header from "../shared/Header";
 import Footer from "../shared/Footer";
 import StandardMainContentWrapper from "../shared/StandardMainContentWrapper";
-import { breakpoints, theme } from "../../theme";
+import { theme, breakpoints } from "../../theme";
+import privacyBG from "../../assets/img/privacy_protection.svg";
 
 const PrivacyPolicy = () => {
   document.title = `Privacy Policy  | Comparify`;
@@ -29,8 +30,9 @@ const PrivacyPolicy = () => {
             <p>
               At any point, you may{" "}
               <a href={`https://www.spotify.com/us/account/apps/`}>
-                revoke Comparify's access to your Spotify account.
+                revoke Comparify's access to your Spotify account
               </a>
+              .
             </p>
             <h2>Information Collection and Use</h2>
             <p>
@@ -61,9 +63,7 @@ const PrivacyPolicy = () => {
             <h2>Contact</h2>
             <p>
               If you have any further questions and/or concerns, please contact{" "}
-              <a href={`mailto:comparifymusic@gmail.com`}>
-                comparifymusic@gmail.com
-              </a>
+              <a href={`mailto:admin@comparify.io`}>comparifymusic@gmail.com</a>
               .
             </p>
           </PrivacyWrapInner>
@@ -80,6 +80,16 @@ const PrivacyWrapInner = styled.div`
 
 const PrivacyWrap = styled.div`
   width: 94%;
+  background-image: url(${privacyBG});
+  background-size: 50% 50%;
+  ${breakpoints.lessThan("85")`
+    background-size: 40% 40%;
+  `}
+  ${breakpoints.lessThan("74")`
+    background-image: none;
+  `}
+  background-repeat: no-repeat;
+  background-position: 110% 50%;
   position: relative;
   margin: 0 auto;
   display: flex;

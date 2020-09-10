@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import {
   AudioFeaturesComparisonDataType,
   AudioFeaturesComparisonProps,
@@ -64,6 +64,17 @@ const AudioFeatresComparison = ({
           </AudioFeaturesButton>
         ))}
       </AudioFeaturesOptions>
+      <MobileAudioFeaturesOptions state={audioFeaturesState}>
+        {audioFeatures.map((feature, idx) => (
+          <MobileAudioFeaturesButton
+            key={idx}
+            onClick={() => handleAudioFeatureClick(feature)}
+            active={audioFeaturesState === feature ? true : false}
+          >
+            {feature === `valence` ? `happiness` : feature}
+          </MobileAudioFeaturesButton>
+        ))}
+      </MobileAudioFeaturesOptions>
       {audioFeaturesComparisonData ? (
         <AudioFeaturesChart>
           <AudioFeatureDescription>
@@ -93,7 +104,7 @@ const AudioFeatresComparison = ({
                     {
                       ticks: {
                         fontColor: colors.grey1,
-                        fontSize: 16,
+                        fontSize: isSmall ? 12 : 16,
                         fontFamily: "'open sans', sans-serif",
                         fontStyle: "bold",
                       },
@@ -138,7 +149,7 @@ const AudioFeatresComparison = ({
                   display: true,
                   position: `bottom`,
                   labels: {
-                    fontSize: 16,
+                    fontSize: isSmall ? 12 : 16,
                     fontColor: colors.grey1,
                     fontFamily: "'open sans', sans-serif",
                     padding: 20,
@@ -161,6 +172,67 @@ export default AudioFeatresComparison;
 
 // Audio Features
 
+const MobileAudioFeaturesOptions = styled.div<{ state: AudioFeaturesState }>`
+  display: none;
+  flex-wrap: wrap;
+  margin: 1em 0;
+  overflow: hidden;
+  ${breakpoints.lessThan("48")`
+    display: flex;
+  `}
+`;
+
+const MobileAudioFeaturesButton = styled.button<{ active: boolean }>`
+  flex: 0 0 50%;
+  border-radius: 1em;
+  font-size: 1.5rem;
+  ${breakpoints.lessThan("30")`
+    font-size: 1rem;
+  `}
+  padding: 0.75em;
+  font-family: "roboto slab", "open sans", "sans-serif";
+  font-weight: 700;
+  text-transform: capitalize;
+  &:nth-child(1) {
+    /* background: ${({ theme, active }) =>
+      active ? theme.colors.straw : `transparent`}; */
+    color: ${({ theme, active }) =>
+      active ? theme.colors.strawDark : theme.colors.textTertiary};
+    background: ${({ theme, active }) => (active ? theme.colors.straw : ``)};
+  }
+  &:nth-child(2) {
+    /* background: ${({ theme, active }) =>
+      active ? theme.colors.spanishViolet : `transparent`}; */
+    color: ${({ theme, active }) =>
+      active ? theme.colors.spanishVioletDark : theme.colors.textTertiary};
+    background: ${({ theme, active }) =>
+      active ? theme.colors.spanishViolet : ``};
+  }
+  &:nth-child(3) {
+    /* background: ${({ theme, active }) =>
+      active ? theme.colors.blueCityBlue : `transparent`}; */
+    color: ${({ theme, active }) =>
+      active ? theme.colors.blueCityBlueDark : theme.colors.textTertiary};
+    background: ${({ theme, active }) =>
+      active ? theme.colors.blueCityBlue : ``};
+  }
+  &:nth-child(4) {
+    /* background: ${({ theme, active }) =>
+      active ? theme.colors.seaGreen : `transparent`}; */
+    color: ${({ theme, active }) =>
+      active ? theme.colors.seaGreenDark : theme.colors.textTertiary};
+    background: ${({ theme, active }) => (active ? theme.colors.seaGreen : ``)};
+  }
+  &:hover {
+    ${({ active, theme }) =>
+      active ? `` : `color: ${theme.colors.textPrimary}`}
+  }
+  &:focus {
+    outline: none;
+  }
+  transition: 0.2s ease all;
+`;
+
 const AudioFeaturesOptions = styled.div<{ state: AudioFeaturesState }>`
   display: flex;
   flex-wrap: wrap;
@@ -171,6 +243,9 @@ const AudioFeaturesOptions = styled.div<{ state: AudioFeaturesState }>`
     overflow: hidden;
     margin-top: 1em;
   `};
+  ${breakpoints.lessThan("48")`
+    display: none;
+  `}
   /* border-top-right-radius: 1em;
   border-top-left-radius: 1em; */
   overflow: hidden;
@@ -195,12 +270,13 @@ const AudioFeaturesButton = styled.button<{ active: boolean }>`
   flex: 1;
   ${breakpoints.lessThan("48")`
     flex: 0 0 50%;
+    border-radius: 1em;
   `}
   ${breakpoints.lessThan("58")`
     font-size: 1.5rem;
   `}
   ${breakpoints.lessThan("30")`
-    font-size: 1.125rem;
+    font-size: 1rem;
   `}
   font-size: 2rem;
   padding: 1em;
@@ -251,6 +327,10 @@ const AudioFeaturesChart = styled.div`
   `}
   border-bottom-left-radius: 1em;
   border-bottom-right-radius: 1em;
+  ${breakpoints.lessThan("48")`
+    border-radius: 1em;
+    padding: 1em;
+  `}
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -258,12 +338,20 @@ const AudioFeaturesChart = styled.div`
     `linear-gradient(180deg, rgba(29,31,33,1) 0%, ${theme.colors.darkBodyOverlay} 100%)`};
   box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.3);
   border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlayBorder};
-  border-top: none;
+  ${breakpoints.greaterThan("48")`
+    border-top: none;
+    padding: 1em;
+  `}
 `;
 
 const AudioFeaturesChartInner = styled.div`
   flex: 3;
   padding-left: 2em;
+  ${breakpoints.lessThan("66")`
+    padding-left: 0;
+    flex-basis: 100%;
+    height: 14em;
+  `}
 `;
 
 const AudioFeatureDescription = styled.div`
@@ -297,6 +385,9 @@ const AudioFeatureDescription = styled.div`
     ${breakpoints.lessThan("74")`
         font-size: 0.875rem;
     `}
+    ${breakpoints.lessThan("66")`
+        padding: 0.5em;
+    `}
   }
   ${breakpoints.lessThan("66")`
     flex-basis: 100%;
@@ -317,4 +408,9 @@ const AudioFeaturesGroup = styled.div`
       margin-bottom: 0;
     }
   }
+  ${breakpoints.lessThan("22")`
+    && h2 {
+      font-size: 2rem;
+    }
+  `}
 `;

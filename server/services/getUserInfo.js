@@ -16,7 +16,7 @@ module.exports = async (authHeader) => {
     const newUserInfo = {
       _id: userProfileData.id,
       createdAt: Date.now(),
-      displayName: userProfileData.display_name,
+      displayName: userProfileData.display_name || null,
       profileImageUrl: userProfileData.images[0].url,
       country: userProfileData.country,
     };

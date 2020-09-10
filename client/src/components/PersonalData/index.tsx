@@ -118,7 +118,11 @@ const PersonalData = () => {
         };
         setUserInfo(userData.userInfo);
         setUserComparifyPage(userData.comparifyPage);
-        setPageTitle(`Hi, ${userData.userInfo.names[0]}`);
+        setPageTitle(
+          userData.userInfo.names
+            ? `Hi, ${userData.userInfo.names[0]}`
+            : `Welcome`
+        );
         setTopGenres(filteredTopGenres);
         setObscurityScore(Math.floor(userData.obscurityScore));
         setFeatureScores(userData.userFeatureScores);
