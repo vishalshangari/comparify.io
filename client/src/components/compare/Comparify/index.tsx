@@ -4,29 +4,17 @@ import axios from "axios";
 import { DEV_URL } from "../../../constants";
 import styled, { keyframes, css } from "styled-components";
 import { BsX } from "react-icons/bs";
-import { Genre } from "../../PersonalData";
 import { LoadedArtist, ArtistItem } from "../../TopArtists";
 import { TrackItem, TrackItemWrapper } from "../../TopTracks";
 import fetchMultipleArtists from "../../../utils/fetchMultipleArtists";
 import fetchMultipleTracks from "../../../utils/fetchMultipleTracks";
 import { GoLinkExternal } from "react-icons/go";
 import { LoadedTrack } from "../../TopTracks";
-import { colors, breakpoints } from "../../../theme";
-import {
-  featureGraphLabels,
-  audioFeatureDescriptions,
-} from "../../AudioFeatures/constants";
-import round5x from "../../../utils/round5x";
-import { Bar } from "react-chartjs-2";
-import { IoMdInformationCircle } from "react-icons/io";
-import { TiChevronRight } from "react-icons/ti";
+import { breakpoints } from "../../../theme";
 import AudioFeaturesComparison from "../AudioFeaturesComparison";
 import ErrorComp from "../../shared/ErrorComp";
 import { ObscurityComparisonDataType } from "../ObscurityComparison/models";
-import {
-  AudioFeaturesComparisonDataType,
-  AudioFeaturesState,
-} from "../AudioFeaturesComparison/models";
+import { AudioFeaturesComparisonDataType } from "../AudioFeaturesComparison/models";
 import ObscurityComparison from "../ObscurityComparison";
 import ProfileSnippet from "../../shared/ProfileSnippet";
 import { APIError } from "../../../models";
@@ -92,15 +80,6 @@ const Comparify = ({ pageID }: ComparifyProps) => {
     audioFeaturesComparisonData,
     setAudioFeaturesComparisonData,
   ] = useState<null | AudioFeaturesComparisonDataType>(null);
-  const audioFeatures: AudioFeaturesState[] = [
-    "valence",
-    "energy",
-    "danceability",
-    "tempo",
-  ];
-  const [audioFeaturesState, setAudioFeaturesState] = useState<
-    AudioFeaturesState
-  >("valence");
   const [
     obscurityComparisonData,
     setObscurityComparisonData,
@@ -178,7 +157,6 @@ const Comparify = ({ pageID }: ComparifyProps) => {
         setVisitorUserInfo(visitor.info);
         setGenresComparisonData(genresComparison);
         setAudioFeaturesComparisonData(audioFeaturesComparison);
-        setAudioFeaturesState("valence");
         setObscurityComparisonData(obscurityComparison);
         setIsLoading(false);
       } catch (error) {
@@ -220,10 +198,13 @@ const Comparify = ({ pageID }: ComparifyProps) => {
 
               <ProfileSnippet>
                 <div className="profileImage">
-                  <img src={visitorUserInfo?.profileImageUrl} />
+                  <img
+                    alt={visitorUserInfo.displayName}
+                    src={visitorUserInfo.profileImageUrl}
+                  />
                 </div>
                 <a
-                  href={`spotify:user:${visitorUserInfo?._id}`}
+                  href={`spotify:user:${visitorUserInfo._id}`}
                   className="userName"
                 >
                   {visitorUserInfo?.displayName}
@@ -236,11 +217,14 @@ const Comparify = ({ pageID }: ComparifyProps) => {
 
               <ProfileSnippet>
                 <div className="profileImage">
-                  <img src={creatorUserInfo?.profileImageUrl} />
+                  <img
+                    alt={creatorUserInfo.displayName}
+                    src={creatorUserInfo.profileImageUrl}
+                  />
                 </div>
 
                 <a
-                  href={`spotify:user:${creatorUserInfo?._id}`}
+                  href={`spotify:user:${creatorUserInfo._id}`}
                   className="userName"
                 >
                   {creatorUserInfo?.displayName}

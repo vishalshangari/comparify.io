@@ -1,3 +1,9 @@
+## comparify.io
+
+An easy, beautiful, and free, way to compare taste in music with friends and people all over the world.
+
+## Create-React-App Docs
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

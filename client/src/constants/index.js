@@ -16,8 +16,8 @@ const ERROR_CODES = {
 
 module.exports = Object.freeze({
   // Spotify API config
-  CLIENT_ID: "70f7c0f3f8a04350b0957f010488e475",
-  CLIENT_SECRET: "a832c80320fc4450a0fa1dbc1465d3c0",
+  CLIENT_ID: "98df4bc9fda8421996becd64266e7e86",
+  CLIENT_SECRET: "5da29b95e7c346a5a2189d8799d4eeec",
   SPOTIFY_AUTH_STATE_KEY: "spotify_auth_state",
   SPOTIFY_API_SCOPES:
     "playlist-read-collaborative playlist-read-private user-read-private user-library-modify user-library-read user-top-read user-read-recently-played",
@@ -78,4 +78,5 @@ module.exports = Object.freeze({
   DB_SITE_CONFIGURATIONS: "config",
   DB_SITE_TOKENS: "tokens",
   DB_COMPARIFYPAGE_COLLECTION: "comparifyPages",
+  DB_FEEDBACK_COLLECTION: "siteFeedback",
 });

@@ -466,7 +466,7 @@ export const ComparePageBreadcrumb = styled.div`
   letter-spacing: 1px;
   opacity: 0.5;
   font-weight: 300;
-  font-family: "roboto slab", "open sans", "sans-serif";
+  font-family: "open sans", "sans-serif";
   color: ${({ theme }) => theme.colors.textTertiary};
   span {
     font-weight: 500;

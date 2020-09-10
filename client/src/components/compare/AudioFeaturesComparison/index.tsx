@@ -1,10 +1,6 @@
 import React, { useState } from "react";
-import styled, { css } from "styled-components";
-import {
-  AudioFeaturesComparisonDataType,
-  AudioFeaturesComparisonProps,
-  AudioFeaturesState,
-} from "./models";
+import styled from "styled-components";
+import { AudioFeaturesComparisonProps, AudioFeaturesState } from "./models";
 import { audioFeatures } from "./constants";
 import { audioFeatureDescriptions } from "../../AudioFeatures/constants";
 import round5x from "../../../utils/round5x";

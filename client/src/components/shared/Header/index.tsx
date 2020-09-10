@@ -1,14 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import ComparifyLogo from "../../ComparifyLogo";
 import { theme, breakpoints } from "../../../theme";
 import { RESPONSE_CODES, DEV_URL } from "../../../constants";
-import { useAuthState, AuthContext } from "../../../App";
-import { HiMenu } from "react-icons/hi";
-import { VscClose } from "react-icons/vsc";
+import { useAuthState } from "../../../App";
 import { Transition } from "react-transition-group";
 import axios from "axios";
-import { useHistory } from "react-router-dom";
 
 type HeaderProps = {
   pageTitle?: string;
@@ -26,7 +23,6 @@ const Header = ({
   const { state: authState, setState: setAuthState } = useAuthState();
   const isAuthenticated = authState.status === RESPONSE_CODES.AUTHENTICATED;
   const [isMobileNavExpanded, setIsMobileNavExpanded] = useState(false);
-  const history = useHistory();
 
   const handleLogOut = async () => {
     try {
@@ -38,9 +34,10 @@ const Header = ({
         status: response.data.status,
         errorType: response.data.errorType,
       });
-      history.push("/");
+      return true;
     } catch (error) {
       console.log(error);
+      return false;
       // TODO: generic error handler -> redirect to error page with query string
     }
   };
@@ -67,7 +64,7 @@ const Header = ({
       </li>
       {isAuthenticated ? (
         <li>
-          <a className="nav" onClick={handleLogOut}>
+          <a href={"/"} className="nav" onClick={handleLogOut}>
             Logout
           </a>
         </li>
@@ -188,7 +185,7 @@ const MobileNavigation = styled.div<{ state: string }>`
   a.nav {
     display: block;
     padding: 1em;
-    font-weight: 600;
+    font-weight: 500;
     text-align: center;
   }
   ${breakpoints.greaterThan("66")`
@@ -302,7 +299,7 @@ const Navigation = styled.div`
     }
   }
   a.nav {
-    font-weight: 600;
+    font-weight: 500;
     transition: 0.2s ease all;
     color: ${({ theme }) => theme.colors.textTertiary};
     padding-bottom: 0.25em;

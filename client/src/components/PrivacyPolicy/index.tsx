@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import Header from "../shared/Header";
 import Footer from "../shared/Footer";
 import StandardMainContentWrapper from "../shared/StandardMainContentWrapper";
-import { theme, breakpoints } from "../../theme";
+import { breakpoints } from "../../theme";
 import privacyBG from "../../assets/img/privacy_protection.svg";
 
 const PrivacyPolicy = () => {

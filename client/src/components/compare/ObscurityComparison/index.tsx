@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { ObscurityComparisonProps } from "./models";
 
-import { colors, breakpoints } from "../../../theme";
-import { IoMdInformationCircle } from "react-icons/io";
+import { breakpoints } from "../../../theme";
 import ProfileSnippet from "../../shared/ProfileSnippet";
 import ErrorComp from "../../shared/ErrorComp";
 import Obscurity from "../../Obscurity";

@@ -6,54 +6,28 @@ import {
   Redirect,
   RouteProps,
 } from "react-router-dom";
-import Test from "../../Test";
 import Home from "../../components/Home";
 import Splash from "../../components/Splash";
-import Login from "../../components/Login";
 import { useAuthState } from "../../App";
-import TestPrivateRoute from "../TestPrivateRoute";
 import { RESPONSE_CODES } from "../../constants";
 import AuthenticatedCreateComparePage from "../AuthenticatedCreateComparePage";
 import AuthenticatedComparePage from "../compare/AuthenticatedComparePage";
 import UnauthenticatedComparePage from "../compare/UnauthenticatedComparePage";
-import DiscoverTogether from "../compare/DiscoverTogether";
-import FormTest from "../FormTest";
 import FourZeroFour from "../FourZeroFour";
-import CompareRouter from "../CompareRouter";
 import UnauthenticatedCreateComparePage from "../UnauthenticatedCreateComparePage";
 import Feedback from "../Feedback";
 import PrivacyPolicy from "../PrivacyPolicy";
 
+// Test components
+// import Test from "../../Test";
+// import Login from "../../components/Login";
+// import TestPrivateRoute from "../TestPrivateRoute";
+// import FormTest from "../FormTest";
+// import CompareRouter from "../CompareRouter";
+
 export interface PrivateRouteProps extends RouteProps {
   isAuthenticated: boolean;
 }
-
-// Old Private Route - TODO: delete
-// const PrivateRoute = ({
-//   component: Component,
-//   isAuthenticated,
-//   ...rest
-// }: PrivateRouteProps) => {
-//   if (!Component) {
-//     throw new Error("Private route component was not specified!");
-//   }
-//   return (
-//     <Route
-//       {...rest}
-//       render={(props) =>
-//         isAuthenticated ? (
-//           <Component {...props} />
-//         ) : (
-//           <Redirect
-//             to={{
-//               pathname: "/login",
-//             }}
-//           />
-//         )
-//       }
-//     />
-//   );
-// };
 
 const Router = () => {
   const { state: authState } = useAuthState();

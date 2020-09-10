@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from "react";
-import styled, { keyframes, css } from "styled-components";
+import styled from "styled-components";
 import Header from "../shared/Header";
 import Footer from "../shared/Footer";
-import { PageTitle, PageTitleInner } from "../shared/PageTitle";
 import db from "../../db";
 import axios from "axios";
 import { DEV_URL, DB_COMPARIFYPAGE_COLLECTION } from "../../constants";
 import StandardMainContentWrapper from "../shared/StandardMainContentWrapper";
-import { MdCompare, MdPersonAdd } from "react-icons/md";
-import { ImMusic } from "react-icons/im";
-import debounce from "lodash/debounce";
 import { useForm, Controller } from "react-hook-form";
 import AwesomeDebouncePromise from "awesome-debounce-promise";
 import { breakpoints, theme } from "../../theme";
 import * as QueryString from "query-string";
-import { useLocation, Redirect, useHistory } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import ComponentWithLoadingState from "../shared/ComponentWithLoadingState";
 import fetchUserSavedData from "../../utils/fetchUserSavedData";
 import { ComparifyPage } from "../../hooks/useComparifyPage";
@@ -32,7 +28,6 @@ const alphaNumericPattern = RegExp("^[a-zA-Z0-9]+$");
 const CreateComparePage = () => {
   const location = useLocation();
   let history = useHistory();
-  const [apiError, setApiError] = useState<null | string>(null);
   const [
     userComparifyPage,
     setUserComparifyPage,
@@ -75,7 +70,7 @@ const CreateComparePage = () => {
         await trigger("comparify");
       }, 500);
     }
-  }, [register, trigger]);
+  }, [register, trigger, autoFillValue.name, history, userComparifyPage]);
 
   const onSubmit = handleSubmit(async ({ comparify }) => {
     setIsCreating(true);
@@ -286,63 +281,6 @@ const InputWrap = styled.div`
   }
 `;
 
-const CreateSplash = styled.div`
-  text-align: center;
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1.5em;
-`;
-
-const DescriptionBoxGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 2em;
-  ${breakpoints.lessThan("66")`
-    grid-template-columns: 1fr;
-    grid-gap: 1em;
-  `}
-`;
-
-const DescriptionBoxInner = styled.div`
-  /* background: linear-gradient(
-    -45deg,
-    rgba(190, 57, 0, 0.75),
-    rgba(106, 17, 104, 0.75)
-  ); */
-  background: ${({ theme }) => theme.colors.mainAccent25p};
-  &:first-child {
-    background: rgba(108, 30, 186, 0.25);
-  }
-  &:last-child {
-    background: rgba(186, 30, 103, 0.25);
-  }
-  box-shadow: 2px 2px 3px rgb(0, 0, 0, 0.3);
-  background-size: 300% 300%;
-  background-position: 50%;
-  border-radius: 0.25em;
-  padding: 1.5em;
-  ${breakpoints.lessThan("66")`
-    padding: 1em;
-  `}
-  display: flex;
-  height: 100%;
-  width: 100%;
-  flex-direction: column;
-  .descriptionIcon {
-    font-size: 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.5em;
-    color: ${({ theme }) => theme.colors.textPrimary};
-  }
-  .descriptionText {
-    text-align: center;
-    color: ${({ theme }) => theme.colors.textPrimary};
-    font-weight: 600;
-  }
-`;
-
 const CreateWrap = styled.div`
   width: 94%;
   position: relative;
@@ -350,10 +288,6 @@ const CreateWrap = styled.div`
   display: flex;
   flex-grow: 1;
   flex-direction: column;
-`;
-
-const CreateInfo = styled.div`
-  color: ${({ theme }) => theme.colors.textPrimary};
 `;
 
 const CreateForm = styled.div`

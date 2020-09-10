@@ -188,7 +188,7 @@ const FrontSubtitle = styled.div<{ state: string }>`
     text-align: center;
 
     .brandUnderline {
-      font-weight: 800;
+      font-weight: 700;
       border-bottom: 3px solid ${({ theme }) => theme.colors.spotifyGreen};
     }
   }

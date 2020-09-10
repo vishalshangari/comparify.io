@@ -12,7 +12,7 @@ const ErrorComp = ({ children, art }: FullPageErrorProps) => {
     <ErrorWrap>
       {art ? (
         <ErrorArt>
-          <img src={contemplation} />
+          <img alt={`Beautiful error art here`} src={contemplation} />
         </ErrorArt>
       ) : null}
       <ErrorInner>{children}</ErrorInner>

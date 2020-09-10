@@ -140,7 +140,7 @@ const PersonalData = () => {
     };
 
     getUserData();
-  }, []);
+  }, [queryValue.deleted]);
 
   const handleCopyClick = () => {
     copyToClipboard(`https://www.comparify.io/${userComparifyPage?.id}`);
@@ -194,7 +194,10 @@ const PersonalData = () => {
               <div className="dataItemInner">
                 <ComparifyPagePreviewDisplay>
                   <div className="profileImage">
-                    <img src={userInfo?.profileImageUrl} />
+                    <img
+                      alt={userInfo?.names.join(" ") || ""}
+                      src={userInfo?.profileImageUrl}
+                    />
                   </div>
                   {userComparifyPage?.exists && userComparifyPage?.id ? (
                     <div className="comparifyURLDisplay">
@@ -445,7 +448,7 @@ const PersonalDataWrapper = styled.div`
   `}
   h2 {
     font-size: 5rem;
-    font-weight: 400;
+    font-weight: 500;
     white-space: nowrap;
   }
   ${breakpoints.lessThan("90")`

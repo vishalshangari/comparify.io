@@ -4,7 +4,6 @@ import Header from "../shared/Header";
 import Footer from "../shared/Footer";
 import StandardMainContentWrapper from "../shared/StandardMainContentWrapper";
 import ComparifyInfo from "../shared/ComparifyInfo";
-import { breakpoints } from "../../theme";
 
 const UnauthenticatedCreateComparePage = () => {
   document.title = `Compare | Comparify`;

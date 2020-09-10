@@ -3,12 +3,10 @@ import styled from "styled-components";
 import { breakpoints } from "../../theme";
 import { DataOptions, DataButton } from "../shared/DataOptions";
 import { TopArtistsType } from "../PersonalData";
-import axios from "axios";
-import { DEV_URL } from "../../constants";
 import Loader from "../Loader";
 import { GoLinkExternal } from "react-icons/go";
 import fetchMultipleArtists from "../../utils/fetchMultipleArtists";
-import { Link, Element, scroller } from "react-scroll";
+import { Element, scroller } from "react-scroll";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 import { APIError } from "../../models";
 import DisplayQuantityToggleBtn from "../shared/DisplayQuantityToggleBtn";
@@ -210,7 +208,11 @@ const TopArtistsWrapper = ({ artists }: TopArtistsProps) => {
         artistListToDisplay(artistsData[currentDisplayPeriod])
       ) : (
         <ErrorComp>
-          `Oops, there was an unknown error loading your top artists 😟`
+          `Oops, there was an unknown error loading your top artists{" "}
+          <span role="img" aria-label="emoji">
+            😟
+          </span>
+          `
         </ErrorComp>
       )}
     </ArtistsDisplay>

@@ -13,7 +13,7 @@ import { breakpoints } from "../../../theme";
 
 const UnauthenticatedComparePage = () => {
   const { comparifyPageID } = useParams();
-  const [showPreview, setShowPreview] = useState(true);
+  const [, setShowPreview] = useState(true);
   const comparifyPage = useComparifyPage(comparifyPageID);
 
   document.title = `${comparifyPageID} | Comparify`;

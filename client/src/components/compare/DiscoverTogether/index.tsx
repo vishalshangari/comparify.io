@@ -2,13 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { DEV_URL } from "../../../constants";
 import { LoadedTrack } from "../../TopTracks";
-import { copyFileSync } from "fs";
 import { DiscoverTogetherProps } from "./models";
 import getRandomFromArr from "../../../utils/getRandomFromArr";
-import { difference } from "lodash";
-import styled, { keyframes, css } from "styled-components";
-import { TrackItem, TrackItemWrapper } from "../../TopTracks";
-import ContentLoader from "react-content-loader";
+import styled from "styled-components";
+import { TrackItemWrapper } from "../../TopTracks";
 import Loader from "../../Loader";
 import { TiArrowShuffle } from "react-icons/ti";
 import { APIError } from "../../../models";
@@ -102,7 +99,12 @@ const DiscoverTogether = ({
       }
     };
     getRecommendationData();
-  }, [shuffleRecommendations]);
+  }, [
+    shuffleRecommendations,
+    artistsComparison,
+    genresComparison,
+    tracksComparison,
+  ]);
 
   if (apiError) {
     return (

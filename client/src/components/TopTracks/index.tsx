@@ -202,7 +202,11 @@ const TopTracksWrapper = ({ tracks }: TopTracksProps) => {
         trackListToDisplay(tracksData[currentDisplayPeriod])
       ) : (
         <ErrorComp>
-          `Oops, there was an unknown error loading your top tracks 😔`
+          `Oops, there was an unknown error loading your top tracks{" "}
+          <span role="img" aria-label="emoji">
+            😔
+          </span>
+          `
         </ErrorComp>
       )}
     </TracksDisplay>

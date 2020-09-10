@@ -9,8 +9,7 @@ import {
 import { colors, breakpoints } from "../../theme";
 import { IoMdInformationCircle } from "react-icons/io";
 import round5x from "../../utils/round5x";
-import { AudioFeatureProps, DisplayedAudioFeatureKeys } from "./models";
-import { FeatureScores } from "../PersonalData";
+import { AudioFeatureProps } from "./models";
 import ErrorComp from "../shared/ErrorComp";
 
 const AudioFeatures = ({ scores }: AudioFeatureProps) => {
