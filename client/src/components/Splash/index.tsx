@@ -106,8 +106,8 @@ const Splash = () => {
               </ActionButton>
               <FrontActionButtonLabel>
                 By clicking, you agree to our{" "}
-                <a href="http://google.ca">
-                  <span>terms &amp; conditions</span>
+                <a href="/privacy">
+                  <span>privacy policy</span>
                 </a>
                 .
               </FrontActionButtonLabel>
@@ -207,7 +207,7 @@ const FrontTitle = styled.div<{ state: string }>`
   h1 {
     text-shadow: 2px 2px 8px rgb(0, 0, 0, 0.2);
     font-weight: 700;
-    color: white;
+    color: ${({ theme }) => theme.colors.textPrimary};
     margin: 0;
     text-align: center;
     line-height: 1;

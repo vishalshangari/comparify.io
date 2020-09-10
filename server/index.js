@@ -22,7 +22,9 @@ const get = require("./routes/get");
 const auth = require("./routes/auth");
 const logout = require("./routes/logout");
 const comparify = require("./routes/comparify");
+// TODO: recommendations route
 const recommend = require("./routes/recommend");
+const feedback = require("./routes/feedback");
 const siteTokenInitialization = require("./routes/siteTokenInitialization");
 const apitest = require("./routes/apitest");
 
@@ -195,7 +197,7 @@ if (!isDev && cluster.isMaster) {
 
   app.use("/api/comparify", comparify);
 
-  app.use("/api/recommend", comparify);
+  app.use("/api/feedback", feedback);
 
   app.use("/api/apitest", apitest);
 

@@ -9,7 +9,7 @@ const Footer = () => {
       <FooterInner>
         <Copyright>&copy; Comparify {date.getFullYear()}</Copyright>
         <FooterLinks>
-          <a href="/">Terms and Conditions</a>
+          <a href="/privacy">Privacy Policy</a>
           <a href="/feedback">
             Submit Feedback{" "}
             <span role="img" aria-label="emoji">

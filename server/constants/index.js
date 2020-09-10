@@ -78,4 +78,5 @@ module.exports = Object.freeze({
   DB_SITE_CONFIGURATIONS: "config",
   DB_SITE_TOKENS: "tokens",
   DB_COMPARIFYPAGE_COLLECTION: "comparifyPages",
+  DB_FEEDBACK_COLLECTION: "siteFeedback",
 });

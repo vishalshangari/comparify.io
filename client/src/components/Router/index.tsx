@@ -22,6 +22,7 @@ import FourZeroFour from "../FourZeroFour";
 import CompareRouter from "../CompareRouter";
 import UnauthenticatedCreateComparePage from "../UnauthenticatedCreateComparePage";
 import Feedback from "../Feedback";
+import PrivacyPolicy from "../PrivacyPolicy";
 
 export interface PrivateRouteProps extends RouteProps {
   isAuthenticated: boolean;
@@ -77,6 +78,7 @@ const Router = () => {
           )}
         </Route>
         <Route path="/feedback" exact component={Feedback} />
+        <Route path="/privacy" exact component={PrivacyPolicy} />
         <Route path="/:comparifyPageID([a-zA-Z0-9]+)">
           {isAuthenticated ? (
             <AuthenticatedComparePage />
