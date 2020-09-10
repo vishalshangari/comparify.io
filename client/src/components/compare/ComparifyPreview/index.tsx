@@ -301,7 +301,7 @@ const ComparifyPreview = ({
                       compare: true,
                     })}`}
                   >
-                    Log-in with Spotify &amp; Comparify
+                    Log-in with Spotify to Comparify
                   </AnimatedActionBtn>
                 )}
               </CompareBtnWrap>
@@ -393,6 +393,7 @@ const CurrentUserPageDisplay = styled.div`
 `;
 
 export const AnimatedActionBtn = styled.a`
+  text-align: center;
   .icon {
     font-size: 1em;
     margin-right: 0.5em;

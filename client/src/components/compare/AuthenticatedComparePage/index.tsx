@@ -29,6 +29,8 @@ const AuthenticatedComparePage = () => {
     }
   }, [performComparison]);
 
+  document.title = `${comparifyPageID} | Comparify`;
+
   return (
     <>
       <Header standardNav={false} logoOnlyNav />
@@ -59,7 +61,7 @@ const AuthenticatedComparePage = () => {
                       </ComparePageBreadcrumb>
                       <h1>This Comparify page does not exist.</h1>
                       <AnimatedActionBtn
-                        href={`/create?name=${comparifyPageID}`}
+                        href={`/compare?name=${comparifyPageID}`}
                       >
                         Claim this page
                       </AnimatedActionBtn>

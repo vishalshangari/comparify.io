@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import styled from "styled-components";
 import ComparifyLogo from "../../ComparifyLogo";
 import { theme, breakpoints } from "../../../theme";
-import { RESPONSE_CODES } from "../../../constants";
-import { useAuthState } from "../../../App";
+import { RESPONSE_CODES, DEV_URL } from "../../../constants";
+import { useAuthState, AuthContext } from "../../../App";
 import { HiMenu } from "react-icons/hi";
 import { VscClose } from "react-icons/vsc";
 import { Transition } from "react-transition-group";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
 
 type HeaderProps = {
   pageTitle?: string;
@@ -21,33 +23,62 @@ const Header = ({
   loading,
   logoOnlyNav,
 }: HeaderProps) => {
-  const { state: authState } = useAuthState();
+  const { state: authState, setState: setAuthState } = useAuthState();
   const isAuthenticated = authState.status === RESPONSE_CODES.AUTHENTICATED;
   const [isMobileNavExpanded, setIsMobileNavExpanded] = useState(false);
+  const history = useHistory();
+
+  const handleLogOut = async () => {
+    try {
+      const response = await axios.post(`${DEV_URL}/api/logout`, "logout", {
+        withCredentials: true,
+      });
+      console.log(response);
+      setAuthState({
+        status: response.data.status,
+        errorType: response.data.errorType,
+      });
+      history.push("/");
+    } catch (error) {
+      console.log(error);
+      // TODO: generic error handler -> redirect to error page with query string
+    }
+  };
+
+  const navLinksToDisplay = (
+    <>
+      <li>
+        <a className="nav" href="/compare">
+          Compare
+        </a>
+      </li>
+      <li>
+        {isAuthenticated ? (
+          <>
+            <a className="nav" href="/">
+              My Account
+            </a>
+          </>
+        ) : (
+          <a className="nav" href={`${DEV_URL}/api/auth/login`}>
+            Login with Spotify
+          </a>
+        )}
+      </li>
+      {isAuthenticated ? (
+        <li>
+          <a className="nav" onClick={handleLogOut}>
+            Logout
+          </a>
+        </li>
+      ) : null}
+    </>
+  );
 
   const responsiveNav = (
     <>
       <Navigation>
-        <ul>
-          <li>
-            <a className="nav" href="/">
-              Compare
-            </a>
-          </li>
-          <li>
-            {isAuthenticated ? (
-              <>
-                <a className="nav" href="/">
-                  My Account
-                </a>
-              </>
-            ) : (
-              <a className="nav" href="/">
-                Login
-              </a>
-            )}
-          </li>
-        </ul>
+        <ul>{navLinksToDisplay}</ul>
         {logoOnlyNav ? null : (
           <ComparifyLogo color={theme.colors.textPrimary} size="1.5rem" />
         )}
@@ -66,24 +97,7 @@ const Header = ({
       <Transition in={isMobileNavExpanded} timeout={500}>
         {(state) => (
           <MobileNavigation state={state}>
-            <ul>
-              <li>
-                <a className="nav" href="/">
-                  Compare
-                </a>
-              </li>
-              <li>
-                {isAuthenticated ? (
-                  <a className="nav" href="/">
-                    My Account
-                  </a>
-                ) : (
-                  <a className="nav" href="/">
-                    Login
-                  </a>
-                )}
-              </li>
-            </ul>
+            <ul>{navLinksToDisplay}</ul>
           </MobileNavigation>
         )}
       </Transition>

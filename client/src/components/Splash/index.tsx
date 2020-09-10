@@ -28,6 +28,8 @@ const Splash = () => {
   const [allTitlesEntered, setAllTitlesEntered] = useState(false);
   const size = useWindowSize();
 
+  document.title = `Comparify - Compare your music with others' and discover new music`;
+
   return (
     <SplashWrap style={{ height: size?.height }}>
       <SplashGlobalStyle />

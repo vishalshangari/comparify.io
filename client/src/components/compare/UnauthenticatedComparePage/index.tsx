@@ -16,6 +16,8 @@ const UnauthenticatedComparePage = () => {
   const [showPreview, setShowPreview] = useState(true);
   const comparifyPage = useComparifyPage(comparifyPageID);
 
+  document.title = `${comparifyPageID} | Comparify`;
+
   return (
     <>
       <Header standardNav={false} logoOnlyNav />

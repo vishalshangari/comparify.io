@@ -21,6 +21,7 @@ import { ComparifyPage } from "../../hooks/useComparifyPage";
 import { Transition } from "react-transition-group";
 import SlidingAlert from "../shared/SlidingAlert";
 import { BarLoader } from "react-spinners";
+import ComparifyInfo from "../shared/ComparifyInfo";
 
 type FormData = {
   comparify: string;
@@ -28,8 +29,6 @@ type FormData = {
 
 const alphaNumericPattern = RegExp("^[a-zA-Z0-9]+$");
 
-// TODO: Only show create options if authenticated user & does not have existing page
-// Create API endpoint to check if user has comparifyPage
 const CreateComparePage = () => {
   const location = useLocation();
   let history = useHistory();
@@ -53,6 +52,8 @@ const CreateComparePage = () => {
   );
   const autoFillValue = QueryString.parse(location.search);
 
+  document.title = `Compare | Comparify`;
+
   useEffect(() => {
     const checkIfUserHasComparifyPage = async () => {
       const userData = await fetchUserSavedData();
@@ -68,6 +69,7 @@ const CreateComparePage = () => {
     };
     checkIfUserHasComparifyPage();
     setAutoFill(autoFillValue.name || null);
+    console.log(userComparifyPage);
     if (autoFillValue.name) {
       setTimeout(async () => {
         await trigger("comparify");
@@ -135,7 +137,7 @@ const CreateComparePage = () => {
           </SlidingAlert>
         )}
       </Transition>
-      <Header standardNav={true} pageTitle={"Create"} />
+      <Header standardNav={true} pageTitle={"Compare"} />
       <StandardMainContentWrapper>
         <ComponentWithLoadingState label={false} loading={isLoading}>
           <CreateWrap>
@@ -203,36 +205,7 @@ const CreateComparePage = () => {
                 (lowercase/uppercase letters and/or numbers).
               </CreateFormRequirements>
             </CreateForm>
-            <CreateInfo>
-              <DescriptionBoxGrid>
-                <DescriptionBoxInner>
-                  <div className="descriptionIcon">
-                    <MdCompare />{" "}
-                  </div>
-                  <div className="descriptionText">
-                    Compare your taste in music with your friends and people
-                    around the world
-                  </div>
-                </DescriptionBoxInner>
-                <DescriptionBoxInner>
-                  <div className="descriptionIcon">
-                    <MdPersonAdd />
-                  </div>
-                  <div className="descriptionText">
-                    Create your own, unique, comparify.io page that can be
-                    shared with anyone easily
-                  </div>
-                </DescriptionBoxInner>
-                <DescriptionBoxInner>
-                  <div className="descriptionIcon">
-                    <ImMusic />
-                  </div>
-                  <div className="descriptionText">
-                    Discover new music from personalized recommendations
-                  </div>
-                </DescriptionBoxInner>
-              </DescriptionBoxGrid>
-            </CreateInfo>
+            <ComparifyInfo authenticated />
           </CreateWrap>
         </ComponentWithLoadingState>
       </StandardMainContentWrapper>

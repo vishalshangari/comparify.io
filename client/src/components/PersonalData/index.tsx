@@ -186,39 +186,50 @@ const PersonalData = () => {
       <PersonalDataWrapper>
         <ComponentWithLoadingState label={false} loading={loading}>
           <UserComparifyPagePreview>
-            <div className="dataItemInner">
-              <ComparifyPagePreviewDisplay>
-                <div className="profileImage">
-                  <img src={userInfo?.profileImageUrl} />
-                </div>
-                {userComparifyPage?.exists && userComparifyPage?.id ? (
-                  <div className="comparifyURLDisplay">
-                    {`comparify.io/`}
-                    <span>{`${userComparifyPage.id}`}</span>
+            <div className="userComparifyFlexContainer">
+              <div className="dataItemInner">
+                <ComparifyPagePreviewDisplay>
+                  <div className="profileImage">
+                    <img src={userInfo?.profileImageUrl} />
                   </div>
+                  {userComparifyPage?.exists && userComparifyPage?.id ? (
+                    <div className="comparifyURLDisplay">
+                      {`comparify.io/`}
+                      <span>{`${userComparifyPage.id}`}</span>
+                    </div>
+                  ) : (
+                    <div className="noComparifyPageDisplay">
+                      You don't have a Comparify page yet.
+                    </div>
+                  )}
+                </ComparifyPagePreviewDisplay>
+              </div>
+              <div className="comparifyPageActions">
+                {userComparifyPage?.exists ? (
+                  <>
+                    <AnimatedActionBtn onClick={handleCopyClick}>
+                      <span className="icon">
+                        <MdShare />
+                      </span>
+                      Share
+                    </AnimatedActionBtn>
+                    <AnimatedActionBtn href={`/${userComparifyPage.id}`}>
+                      Preview
+                    </AnimatedActionBtn>
+                  </>
                 ) : (
-                  <div className="noComparifyPageDisplay">
-                    You don't have a Comparify page yet.
-                  </div>
+                  <AnimatedActionBtn href={`/compare`}>
+                    Create
+                  </AnimatedActionBtn>
                 )}
-              </ComparifyPagePreviewDisplay>
+              </div>
             </div>
-            <div className="comparifyPageActions">
-              {userComparifyPage?.exists ? (
-                <>
-                  <AnimatedActionBtn onClick={handleCopyClick}>
-                    <span className="icon">
-                      <MdShare />
-                    </span>
-                    Share
-                  </AnimatedActionBtn>
-                  <AnimatedActionBtn href={`/${userComparifyPage.id}`}>
-                    Preview
-                  </AnimatedActionBtn>
-                </>
-              ) : (
-                <AnimatedActionBtn href={`/create`}>Create</AnimatedActionBtn>
-              )}
+            <div className="comparifyURLSupport">
+              {userComparifyPage?.exists && userComparifyPage?.id
+                ? `This is your personal and unique Comparify URL. Share it with
+                another Spotify user to let them compare their music taste with
+                you.`
+                : `To create your own personalized Comparify page, click the 'Create' button.`}
             </div>
           </UserComparifyPagePreview>
           <PersonalDataInner position="top">
@@ -321,18 +332,10 @@ const ComparifyPagePreviewDisplay = styled.div`
 const UserComparifyPagePreview = styled.div`
   width: 94%;
   margin: 0 auto 4em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  > div {
-    margin-right: 2em;
-  }
-  > div:last-child {
-    margin-right: 0;
-  }
 
   .comparifyPageActions {
     display: flex;
+    margin-left: 1em;
     a {
       flex: 1;
       display: flex;
@@ -344,26 +347,38 @@ const UserComparifyPagePreview = styled.div`
       margin-left: 1em;
     }
   }
+  .comparifyURLSupport {
+    flex-basis: 100%;
+    margin-top: 1em;
+  }
+  .userComparifyFlexContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
   ${breakpoints.lessThan("66")`
     margin: 0 auto 2em;
-  `}
-  ${breakpoints.lessThan("48")`
-    flex-wrap: wrap;
-    > div {
-      flex-basis: 100%;
-      margin: 0;
-    }
-    > div:last-child {
+    margin-top: 1em;
+    .comparifyPageActions {
       margin-top: 1em;
-      display: flex;
       align-items: center;
       justify-content: center;
     }
     && .dataItemInner {
       padding: 1em;
     }
+    .comparifyURLSupport {
+      font-size: 0.875rem;
+    }
     && ${AnimatedActionBtn} {
       font-size: 1.25em;
+    }
+  `}
+  ${breakpoints.lessThan("48")`
+    .comparifyPageActions {
+      flex-basis: 100%;
+      margin: 1em 0 0;
     }
   `}
   ${breakpoints.lessThan("58")`
