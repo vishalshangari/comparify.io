@@ -29,8 +29,6 @@ const TopGenres = ({ data }: TopGenresProps) => {
     setCurrentDisplayData(data![period]!);
   };
 
-  console.log(data);
-
   return data ? (
     <GenresDisplay>
       <div className="dataItemHeader">

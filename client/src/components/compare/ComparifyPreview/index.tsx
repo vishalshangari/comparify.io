@@ -138,7 +138,6 @@ const ComparifyPreview = ({
         setCurrentUserID(userData.id);
         setProfileData(data);
       } catch (error) {
-        console.log(error);
         setApiError({
           isError: true,
           status: error.response.data.status,
@@ -172,7 +171,6 @@ const ComparifyPreview = ({
           comparifyPageName: comparifyPage.id,
         },
       });
-      console.log(res.data);
       if (res.data.status === "200") {
         history.push("/home?deleted=true");
       }

@@ -54,13 +54,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         credentials: "include",
       });
       const responseBody = await response.json();
-      console.log(responseBody);
       setState({
         status: responseBody.status,
         errorType: responseBody.errorType,
       });
     } catch (error) {
-      console.log(error);
       // TODO: generic error handler -> redirect to error page with query string
     }
   }, [DEV_URL]);
@@ -99,8 +97,7 @@ const FullSiteWrap = styled.div`
 //   const handleCreateFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 //     e.preventDefault();
 //     e.persist();
-//     console.log("Form was submitted");
-//     console.log(e);
+
 //   };
 
 //   return (

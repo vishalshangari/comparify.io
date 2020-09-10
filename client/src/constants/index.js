@@ -43,7 +43,7 @@ module.exports = Object.freeze({
     : "http://www.comparify.io/api/auth/login/callback",
   HOME_REDIRECT_URI: isDev ? "http://localhost:3000/" : "/",
   COMPARIFY_TOKEN_COOKIE_KEY: "comparifyToken",
-  COOKIE_DOMAIN: isDev ? "" : "http://comparify.io",
+  COOKIE_DOMAIN: isDev ? "" : "http://www.comparify.io",
   MAX_COOKIE_AGE: 604800000, // One week, should be same as JWT expiration
   SERVER_PRIVATE_KEY: "serverPrivateAPIKey",
   ACCESS_TOKEN_REFRESH_PERIOD: 3420000, // Just less than one hour

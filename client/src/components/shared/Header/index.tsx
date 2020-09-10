@@ -29,14 +29,12 @@ const Header = ({
       const response = await axios.post(`${DEV_URL}/api/logout`, "logout", {
         withCredentials: true,
       });
-      console.log(response);
       setAuthState({
         status: response.data.status,
         errorType: response.data.errorType,
       });
       return true;
     } catch (error) {
-      console.log(error);
       return false;
       // TODO: generic error handler -> redirect to error page with query string
     }

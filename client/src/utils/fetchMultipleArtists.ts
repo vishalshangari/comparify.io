@@ -14,7 +14,6 @@ export default async (ids: string[]) => {
     );
     return data;
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };

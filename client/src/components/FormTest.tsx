@@ -12,13 +12,8 @@ export default function App() {
   const { register, setValue, handleSubmit, errors } = useForm<FormData>({
     mode: "onChange",
   });
-  const onNewSubmit = () => {
-    console.log("yo");
-  };
   const onSubmit = handleSubmit(async ({ firstName, lastName }) => {
-    console.log(firstName, lastName);
     const page = await db.collection("users").doc("smaleki517").get();
-    console.log(page.data());
   }); // firstName and lastName will have correct type
 
   const validateName = async (name: string) => {

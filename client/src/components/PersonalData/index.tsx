@@ -130,7 +130,6 @@ const PersonalData = () => {
         setTopArtists(userData.topArtists);
         setLoading(false);
       } catch (error) {
-        console.log(error);
         setApiError({
           isError: true,
           status: error.response.data.status,

@@ -64,7 +64,6 @@ const CreateComparePage = () => {
     };
     checkIfUserHasComparifyPage();
     setAutoFill(autoFillValue.name || null);
-    console.log(userComparifyPage);
     if (autoFillValue.name) {
       setTimeout(async () => {
         await trigger("comparify");

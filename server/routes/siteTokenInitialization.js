@@ -19,6 +19,7 @@ const {
   SPOTIFY_GET_AUTH_TOKEN_URL,
   DB_SITE_CONFIGURATIONS,
   DB_SITE_TOKENS,
+  PRIVATE_TOKEN_ENDPOINTS_ENDPOINT,
 } = require("../constants");
 
 const router = express.Router();
@@ -32,7 +33,7 @@ router.get("/site-tokens-initialize", (req, res) => {
       queryString.stringify({
         response_type: "code",
         client_id: CLIENT_ID,
-        redirect_uri: "http://localhost:3001/api/get/site-token",
+        redirect_uri: `http://localhost:3001/api/private/${PRIVATE_TOKEN_ENDPOINTS_ENDPOINT}/site-token`,
         state: state,
       })
   );
@@ -69,7 +70,7 @@ router.get("/site-token", async (req, res) => {
 
     const authRequestBody = {
       code: code,
-      redirect_uri: "http://localhost:3001/api/get/site-token",
+      redirect_uri: `http://localhost:3001/api/private/${PRIVATE_TOKEN_ENDPOINTS_ENDPOINT}/site-token`,
       grant_type: "authorization_code",
     };
 
@@ -94,7 +95,6 @@ router.get("/site-token", async (req, res) => {
 
       res.redirect(
         HOME_REDIRECT_URI +
-          "/" +
           queryString.stringify({
             error: "successfully_got_site_tokens",
           })
@@ -104,7 +104,6 @@ router.get("/site-token", async (req, res) => {
       console.log(`Site token get error: ` + error);
       res.redirect(
         HOME_REDIRECT_URI +
-          "/" +
           queryString.stringify({
             error: "could_not_get_site_token",
           })

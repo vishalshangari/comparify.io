@@ -38,7 +38,6 @@ const Feedback = () => {
 
   const onSubmit = handleSubmit(async ({ name, email, message }) => {
     setIsSubmitting(true);
-    console.log(name, email, message);
     try {
       const res = await axios.post(`${DEV_URL}/api/feedback`, {
         name: name,
