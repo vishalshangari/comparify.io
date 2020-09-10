@@ -169,6 +169,8 @@ const FeedbackForm = styled.form`
   }
   input[type="submit"] {
     cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     padding: 0.5em 1em;
     font-size: 1.5em;
     border: 0;
@@ -191,7 +193,8 @@ const FeedbackForm = styled.form`
     border-radius: 0.25em;
     background: ${({ theme }) => theme.colors.darkBodyOverlay};
     color: ${({ theme }) => theme.colors.textPrimary};
-    min-width: 40ch;
+    width: 100%;
+    max-width: 400px;
     font-family: "open sans", "sans-serif";
   }
   textarea {

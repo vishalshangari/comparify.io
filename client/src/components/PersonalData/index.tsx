@@ -359,7 +359,7 @@ const UserComparifyPagePreview = styled.div`
   }
   ${breakpoints.lessThan("66")`
     margin: 0 auto 2em;
-    margin-top: 1em;
+
     .comparifyPageActions {
       margin-top: 1em;
       align-items: center;

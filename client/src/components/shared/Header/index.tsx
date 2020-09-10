@@ -168,7 +168,7 @@ const MobileNavigation = styled.div<{ state: string }>`
   transition: 0.3s ease-in-out all;
   ${({ state }) =>
     state === "entered" || state === `entering`
-      ? `max-height: 10em; opacity: 1;`
+      ? `max-height: 14em; opacity: 1;`
       : `max-height: 0px; opacity: 0;`}
   justify-content: flex-end;
   ul {

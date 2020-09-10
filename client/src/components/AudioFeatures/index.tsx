@@ -457,7 +457,7 @@ const FeaturesDisplay = styled.div`
   }
   ${breakpoints.lessThan("58")`
     > div {
-      padding: 2em 0;
+      padding: 1em 0;
     }
   `};
   h2 {
