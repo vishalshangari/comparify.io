@@ -277,8 +277,8 @@ const ComparifyPagePreviewDisplay = styled.div`
     font-size: 2rem;
     line-height: 1;
     letter-spacing: 1px;
-    font-weight: 300;
-    font-family: "roboto slab", "open sans", "sans-serif";
+    font-weight: 400;
+    font-family: "open sans", "sans-serif";
     color: ${({ theme }) => theme.colors.textTertiary};
     span {
       font-weight: 700;
