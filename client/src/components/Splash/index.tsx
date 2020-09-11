@@ -102,7 +102,7 @@ const Splash = () => {
           {(state) => (
             <FrontActionButtonWrap state={state}>
               <ActionButton href={`${DEV_URL}/api/auth/login`}>
-                <span>GET STARTED</span> <IoIosArrowDroprightCircle />
+                <span>Log in with Spotify</span> <IoIosArrowDroprightCircle />
               </ActionButton>
               <FrontActionButtonLabel>
                 By clicking, you agree to our{" "}
@@ -122,17 +122,17 @@ const Splash = () => {
 const FrontActionButtonLabel = styled.div`
   margin-top: 10px;
   font-size: 1rem;
-  color: ${({ theme }) => theme.colors.textTertiary};
-  opacity: 0.8;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.textPrimary};
+  opacity: 0.7;
   width: 100%;
   line-height: 2rem;
   a {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.textTertiary};
-    text-decoration: none;
-    color: ${({ theme }) => theme.colors.textTertiary};
+    border-bottom: 1px solid ${({ theme }) => theme.colors.mainAccent};
+    background: ${({ theme }) => theme.colors.mainAccent10p};
+    color: ${({ theme }) => theme.colors.textPrimary};
     &:hover {
-      color: #fff;
-      border-bottom: 1px solid ${({ theme }) => theme.colors.textPrimary};
+      background: ${({ theme }) => theme.colors.mainAccent};
     }
   }
 `;
@@ -154,6 +154,7 @@ const ActionButton = styled.a`
   line-height: 1;
   span {
     margin-right: 10px;
+    font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
   }
@@ -235,6 +236,7 @@ const SplashBackgroundLabel = styled.div<{ state: string }>`
   transition: 3s ease opacity;
   color: ${({ theme }) => theme.colors.textTertiary};
   a {
+    font-weight: 600;
     &:hover {
       color: ${({ theme }) => theme.colors.textPrimary};
       border-bottom: 1px solid ${({ theme }) => theme.colors.textPrimary};

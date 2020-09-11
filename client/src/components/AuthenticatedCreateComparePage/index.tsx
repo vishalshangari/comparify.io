@@ -28,16 +28,11 @@ const alphaNumericPattern = RegExp("^[a-zA-Z0-9]+$");
 const CreateComparePage = () => {
   const location = useLocation();
   let history = useHistory();
-  const [
-    userComparifyPage,
-    setUserComparifyPage,
-  ] = useState<null | ComparifyPage>(null);
+  const [, setUserComparifyPage] = useState<null | ComparifyPage>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateButtonDisabled, setIsCreateButtonDisabled] = useState(true);
   const [autoFill, setAutoFill] = useState<null | string | string[]>(null);
-  const { register, handleSubmit, errors, trigger, control } = useForm<
-    FormData
-  >({
+  const { handleSubmit, errors, trigger, control } = useForm<FormData>({
     mode: "onChange",
   });
   const [isCreating, setIsCreating] = useState(false);
@@ -67,7 +62,7 @@ const CreateComparePage = () => {
         await trigger("comparify");
       }, 500);
     }
-  }, [register, trigger, autoFillValue.name, history, userComparifyPage]);
+  }, [autoFillValue.name, history, trigger]);
 
   const onSubmit = handleSubmit(async ({ comparify }) => {
     setIsCreating(true);
@@ -320,13 +315,16 @@ const CreateBtn = styled.button`
   padding: 0.5em 1em 0.625em;
   border: 0;
   border-radius: 0.25em;
-  font-family: "roboto slab", "open sans", "sans-serif";
-  font-size: 1.75rem;
+  font-family: "open sans", "sans-serif";
+  font-size: 2rem;
   ${breakpoints.lessThan("66")`
     font-size: 1.5rem;
   `}
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
+  ${breakpoints.lessThan("38")`
+    font-size: 1.25rem;
+  `}
+  color: ${({ theme }) => theme.colors.textPrimary};
+  font-weight: 700;
   letter-spacing: 1px;
   outline: 0;
   display: inline-block;

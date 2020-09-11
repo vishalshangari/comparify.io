@@ -170,7 +170,7 @@ if (!isDev && cluster.isMaster) {
   //   })
   // );
 
-  Dynamic Meta tag testing
+  // Dynamic Meta tag testing
   app.get("/", function (request, response) {
     console.log("Home page visited!");
     const filePath = path.resolve(__dirname, "../client/build", "index.html");
