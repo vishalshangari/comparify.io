@@ -149,7 +149,7 @@ const PersonalData = () => {
   if (apiError) {
     return (
       <>
-        <Header standardNav={true} />
+        <Header standardNav={false} logoOnlyNav />
         <PersonalDataWrapper>
           <ErrorComp art>
             <span>

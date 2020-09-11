@@ -17,7 +17,9 @@ module.exports = async (authHeader) => {
       _id: userProfileData.id,
       createdAt: Date.now(),
       displayName: userProfileData.display_name || null,
-      profileImageUrl: userProfileData.images[0].url,
+      profileImageUrl: userProfileData.images
+        ? userProfileData.images[0].url
+        : null,
       country: userProfileData.country,
     };
 

@@ -62,7 +62,7 @@ const DiscoverTogether = ({
       ) {
         tracks = Math.min(
           tracksComparison.now.shared.length,
-          5 - artists + genres
+          5 - artists - genres
         );
         tracksToUse = getRandomFromArr(
           tracksComparison.now.shared.slice(0, 5),
