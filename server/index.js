@@ -106,9 +106,20 @@ if (!isDev && cluster.isMaster) {
   });
 } else {
   const app = express();
+
+  if (IS_DEV) {
+    const cors = require("cors");
+    app.use(
+      cors({
+        credentials: true,
+        origin: "http://localhost:3000",
+      })
+    );
+    console.log("cors");
+  }
   app.use(cookieParser()).use(express.json());
 
-  //Add headers
+  // //Add headers
   // app.use(function (req, res, next) {
   //   // Website you wish to allow to connect
   //   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -159,20 +170,30 @@ if (!isDev && cluster.isMaster) {
   //   })
   // );
 
+  Dynamic Meta tag testing
+  app.get("/", function (request, response) {
+    console.log("Home page visited!");
+    const filePath = path.resolve(__dirname, "../client/build", "index.html");
+
+    // read in the index.html file
+    fs.readFile(filePath, "utf8", function (err, data) {
+      if (err) {
+        return console.log(err);
+      }
+
+      // replace the special strings with server generated strings
+      data = data.replace(/\$OG_TITLE/g, "Comparify Home Page - Testing");
+      data = data.replace(
+        /\$OG_DESCRIPTION/g,
+        "Home page description - Testing"
+      );
+      result = data.replace(/\$OG_IMAGE/g, "https://i.imgur.com/V7irMl8.png");
+      response.send(result);
+    });
+  });
+
   // Priority serve any static files.
   app.use(express.static(path.resolve(__dirname, "../client/build")));
-
-  // Enable CORS for dev
-  if (IS_DEV) {
-    const cors = require("cors");
-    app.use(
-      cors({
-        credentials: true,
-        origin: "http://localhost:3000",
-      })
-    );
-    console.log("cors");
-  }
 
   // Answer API requests.
   app.get("/api", (req, res) => {
