@@ -58,10 +58,8 @@ const port = process.env.PORT || 3001;
 
 // Redirection logic
 function wwwRedirect(req, res, next) {
-  var host = req.header("host");
-  if (host.match(/^www\..*/i)) {
-    next();
-  } else {
+  let host = req.headers.host;
+  if (host.slice(0, 4) !== "www.") {
     res.redirect(301, `${req.protocol}://www.${host}${req.originalUrl}`);
   }
   next();
@@ -84,7 +82,7 @@ if (!isDev && cluster.isMaster) {
 } else {
   const app = express();
   app.use(cookieParser()).use(express.json());
-  // app.use(wwwRedirect);
+  app.use(wwwRedirect);
   //Add headers
   // app.use(function (req, res, next) {
   //   // Website you wish to allow to connect
