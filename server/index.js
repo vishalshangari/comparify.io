@@ -188,10 +188,7 @@ if (!isDev && cluster.isMaster) {
         /\$OG_DESCRIPTION/g,
         "Compare taste in music with others' and the world"
       );
-      result = data.replace(
-        /\$OG_IMAGE/g,
-        path.resolve(__dirname, "../client/build", "logo512.png")
-      );
+      result = data.replace(/\$OG_IMAGE/g, "%PUBLIC_URL%/logo512.png");
       response.send(result);
     });
   });
