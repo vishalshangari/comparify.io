@@ -13,9 +13,14 @@ import * as QueryString from "query-string";
 import { ComparePageBreadcrumb } from "../ComparifyPreview";
 import ComparifyPreview, { AnimatedActionBtn } from "../ComparifyPreview";
 import { NoComparifyPage } from "../UnauthenticatedComparePage";
+import { Helmet } from "react-helmet";
+
+type RouteParams = {
+  comparifyPageID: string;
+};
 
 const AuthenticatedComparePage = () => {
-  const { comparifyPageID } = useParams();
+  const { comparifyPageID } = useParams<RouteParams>();
   const location = useLocation();
   const [showComparison, setShowComparison] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
@@ -29,10 +34,29 @@ const AuthenticatedComparePage = () => {
     }
   }, [performComparison]);
 
-  document.title = `${comparifyPageID} | Comparify`;
-
   return (
     <>
+      <Helmet>
+        <title>{comparifyPageID} | Comparify</title>
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={`${comparifyPageID} | Comparify`} />
+        <meta property="og:site_name" content="Comparify" />
+        <meta
+          name="twitter:description"
+          property="og:description"
+          content="Compare your music taste with me!"
+        />
+        <meta
+          property="twitter:title"
+          content={`${comparifyPageID} | Comparify`}
+        />
+        <meta name="twitter:domain" content="comparify.io" />
+        <meta property="twitter:card" content="summary" />
+        <meta
+          property="og:url"
+          content={`http://comparify.io/${comparifyPageID}`}
+        />
+      </Helmet>
       <Header standardNav={false} logoOnlyNav />
       <StandardMainContentWrapper>
         <ComparePageWrapper>
@@ -56,6 +80,13 @@ const AuthenticatedComparePage = () => {
                     />
                   ) : (
                     <NoComparifyPage>
+                      <Helmet>
+                        <meta
+                          name="twitter:description"
+                          property="og:description"
+                          content="This Comparify page doesn't exist yet! Claim it now"
+                        />
+                      </Helmet>
                       <ComparePageBreadcrumb>
                         comparify.io/<span>{comparifyPageID}</span>
                       </ComparePageBreadcrumb>

@@ -11,6 +11,7 @@ import { DEV_URL } from "../../constants";
 import axios from "axios";
 import { Transition } from "react-transition-group";
 import SlidingAlert from "../shared/SlidingAlert";
+import { Helmet } from "react-helmet";
 
 type FeedbackFormData = {
   name: string;
@@ -19,7 +20,6 @@ type FeedbackFormData = {
 };
 
 const Feedback = () => {
-  document.title = `Feedback  | Comparify`;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -56,6 +56,13 @@ const Feedback = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Feedback | Comparify</title>
+        <meta
+          name="description"
+          content="Provide feedback on your experience to the developers of Comparify. We thank you for your input."
+        />
+      </Helmet>
       <Transition
         in={showErrorAlert}
         timeout={1500}

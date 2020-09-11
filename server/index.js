@@ -53,42 +53,19 @@ const expressWinston = require("express-winston");
 const winston = require("winston");
 const { createLogger } = require("winston");
 
-// Firestore initial script
-// const songRef = db.collection("songs").doc("jKVoXZPJm0g8aRwarEv2");
-
-// (async () => {
-//   const doc = await songRef.get();
-//   if (!doc.exists) {
-//     console.log("No such document!");
-//   } else {
-//     console.log("Document data:", doc.data());
-//   }
-// })();
-
-const datatowrite = {
-  name: "Vishal",
-  spotifyId: "1233",
-  age: "250",
-  interests: {
-    travel: {},
-    reading: {
-      books: {
-        genres: {
-          fiction: ["great gatsby", "sherlock holmes"],
-          "non-fiction": ["4 hour work week", "sapiens"],
-        },
-      },
-    },
-  },
-};
-
-// (async () => {
-//   console.log(datatowrite);
-//   await db.collection("my users").doc(datatowrite.spotifyId).set(datatowrite);
-// })();
-
 const isDev = process.env.NODE_ENV !== "production";
 const port = process.env.PORT || 3001;
+
+// Redirection logic
+function wwwRedirect(req, res, next) {
+  var host = req.header("host");
+  if (host.match(/^www\..*/i)) {
+    next();
+  } else {
+    res.redirect(301, `${req.protocol}://www.${host}${req.originalUrl}`);
+  }
+  next();
+}
 
 // Multi-process to utilize all CPU cores in production
 if (!isDev && cluster.isMaster) {
@@ -107,7 +84,7 @@ if (!isDev && cluster.isMaster) {
 } else {
   const app = express();
   app.use(cookieParser()).use(express.json());
-
+  app.use(wwwRedirect);
   //Add headers
   // app.use(function (req, res, next) {
   //   // Website you wish to allow to connect
@@ -158,6 +135,8 @@ if (!isDev && cluster.isMaster) {
   //     ],
   //   })
   // );
+
+  // Rediret all non-www requests to www
 
   // Priority serve any static files.
   app.use(express.static(path.resolve(__dirname, "../client/build")));

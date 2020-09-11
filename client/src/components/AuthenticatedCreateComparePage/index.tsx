@@ -42,8 +42,6 @@ const CreateComparePage = () => {
   );
   const autoFillValue = QueryString.parse(location.search);
 
-  document.title = `Compare | Comparify`;
-
   useEffect(() => {
     const checkIfUserHasComparifyPage = async () => {
       const userData = await fetchUserSavedData();

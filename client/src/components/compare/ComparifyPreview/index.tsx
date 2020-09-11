@@ -16,6 +16,7 @@ import SlidingAlert from "../../shared/SlidingAlert";
 import Modal from "react-modal";
 import Loader from "../../Loader";
 import { useHistory } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 type SpotifyProfileImage = {
   height: null | number;
@@ -214,14 +215,21 @@ const ComparifyPreview = ({
               comparify.io/<span>{comparifyPage.id}</span>
             </ComparePageBreadcrumb>
             {profileData.images && profileData.images.length > 0 ? (
-              <ProfileImage>
-                <img alt={profileData.name} src={profileData.images[0].url} />
-              </ProfileImage>
+              <>
+                <Helmet>
+                  <meta
+                    property="og:image"
+                    content={profileData.images[0].url}
+                  />
+                </Helmet>
+                <ProfileImage>
+                  <img alt={profileData.name} src={profileData.images[0].url} />
+                </ProfileImage>
+              </>
             ) : null}
 
             <ProfileName>
               <h1>{profileData.name}</h1>
-              {/* <h1>{currentUserID}</h1> */}
             </ProfileName>
 
             {comparifyPage.data!.creator._id === currentUserID ? (
@@ -293,10 +301,8 @@ const ComparifyPreview = ({
                   </AnimatedActionBtn>
                 ) : (
                   <AnimatedActionBtn
-                    // href={`${DEV_URL}/api/auth/login?redir=${comparifyPage.id}`}
                     href={`${DEV_URL}/api/auth/login?${QueryString.stringify({
                       redir: comparifyPage.id,
-                      compare: true,
                     })}`}
                   >
                     Log-in with Spotify to Comparify

@@ -17,6 +17,7 @@ import FourZeroFour from "../FourZeroFour";
 import UnauthenticatedCreateComparePage from "../UnauthenticatedCreateComparePage";
 import Feedback from "../Feedback";
 import PrivacyPolicy from "../PrivacyPolicy";
+import { Helmet } from "react-helmet";
 
 // Test components
 // import Test from "../../Test";
@@ -42,9 +43,14 @@ const Router = () => {
         <Route path="/home" exact>
           {isAuthenticated ? <Home /> : <Redirect to="/" />}
         </Route>
-        {/* <Route path="/login" exact component={Login} /> */}
         <Route path="/compare" exact>
-          {/* <Route path="/compareTest" exact component={CompareRouter} /> */}
+          <Helmet>
+            <title>Compare | Comparify</title>
+            <meta
+              name="description"
+              content="Create unique Comparify page to share with friends and compare taste in music."
+            />
+          </Helmet>
           {isAuthenticated ? (
             <AuthenticatedCreateComparePage />
           ) : (
@@ -60,19 +66,6 @@ const Router = () => {
             <UnauthenticatedComparePage />
           )}
         </Route>
-        {/* <Route path="/auth" component={Test} />
-        <Route path="/formTest" exact component={FormTest} />
-        <Route path="/test" component={DiscoverTogether} /> */}
-        {/* <Route path="/private" exact>
-          {isAuthenticated ? <TestPrivateRoute /> : <Redirect to="/login" />}
-        </Route> */}
-        {/* OLD Private route
-        <PrivateRoute
-          isAuthenticated={isAuthenticated}
-          path="/private"
-          exact
-          component={TestPrivateRoute}
-        /> */}
         <Route path="*" component={FourZeroFour} />
       </Switch>
     </BrowserRouter>

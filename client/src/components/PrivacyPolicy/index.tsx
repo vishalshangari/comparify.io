@@ -5,12 +5,18 @@ import Footer from "../shared/Footer";
 import StandardMainContentWrapper from "../shared/StandardMainContentWrapper";
 import { breakpoints } from "../../theme";
 import privacyBG from "../../assets/img/privacy_protection.svg";
+import { Helmet } from "react-helmet";
 
 const PrivacyPolicy = () => {
-  document.title = `Privacy Policy  | Comparify`;
-
   return (
     <>
+      <Helmet>
+        <title>Privacy Policy | Comparify</title>
+        <meta
+          name="description"
+          content="Information relating to the collection, use, and storage of user data for the operation and improvement of Comparify services."
+        />
+      </Helmet>
       <Header standardNav={true} pageTitle={"Privacy"} />
       <StandardMainContentWrapper>
         <PrivacyWrap>

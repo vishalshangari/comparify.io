@@ -10,9 +10,14 @@ import useComparifyPage from "../../../hooks/useComparifyPage";
 import { ComparePageBreadcrumb, AnimatedActionBtn } from "../ComparifyPreview";
 import styled from "styled-components";
 import { breakpoints } from "../../../theme";
+import { Helmet } from "react-helmet";
+
+type RouteParams = {
+  comparifyPageID: string;
+};
 
 const UnauthenticatedComparePage = () => {
-  const { comparifyPageID } = useParams();
+  const { comparifyPageID } = useParams<RouteParams>();
   const [, setShowPreview] = useState(true);
   const comparifyPage = useComparifyPage(comparifyPageID);
 
@@ -20,6 +25,27 @@ const UnauthenticatedComparePage = () => {
 
   return (
     <>
+      <Helmet>
+        <title>{comparifyPageID} | Comparify</title>
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={`${comparifyPageID} | Comparify`} />
+        <meta property="og:site_name" content="Comparify" />
+        <meta
+          name="twitter:description"
+          property="og:description"
+          content="Compare your music taste with me!"
+        />
+        <meta
+          property="twitter:title"
+          content={`${comparifyPageID} | Comparify`}
+        />
+        <meta name="twitter:domain" content="comparify.io" />
+        <meta property="twitter:card" content="summary" />
+        <meta
+          property="og:url"
+          content={`http://comparify.io/${comparifyPageID}`}
+        />
+      </Helmet>
       <Header standardNav={false} logoOnlyNav />
       <StandardMainContentWrapper>
         <UnauthenticatedComparePageInner>
