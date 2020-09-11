@@ -188,7 +188,11 @@ if (!isDev && cluster.isMaster) {
         /\$OG_DESCRIPTION/g,
         "Compare taste in music with others' and the world"
       );
-      result = data.replace(/\$OG_IMAGE/g, "%PUBLIC_URL%/logo512.png");
+      result = data.replace(
+        /\$OG_IMAGE/g,
+        "http://www.comparify.io/logo512.png"
+      );
+      result = data.replace(/\$OG_URL/g, "http://www.comparify.io/");
       response.send(result);
     });
   });
