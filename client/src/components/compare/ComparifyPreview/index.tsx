@@ -467,7 +467,7 @@ export const ComparePageBreadcrumb = styled.div`
   font-family: "open sans", "sans-serif";
   color: ${({ theme }) => theme.colors.textTertiary};
   span {
-    font-weight: 500;
+    font-weight: 700;
     color: ${({ theme }) => theme.colors.textPrimary};
   }
 `;
