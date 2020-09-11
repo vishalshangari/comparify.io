@@ -84,7 +84,7 @@ if (!isDev && cluster.isMaster) {
 } else {
   const app = express();
   app.use(cookieParser()).use(express.json());
-  app.use(wwwRedirect);
+  // app.use(wwwRedirect);
   //Add headers
   // app.use(function (req, res, next) {
   //   // Website you wish to allow to connect
