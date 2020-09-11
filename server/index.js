@@ -6,6 +6,7 @@ const queryString = require("query-string");
 const cookieParser = require("cookie-parser");
 const numCPUs = require("os").cpus().length;
 const axios = require("axios");
+const fs = require("fs");
 
 require("dotenv").config();
 
