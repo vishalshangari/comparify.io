@@ -138,7 +138,7 @@ if (!isDev && cluster.isMaster) {
   // Dynamic Meta tag testing
   app.get("/", function (request, response) {
     console.log("Home page visited!");
-    const filePath = path.resolve(__dirname, "./build", "index.html");
+    const filePath = path.resolve(__dirname, "../client/build", "index.html");
 
     // read in the index.html file
     fs.readFile(filePath, "utf8", function (err, data) {
