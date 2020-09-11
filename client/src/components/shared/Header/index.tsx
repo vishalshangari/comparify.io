@@ -6,7 +6,6 @@ import { RESPONSE_CODES, DEV_URL } from "../../../constants";
 import { useAuthState } from "../../../App";
 import { Transition } from "react-transition-group";
 import axios from "axios";
-import { useHistory } from "react-router-dom";
 
 type HeaderProps = {
   pageTitle?: string;
@@ -24,7 +23,6 @@ const Header = ({
   const { state: authState, setState: setAuthState } = useAuthState();
   const isAuthenticated = authState.status === RESPONSE_CODES.AUTHENTICATED;
   const [isMobileNavExpanded, setIsMobileNavExpanded] = useState(false);
-  let history = useHistory();
 
   const handleLogOut = async () => {
     try {
@@ -35,8 +33,9 @@ const Header = ({
         status: response.data.status,
         errorType: response.data.errorType,
       });
-      history.push("/");
+      return true;
     } catch (error) {
+      return false;
       // TODO: generic error handler -> redirect to error page with query string
     }
   };
@@ -63,9 +62,9 @@ const Header = ({
       </li>
       {isAuthenticated ? (
         <li>
-          <button className="nav" onClick={handleLogOut}>
+          <a href={"/"} className="nav" onClick={handleLogOut}>
             Logout
-          </button>
+          </a>
         </li>
       ) : null}
     </>
@@ -181,8 +180,7 @@ const MobileNavigation = styled.div<{ state: string }>`
       border-bottom: none;
     }
   }
-  a.nav,
-  button.nav {
+  a.nav {
     display: block;
     padding: 1em;
     font-weight: 500;
@@ -283,7 +281,7 @@ const Navigation = styled.div`
   align-items: center;
   ul {
     display: flex;
-    padding: 1em 1.5em 0.75em;
+    padding: 1em 1.5em;
     border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlay};
     border-radius: 0.25em;
     background: ${({ theme }) => theme.colors.mainContentBg};
@@ -298,13 +296,12 @@ const Navigation = styled.div`
       margin-right: 0;
     }
   }
-  a.nav,
-  button.nav {
-    font-weight: 700;
+  a.nav {
+    font-weight: 500;
     transition: 0.2s ease all;
     color: ${({ theme }) => theme.colors.textTertiary};
     padding-bottom: 0.25em;
-    border-bottom: 2px solid transparent;
+    border-bottom: 1px solid transparent;
     &:hover {
       opacity: 1;
       color: ${({ theme }) => theme.colors.textPrimary};

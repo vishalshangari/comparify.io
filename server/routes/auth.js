@@ -222,7 +222,7 @@ router.get("/login/callback", async (req, res) => {
 });
 
 router.get("/verifyToken", (req, res) => {
-  console.log(`Cookies in request:`, JSON.stringify(req.cookies));
+  console.log(`Cookies in request: `, JSON.stringify(req.cookies));
   if (req.cookies["comparifyToken"]) {
     try {
       const jwtresult = jwt.verify(

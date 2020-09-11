@@ -1,8 +1,13 @@
 const express = require("express");
+const axios = require("axios");
 
 const router = express.Router();
 
-const { RESPONSE_CODES } = require("../constants");
+const {
+  HOME_REDIRECT_URI,
+  COOKIE_DOMAIN,
+  RESPONSE_CODES,
+} = require("../constants");
 
 router.post("/", (req, res) => {
   console.log("logging out...");
