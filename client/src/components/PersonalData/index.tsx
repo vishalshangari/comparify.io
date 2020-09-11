@@ -281,7 +281,7 @@ const ComparifyPagePreviewDisplay = styled.div`
     font-family: "open sans", "sans-serif";
     color: ${({ theme }) => theme.colors.textTertiary};
     span {
-      font-weight: 700;
+      font-weight: 500;
       color: ${({ theme }) => theme.colors.textPrimary};
     }
   }
