@@ -16,7 +16,6 @@ import SlidingAlert from "../../shared/SlidingAlert";
 import Modal from "react-modal";
 import Loader from "../../Loader";
 import { useHistory } from "react-router-dom";
-import { Helmet } from "react-helmet";
 
 type SpotifyProfileImage = {
   height: null | number;
@@ -216,12 +215,6 @@ const ComparifyPreview = ({
             </ComparePageBreadcrumb>
             {profileData.images && profileData.images.length > 0 ? (
               <>
-                <Helmet>
-                  <meta
-                    property="og:image"
-                    content={profileData.images[0].url}
-                  />
-                </Helmet>
                 <ProfileImage>
                   <img alt={profileData.name} src={profileData.images[0].url} />
                 </ProfileImage>

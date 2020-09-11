@@ -38,7 +38,7 @@ const AuthenticatedComparePage = () => {
     <>
       <Helmet>
         <title>{comparifyPageID} | Comparify</title>
-        <meta property="og:type" content="website" />
+        {/* <meta property="og:type" content="website" />
         <meta property="og:title" content={`${comparifyPageID} | Comparify`} />
         <meta property="og:site_name" content="Comparify" />
         <meta
@@ -55,7 +55,7 @@ const AuthenticatedComparePage = () => {
         <meta
           property="og:url"
           content={`http://comparify.io/${comparifyPageID}`}
-        />
+        /> */}
       </Helmet>
       <Header standardNav={false} logoOnlyNav />
       <StandardMainContentWrapper>

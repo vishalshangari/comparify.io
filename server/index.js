@@ -182,12 +182,15 @@ if (!isDev && cluster.isMaster) {
       }
 
       // replace the special strings with server generated strings
-      data = data.replace(/\$OG_TITLE/g, "Comparify Home Page - Testing");
+      data = data.replace(/\$OG_TITLE/g, "Comparify");
       data = data.replace(
         /\$OG_DESCRIPTION/g,
-        "Home page description - Testing"
+        "Compare taste in music with others' and the world"
       );
-      result = data.replace(/\$OG_IMAGE/g, "https://i.imgur.com/V7irMl8.png");
+      result = data.replace(
+        /\$OG_IMAGE/g,
+        path.resolve(__dirname, "../client/build", "logo512.png")
+      );
       response.send(result);
     });
   });
