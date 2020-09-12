@@ -165,6 +165,7 @@ const CreateComparePage = () => {
                           value={value ? value : ``}
                           onChange={onChange}
                           autoFocus
+                          autoCapitalize="off"
                         />
                       )}
                     />
