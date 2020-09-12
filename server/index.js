@@ -188,7 +188,10 @@ if (!isDev && cluster.isMaster) {
         /\$OG_DESCRIPTION/g,
         "Compare taste in music with others' and the world"
       );
-      data = data.replace(/\$OG_IMAGE/g, "http://www.comparify.io/logo512.png");
+      data = data.replace(
+        /\$OG_IMAGE/g,
+        "https://firebasestorage.googleapis.com/v0/b/spotify-compare.appspot.com/o/logo512.png?alt=media&token=95414df3-d357-46a9-899a-d7478ab37d83"
+      );
       result = data.replace(/\$OG_URL/g, "http://www.comparify.io/");
       response.send(result);
     });

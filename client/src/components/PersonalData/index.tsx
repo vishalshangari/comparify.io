@@ -277,11 +277,11 @@ const ComparifyPagePreviewDisplay = styled.div`
     font-size: 2rem;
     line-height: 1;
     letter-spacing: 1px;
-    font-weight: 400;
+    font-weight: 500;
     font-family: "open sans", "sans-serif";
     color: ${({ theme }) => theme.colors.textTertiary};
     span {
-      font-weight: 500;
+      font-weight: 700;
       color: ${({ theme }) => theme.colors.textPrimary};
     }
   }

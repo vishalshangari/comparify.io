@@ -461,12 +461,12 @@ export const ComparePageBreadcrumb = styled.div`
   font-size: 1.75rem;
   margin-bottom: 1em;
   letter-spacing: 1px;
-  opacity: 0.5;
-  font-weight: 300;
+
+  font-weight: 500;
   font-family: "open sans", "sans-serif";
   color: ${({ theme }) => theme.colors.textTertiary};
   span {
-    font-weight: 500;
+    font-weight: 700;
     color: ${({ theme }) => theme.colors.textPrimary};
   }
 `;
