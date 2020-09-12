@@ -173,7 +173,7 @@ const TracksShuffleOverlay = styled.div`
   position: absolute;
   z-index: 3;
   font-size: 1.5em;
-  font-weight: 500;
+  font-weight: 600;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   border-radius: 0.66667em;
   left: -10px;

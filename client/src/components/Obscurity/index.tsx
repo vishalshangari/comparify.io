@@ -160,7 +160,7 @@ const ScoreDisplay = styled.div`
         font-size: 6rem;
     `}
   }
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -2px;
   font-size: 4rem;
   color: rgb(255, 255, 255, 0.2);

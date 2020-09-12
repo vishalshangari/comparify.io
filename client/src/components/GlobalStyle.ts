@@ -25,7 +25,7 @@ const GlobalStyle = createGlobalStyle<{ theme: Theme }>`
     // background: ${({ theme }) => theme.colors.bodyBg};
     font-family: ${({ theme }) => theme.fonts.main}, sans-serif;
     color: ${({ theme }) => theme.colors.textPrimary};
-    font-weight: 500;
+    font-weight: 600;
   }
 
   * {

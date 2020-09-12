@@ -20,7 +20,7 @@ const StyledAlert = styled.div<{ state: string; error?: boolean }>`
   display: inline-block;
   top: 1em;
   left: 50%;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 1rem;
   ${breakpoints.lessThan("38")`
     font-size: 0.875rem;

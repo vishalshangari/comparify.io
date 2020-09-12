@@ -213,7 +213,7 @@ const DescriptionBoxInner = styled.div`
   .descriptionText {
     text-align: center;
     color: ${({ theme }) => theme.colors.textPrimary};
-    font-weight: 500;
+    font-weight: 600;
   }
 `;
 

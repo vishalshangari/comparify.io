@@ -184,7 +184,7 @@ const MobileNavigation = styled.div<{ state: string }>`
   .nav {
     display: block;
     padding: 1em;
-    font-weight: 500;
+    font-weight: 600;
     text-align: center;
     width: 100%;
   }
@@ -299,7 +299,7 @@ const Navigation = styled.div`
     }
   }
   .nav {
-    font-weight: 700;
+    font-weight: 600;
     transition: 0.2s ease all;
     color: ${({ theme }) => theme.colors.textTertiary};
     padding-bottom: 0.25em;
