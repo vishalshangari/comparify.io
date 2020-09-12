@@ -190,7 +190,7 @@ if (!isDev && cluster.isMaster) {
       );
       data = data.replace(
         /\$OG_IMAGE/g,
-        "https://firebasestorage.googleapis.com/v0/b/spotify-compare.appspot.com/o/logo512.png?alt=media&token=95414df3-d357-46a9-899a-d7478ab37d83"
+        "https://firebasestorage.googleapis.com/v0/b/spotify-compare.appspot.com/o/logoOG.png?alt=media&token=584845cc-347c-45d8-b6ba-0ea3788a7f5a"
       );
       result = data.replace(/\$OG_URL/g, "http://www.comparify.io/");
       response.send(result);
