@@ -337,6 +337,9 @@ const LogoOnlyNavWrap = styled.div`
   }
   ${MobileNavigation} {
     flex-basis: 100%;
+    ul {
+      margin-bottom: 0;
+    }
   }
 `;
 
