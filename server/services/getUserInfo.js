@@ -13,7 +13,10 @@ module.exports = async (authHeader) => {
       requestConfig
     );
 
-    const profileImage = userProfileData.images[0] || ``;
+    const profileImage =
+      userProfileData.images && userProfileData.images.length > 0
+        ? userProfileData.images[0].url
+        : ``;
 
     const newUserInfo = {
       _id: userProfileData.id,
