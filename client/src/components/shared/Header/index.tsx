@@ -325,7 +325,7 @@ const LogoOnlyNavWrap = styled.div`
   align-items: center;
   padding: 1em 0;
   ${breakpoints.lessThan("66")`
-    padding-bottom: 0;
+
   `};
   ${Navigation} {
     ul {
