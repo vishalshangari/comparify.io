@@ -10,7 +10,8 @@ const UnauthenticatedCreateComparePage = () => {
 
   return (
     <>
-      <Header standardNav={true} pageTitle={"Compare"} />
+      <Header standardNav={false} logoOnlyNav />
+
       <StandardMainContentWrapper>
         <CreateWrap>
           <ComparifyInfo />

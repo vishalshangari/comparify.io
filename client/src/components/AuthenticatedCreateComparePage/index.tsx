@@ -124,7 +124,8 @@ const CreateComparePage = () => {
           </SlidingAlert>
         )}
       </Transition>
-      <Header standardNav={true} pageTitle={"Compare"} />
+      <Header standardNav={false} logoOnlyNav />
+
       <StandardMainContentWrapper>
         <ComponentWithLoadingState label={false} loading={isLoading}>
           <CreateWrap>
