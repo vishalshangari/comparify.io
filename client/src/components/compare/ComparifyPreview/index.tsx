@@ -474,7 +474,12 @@ export const ComparePageBreadcrumb = styled.div`
   font-size: 1.75rem;
   margin-bottom: 1em;
   letter-spacing: 1px;
-
+  ${breakpoints.lessThan("48")`
+    font-size: 1.5rem;
+  `}
+  ${breakpoints.lessThan("38")`
+    font-size: 1.25rem;
+  `}
   font-weight: 500;
   font-family: "open sans", "sans-serif";
   color: ${({ theme }) => theme.colors.textTertiary};
@@ -506,16 +511,20 @@ const ProfileImage = styled.div`
   }
   ${breakpoints.lessThan("38")`
     height: 14em;
+    margin-bottom: 1em;
     width: 14em;
   `};
   ${breakpoints.lessThan("30")`
-    height: 12em;
-    width: 12em;
+    height: 10em;
+    width: 10em;
   `};
 `;
 
 const ProfileName = styled.div`
   margin: 0.5em 0 2em;
+  ${breakpoints.lessThan("38")`
+    margin-bottom: 1em;
+  `}
   h1 {
     font-family: "open sans", "sans-serif";
     font-size: 5rem;

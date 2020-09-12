@@ -849,6 +849,8 @@ const ArtistsGroup = styled.div`
   }
   .artistsDisplayContainer {
     padding: 1em;
+    min-height: 8em;
+    overflow: hidden;
     justify-content: center;
     border-radius: 1em;
     display: flex;
