@@ -353,6 +353,10 @@ const DeletePageBtn = styled.a`
   border: 0;
   font-family: "open sans", "sans-serif";
   font-size: 1.25rem;
+  ${breakpoints.lessThan("48")`
+    font-size: 1rem;
+  `}
+
   font-weight: 700;
   outline: 0;
   display: inline-flex;
@@ -365,33 +369,6 @@ const DeletePageBtn = styled.a`
     opacity: 0.8;
   `}
 `;
-
-const CurrentUserPageDisplay = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  h3 {
-    margin-bottom: 1.5em;
-    font-family: "open sans", "sans-serif";
-    color: ${({ theme }) => theme.colors.textSecondary};
-    font-weight: 500;
-    font-size: 1.75rem;
-    ${breakpoints.lessThan("58")`
-      font-size: 1.75rem;
-    `};
-    ${breakpoints.lessThan("48")`
-      font-size: 1.5rem;
-    `};
-    ${breakpoints.lessThan("38")`
-      font-size: 1.25rem;
-    `};
-    ${breakpoints.lessThan("30")`
-      font-size: 1rem;
-    `};
-  }
-`;
-
 export const AnimatedActionBtn = styled.a`
   text-align: center;
   .icon {
@@ -453,6 +430,42 @@ export const AnimatedActionBtn = styled.a`
       transform: scaleX(1);
     }
   `};
+`;
+
+const CurrentUserPageDisplay = styled.div`
+  display: flex;
+  ${AnimatedActionBtn} {
+    margin-top: 0.5em;
+    ${breakpoints.lessThan("48")`
+      font-size: 1.5rem;
+    `}
+    ${breakpoints.lessThan("38")`
+      font-size: 1.25rem;
+    `}
+  }
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  h3 {
+    margin-bottom: 1.5em;
+    font-family: "open sans", "sans-serif";
+    color: ${({ theme }) => theme.colors.textSecondary};
+    font-weight: 600;
+    font-size: 1.75rem;
+    ${breakpoints.lessThan("58")`
+      font-size: 1.75rem;
+    `};
+    ${breakpoints.lessThan("48")`
+      font-size: 1.5rem;
+    `};
+    ${breakpoints.lessThan("38")`
+      font-size: 1.25rem;
+      margin-bottom: 1em;
+    `};
+    ${breakpoints.lessThan("30")`
+      font-size: 1rem;
+    `};
+  }
 `;
 
 const CompareBtnWrap = styled.div`
