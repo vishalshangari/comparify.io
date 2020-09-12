@@ -238,6 +238,9 @@ const ShuffleButton = styled.button`
 
 const DiscoverTogetherGroup = styled.div`
   margin-top: 4em;
+  ${breakpoints.lessThan("66")`
+    margin-top: 2em;
+  `}
   display: flex;
   flex-direction: column;
 `;

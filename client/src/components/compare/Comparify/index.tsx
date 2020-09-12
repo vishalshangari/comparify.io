@@ -751,6 +751,7 @@ const TracksGrid = styled.div`
   `};
 
   ${breakpoints.lessThan("48")`
+    grid-gap: 0;
     grid-template-areas:
       "common common common common"
       "visitor visitor visitor visitor"

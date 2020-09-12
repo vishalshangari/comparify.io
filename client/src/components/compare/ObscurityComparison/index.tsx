@@ -106,7 +106,7 @@ const ObscurityGrid = styled.div`
 `;
 
 const ObscurityGroup = styled.div`
-  margin-top: 4em;
+  margin: 4em 0 3em;
   display: flex;
   flex-direction: column;
   justify-content: center;
