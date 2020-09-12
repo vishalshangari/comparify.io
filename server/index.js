@@ -188,7 +188,7 @@ if (!isDev && cluster.isMaster) {
         /\$OG_DESCRIPTION/g,
         "Compare taste in music with others' and the world"
       );
-      result = data.replace(
+      data = data.replace(
         /\$OG_IMAGE/g,
         "https://firebasestorage.googleapis.com/v0/b/spotify-compare.appspot.com/o/logo512.png?alt=media&token=95414df3-d357-46a9-899a-d7478ab37d83"
       );
