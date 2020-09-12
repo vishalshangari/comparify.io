@@ -188,11 +188,71 @@ if (!isDev && cluster.isMaster) {
         /\$OG_DESCRIPTION/g,
         "Compare taste in music with others' and the world"
       );
-      data = data.replace(
-        /\$OG_IMAGE/g,
-        "https://firebasestorage.googleapis.com/v0/b/spotify-compare.appspot.com/o/logoOG.png?alt=media&token=584845cc-347c-45d8-b6ba-0ea3788a7f5a"
-      );
       result = data.replace(/\$OG_URL/g, "http://www.comparify.io/");
+      response.send(result);
+    });
+  });
+
+  app.get("/compare", function (request, response) {
+    console.log("Compare page visited!");
+    const filePath = path.resolve(__dirname, "../client/build", "index.html");
+
+    // read in the index.html file
+    fs.readFile(filePath, "utf8", function (err, data) {
+      if (err) {
+        return console.log(err);
+      }
+
+      // replace the special strings with server generated strings
+      data = data.replace(/\$OG_TITLE/g, "Create a Comparify Page");
+      data = data.replace(
+        /\$OG_DESCRIPTION/g,
+        "Comparify lets you compare taste in music with others' and the world"
+      );
+      result = data.replace(/\$OG_URL/g, "http://www.comparify.io/compare");
+      response.send(result);
+    });
+  });
+
+  app.get("/feedback", function (request, response) {
+    console.log("Feedback page visited!");
+    const filePath = path.resolve(__dirname, "../client/build", "index.html");
+
+    // read in the index.html file
+    fs.readFile(filePath, "utf8", function (err, data) {
+      if (err) {
+        return console.log(err);
+      }
+
+      // replace the special strings with server generated strings
+      data = data.replace(/\$OG_TITLE/g, "Feedback | Comparify");
+      data = data.replace(
+        /\$OG_DESCRIPTION/g,
+        "Provide feedback to the developers of Comparify."
+      );
+      result = data.replace(/\$OG_URL/g, "http://www.comparify.io/feedback");
+      response.send(result);
+    });
+  });
+
+  app.get("/:id", function (request, response) {
+    const id = req.params.id;
+    console.log("Comparify page visited!");
+    const filePath = path.resolve(__dirname, "../client/build", "index.html");
+
+    // read in the index.html file
+    fs.readFile(filePath, "utf8", function (err, data) {
+      if (err) {
+        return console.log(err);
+      }
+
+      // replace the special strings with server generated strings
+      data = data.replace(/\$OG_TITLE/g, `${id} | Comparify`);
+      data = data.replace(
+        /\$OG_DESCRIPTION/g,
+        "Compare your taste in music with me! Comparify lets you compare taste in music with others' and the world"
+      );
+      result = data.replace(/\$OG_URL/g, `http://www.comparify.io/${id}`);
       response.send(result);
     });
   });
