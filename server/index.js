@@ -186,7 +186,7 @@ if (!isDev && cluster.isMaster) {
       data = data.replace(/\$OG_TITLE/g, "Comparify");
       data = data.replace(
         /\$OG_DESCRIPTION/g,
-        "Compare taste in music with others' and the world"
+        "Compare taste in music with others and the world"
       );
       result = data.replace(/\$OG_URL/g, "http://www.comparify.io/");
       response.send(result);
@@ -250,7 +250,7 @@ if (!isDev && cluster.isMaster) {
       data = data.replace(/\$OG_TITLE/g, `${id} | Comparify`);
       data = data.replace(
         /\$OG_DESCRIPTION/g,
-        "Compare your taste in music with me! Comparify lets you compare taste in music with others' and the world"
+        "Compare your taste in music with me! Comparify lets you compare taste in music with others and the world"
       );
       result = data.replace(/\$OG_URL/g, `http://www.comparify.io/${id}`);
       response.send(result);

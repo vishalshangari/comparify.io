@@ -293,13 +293,16 @@ const ComparifyPreview = ({
                     Comparify
                   </AnimatedActionBtn>
                 ) : (
-                  <AnimatedActionBtn
-                    href={`${DEV_URL}/api/auth/login?${QueryString.stringify({
-                      redir: comparifyPage.id,
-                    })}`}
-                  >
-                    Log-in with Spotify to Comparify
-                  </AnimatedActionBtn>
+                  <>
+                    <p>To compare music:</p>
+                    <AnimatedActionBtn
+                      href={`${DEV_URL}/api/auth/login?${QueryString.stringify({
+                        redir: comparifyPage.id,
+                      })}`}
+                    >
+                      Log in with Spotify
+                    </AnimatedActionBtn>
+                  </>
                 )}
               </CompareBtnWrap>
             )}
@@ -454,7 +457,17 @@ export const AnimatedActionBtn = styled.a`
 
 const CompareBtnWrap = styled.div`
   border-radius: 0.5em;
+  text-align: center;
   overflow: hidden;
+  ${AnimatedActionBtn} {
+    margin-top: 0.5em;
+    ${breakpoints.lessThan("48")`
+      font-size: 1.5rem;
+    `}
+    ${breakpoints.lessThan("38")`
+      font-size: 1.25rem;
+    `}
+  }
 `;
 
 export const ComparePageBreadcrumb = styled.div`
