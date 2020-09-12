@@ -236,7 +236,7 @@ if (!isDev && cluster.isMaster) {
   });
 
   app.get("/:id", function (request, response) {
-    const id = req.params.id;
+    const id = request.params.id;
     console.log("Comparify page visited!");
     const filePath = path.resolve(__dirname, "../client/build", "index.html");
 
