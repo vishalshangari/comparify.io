@@ -111,7 +111,7 @@ const CustomLegend = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   padding: 1em 0;
-  grid-gap: 1em;
+  grid-gap: 0.75em;
   .customLegendItem {
     display: flex;
     align-items: center;
@@ -122,6 +122,9 @@ const CustomLegend = styled.div`
     margin-right: 1em;
     border: 1px solid ${({ theme }) => theme.colors.textPrimary};
     border-radius: 0.125em;
+    ${breakpoints.lessThan("38")`
+      margin-right: 0.5em;
+    `}
   }
   .customLegendLabel {
     flex-grow: 1;

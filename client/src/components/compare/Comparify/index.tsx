@@ -853,11 +853,20 @@ const ArtistsGroup = styled.div`
     border-radius: 1em;
     display: flex;
     > a {
+      ${breakpoints.lessThan("30")`
+        flex: 0 0 6em;
+        height: 6em;
+      `}
+
       flex: 0 0 8em;
       margin-left: 1em;
       height: 8em;
       &:first-child {
         margin-left: 0;
+        margin-bottom: 1em;
+      }
+      &:only-child {
+        margin-bottom: 0;
       }
     }
   }
