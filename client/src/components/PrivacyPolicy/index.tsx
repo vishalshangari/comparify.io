@@ -62,7 +62,7 @@ const PrivacyPolicy = () => {
               Comparify uses cookies to track a user's session in order to
               provide a streamlined browsing experience. In using Spotify's
               authentication service, there may or may not be other cookies
-              invovled in the authentication process as reuqired by Spotify. You
+              invovled in the authentication process as required by Spotify. You
               reserve the right to refuse these cookies. If you refuse cookies,
               you may not be able to use some portions of this service.
             </p>

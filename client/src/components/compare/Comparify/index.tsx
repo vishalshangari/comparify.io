@@ -197,12 +197,15 @@ const Comparify = ({ pageID }: ComparifyProps) => {
               {/* Group 1: Names */}
 
               <ProfileSnippet>
-                <div className="profileImage">
-                  <img
-                    alt={visitorUserInfo.displayName}
-                    src={visitorUserInfo.profileImageUrl}
-                  />
-                </div>
+                {visitorUserInfo.profileImageUrl !== "" &&
+                visitorUserInfo.profileImageUrl ? (
+                  <div className="profileImage">
+                    <img
+                      alt={visitorUserInfo.displayName}
+                      src={visitorUserInfo.profileImageUrl}
+                    />
+                  </div>
+                ) : null}
                 <a
                   href={`spotify:user:${visitorUserInfo._id}`}
                   className="userName"
@@ -216,13 +219,15 @@ const Comparify = ({ pageID }: ComparifyProps) => {
               </NameSeparator>
 
               <ProfileSnippet>
-                <div className="profileImage">
-                  <img
-                    alt={creatorUserInfo.displayName}
-                    src={creatorUserInfo.profileImageUrl}
-                  />
-                </div>
-
+                {creatorUserInfo.profileImageUrl !== "" &&
+                creatorUserInfo.profileImageUrl ? (
+                  <div className="profileImage">
+                    <img
+                      alt={creatorUserInfo.displayName}
+                      src={creatorUserInfo.profileImageUrl || ``}
+                    />
+                  </div>
+                ) : null}
                 <a
                   href={`spotify:user:${creatorUserInfo._id}`}
                   className="userName"
@@ -850,7 +855,8 @@ const ArtistsGroup = styled.div`
   }
   .artistsDisplayContainer {
     padding: 1em;
-    min-height: 8em;
+    min-height: 10em;
+    align-items: center;
     overflow: hidden;
     justify-content: center;
     border-radius: 1em;
