@@ -20,7 +20,7 @@ const GlobalStyle = createGlobalStyle<{ theme: Theme }>`
   }
 
   body {
-
+    overflow: hidden;
     background: black;
     // background: ${({ theme }) => theme.colors.bodyBg};
     font-family: ${({ theme }) => theme.fonts.main}, sans-serif;

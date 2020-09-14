@@ -9,7 +9,7 @@ import Loader from "./components/Loader";
 
 import { ERROR_CODES, RESPONSE_CODES } from "./constants";
 
-import useWindowSize from "./hooks/useWindowSize";
+import useWindowSize, { WindowSize } from "./hooks/useWindowSize";
 
 let DEV_URL = "";
 if (process.env.NODE_ENV === `development`) {
@@ -76,6 +76,7 @@ const App = () => {
     <>
       <ThemeProvider theme={theme}>
         <GlobalStyle />
+        {/* <FullPageTest size={size}></FullPageTest> */}
         <AuthProvider>
           <FullSiteWrap style={{ minHeight: size?.height }}>
             <Router />
@@ -85,6 +86,11 @@ const App = () => {
     </>
   );
 };
+
+const FullPageTest = styled.div<{ size: WindowSize }>`
+  height: ${({ size }) => (size ? size.height + `px` : ``)};
+  background: tomato;
+`;
 
 const FullSiteWrap = styled.div`
   display: flex;
