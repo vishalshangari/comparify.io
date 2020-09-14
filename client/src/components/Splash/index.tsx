@@ -285,8 +285,7 @@ const SplashBackground = styled.div<{ state: string }>`
 
 const SplashWrap = styled.div`
   width: 100vw;
-  height: 100%;
-  min-height: 800px;
+
   overflow: hidden;
   position: relative;
   /* All splash page media queries */

@@ -141,13 +141,11 @@ if (!isDev && cluster.isMaster) {
       })
     );
     console.log("cors");
+  } else {
+    app.use(wwwRedirect);
   }
 
-  app
-    .use(cookieParser())
-    .use(express.json())
-    .use(wwwRedirect)
-    .use(requireHTTPS);
+  app.use(cookieParser()).use(express.json()).use(requireHTTPS);
   // //Add headers
   // app.use(function (req, res, next) {
   //   // Website you wish to allow to connect
