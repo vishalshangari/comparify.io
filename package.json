@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/vishalshangari/spotify-mainstream/issues"
   },
-  "homepage": "https://github.com/vishalshangari/spotify-mainstream#readme",
+  "homepage": "https://www.comparify.io",
   "dependencies": {
     "@types/lodash": "^4.14.160",
     "async": "^3.2.0",
