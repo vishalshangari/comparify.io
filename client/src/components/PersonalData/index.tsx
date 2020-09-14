@@ -142,7 +142,7 @@ const PersonalData = () => {
   }, [queryValue.deleted]);
 
   const handleCopyClick = () => {
-    copyToClipboard(`https://comparify.io/${userComparifyPage?.id}`);
+    copyToClipboard(`https://www.comparify.io/${userComparifyPage?.id}`);
     setShowCopyAlert(true);
   };
 

@@ -201,7 +201,7 @@ if (!isDev && cluster.isMaster) {
         /\$OG_DESCRIPTION/g,
         "Compare taste in music with others and the world"
       );
-      result = data.replace(/\$OG_URL/g, "https://comparify.io/");
+      result = data.replace(/\$OG_URL/g, "https://www.comparify.io/");
       response.send(result);
     });
   });
@@ -222,7 +222,7 @@ if (!isDev && cluster.isMaster) {
         /\$OG_DESCRIPTION/g,
         "Comparify lets you compare taste in music with others' and the world"
       );
-      result = data.replace(/\$OG_URL/g, "https://comparify.io/compare");
+      result = data.replace(/\$OG_URL/g, "https://www.comparify.io/compare");
       response.send(result);
     });
   });
@@ -243,7 +243,7 @@ if (!isDev && cluster.isMaster) {
         /\$OG_DESCRIPTION/g,
         "Provide feedback to the developers of Comparify."
       );
-      result = data.replace(/\$OG_URL/g, "https://comparify.io/feedback");
+      result = data.replace(/\$OG_URL/g, "https://www.comparify.io/feedback");
       response.send(result);
     });
   });
@@ -265,7 +265,7 @@ if (!isDev && cluster.isMaster) {
         /\$OG_DESCRIPTION/g,
         "Compare your taste in music with me! Comparify lets you compare taste in music with others and the world"
       );
-      result = data.replace(/\$OG_URL/g, `https://comparify.io/${id}`);
+      result = data.replace(/\$OG_URL/g, `https://www.comparify.io/${id}`);
       response.send(result);
     });
   });

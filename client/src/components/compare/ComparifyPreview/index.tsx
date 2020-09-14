@@ -99,7 +99,7 @@ const ComparifyPreview = ({
   };
 
   const handleCopyClick = () => {
-    copyToClipboard(`https://comparify.io/${comparifyPage.id}`);
+    copyToClipboard(`https://www.comparify.io/${comparifyPage.id}`);
     setShowCopyAlert(true);
   };
 
