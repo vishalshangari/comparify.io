@@ -213,11 +213,11 @@ const FrontSubtitle = styled.div<{ state: string }>`
 
 const FrontSubtitleWrap = styled.div`
   width: 100%;
-  margin: 3em 0 5em;
+  margin: 2em 0 5em;
 `;
 
 const FrontTitle = styled.div<{ state: string }>`
-  margin-top: 40vh;
+  margin-top: 30vh;
   transition: 1s ease opacity, 1s ease transform;
   h1 {
     text-shadow: 2px 2px 8px rgb(0, 0, 0, 0.2);
