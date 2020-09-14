@@ -88,8 +88,7 @@ const datatowrite = {
 //   await db.collection("my users").doc(datatowrite.spotifyId).set(datatowrite);
 // })();
 
-// Force HTTPS:
-
+// Force HTTPS
 function requireHTTPS(req, res, next) {
   // The 'x-forwarded-proto' check is for Heroku
   if (
@@ -98,6 +97,17 @@ function requireHTTPS(req, res, next) {
     process.env.NODE_ENV !== "development"
   ) {
     return res.redirect("https://" + req.get("host") + req.url);
+  }
+  next();
+}
+
+// Force www
+function wwwRedirect(req, res, next) {
+  if (!req.hostname.slice(0, 4) === "www.") {
+    return res.redirect(
+      301,
+      req.protocol + "://www" + req.hostname + req.originalUrl
+    );
   }
   next();
 }
@@ -133,7 +143,11 @@ if (!isDev && cluster.isMaster) {
     console.log("cors");
   }
 
-  app.use(cookieParser()).use(express.json()).use(requireHTTPS);
+  app
+    .use(cookieParser())
+    .use(express.json())
+    .use(wwwRedirect)
+    .use(requireHTTPS);
   // //Add headers
   // app.use(function (req, res, next) {
   //   // Website you wish to allow to connect
