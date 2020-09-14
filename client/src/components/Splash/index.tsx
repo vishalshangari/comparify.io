@@ -77,8 +77,8 @@ const Splash = () => {
             {(state) => (
               <FrontSubtitle state={state}>
                 <h3>
-                  Compare your taste with{" "}
-                  <span className="brandUnderline">friends and the world</span>.
+                  What does your music say{" "}
+                  <span className="brandUnderline">about you</span>?
                 </h3>
               </FrontSubtitle>
             )}
@@ -91,11 +91,25 @@ const Splash = () => {
             {(state) => (
               <FrontSubtitle state={state}>
                 <h3>
-                  <span className="brandUnderline">Discover</span> new music.
+                  Compare your taste with{" "}
+                  <span className="brandUnderline">friends and the world</span>.
                 </h3>
               </FrontSubtitle>
             )}
           </Transition>
+          {/* <Transition
+            in={subtitleEntered}
+            timeout={1000}
+            onEntered={() => setAllTitlesEntered(true)}
+          >
+            {(state) => (
+              <FrontSubtitle state={state}>
+                <h3>
+                  <span className="brandUnderline">Discover</span> new music.
+                </h3>
+              </FrontSubtitle>
+            )}
+          </Transition> */}
         </FrontSubtitleWrap>
 
         <Transition in={allTitlesEntered} timeout={1000}>
