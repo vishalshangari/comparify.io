@@ -342,7 +342,7 @@ const SplashWrap = styled.div`
 
 const SplashGlobalStyle = createGlobalStyle<{ theme: Theme }>`
   body {
-    background: #000;
+    overflow: hidden;
   }
 `;
 
