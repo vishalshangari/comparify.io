@@ -106,7 +106,7 @@ function wwwRedirect(req, res, next) {
   if (req.hostname.slice(0, 4) !== "www.") {
     return res.redirect(
       301,
-      req.protocol + "://www" + req.hostname + req.originalUrl
+      req.protocol + "://www." + req.hostname + req.originalUrl
     );
   }
   next();
