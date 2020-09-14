@@ -361,11 +361,12 @@ const UserComparifyPagePreview = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
   }
   ${breakpoints.lessThan("66")`
     margin: 0 auto 2em;
-
+    .userComparifyFlexContainer {
+      flex-wrap: wrap;
+    }
     .comparifyPageActions {
       margin-top: 1em;
       align-items: center;
@@ -387,7 +388,7 @@ const UserComparifyPagePreview = styled.div`
       margin: 1em 0 0;
     }
   `}
-  ${breakpoints.lessThan("58")`
+  ${breakpoints.lessThan("38")`
     && ${AnimatedActionBtn} {
       font-size: 1em;
     }
