@@ -69,7 +69,7 @@ const Splash = () => {
           )}
         </Transition>
         <FrontSubtitleWrap>
-          <Transition
+          {/* <Transition
             in={titleEntered}
             timeout={1000}
             onEntered={() => setSubtitleEntered(true)}
@@ -96,7 +96,7 @@ const Splash = () => {
                 </h3>
               </FrontSubtitle>
             )}
-          </Transition>
+          </Transition> */}
           {/* <Transition
             in={subtitleEntered}
             timeout={1000}
