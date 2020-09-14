@@ -133,7 +133,8 @@ if (!isDev && cluster.isMaster) {
     console.log("cors");
   }
 
-  app.use(cookieParser()).use(express.json()).use(requireHTTPS);
+  app.use(cookieParser()).use(express.json());
+  // .use(requireHTTPS);
   // //Add headers
   // app.use(function (req, res, next) {
   //   // Website you wish to allow to connect
