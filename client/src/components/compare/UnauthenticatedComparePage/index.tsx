@@ -43,7 +43,7 @@ const UnauthenticatedComparePage = () => {
         <meta property="twitter:card" content="summary" />
         <meta
           property="og:url"
-          content={`http://comparify.io/${comparifyPageID}`}
+          content={`https://comparify.io/${comparifyPageID}`}
         />
       </Helmet>
       <Header standardNav={false} logoOnlyNav />
