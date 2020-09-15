@@ -26,7 +26,7 @@ const LogoContainer = styled.div<{
     opacity: 0.7;
     color: ${({ logoColor: color }) => color};
     font-size: ${({ size }) => size};
-    font-family: "Roboto Slab", serif;
+    font-family: "Roboto Slab", "open sans", "sans-serif";
     &:hover {
       opacity: 1;
     }

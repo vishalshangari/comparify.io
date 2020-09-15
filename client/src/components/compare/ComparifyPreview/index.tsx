@@ -9,13 +9,14 @@ import { APIError } from "../../../models";
 import { breakpoints, theme } from "../../../theme";
 import * as QueryString from "query-string";
 import { useMedia } from "react-use";
-import { MdShare, MdDelete } from "react-icons/md";
+import { MdShare, MdDelete, MdClose } from "react-icons/md";
 import { Transition } from "react-transition-group";
 import copyToClipboard from "../../../utils/copyToClipboard";
 import SlidingAlert from "../../shared/SlidingAlert";
 import Modal from "react-modal";
 import Loader from "../../Loader";
 import { useHistory } from "react-router-dom";
+import ComparifyInfo from "../../shared/ComparifyInfo";
 
 type SpotifyProfileImage = {
   height: null | number;
@@ -84,6 +85,7 @@ const ComparifyPreview = ({
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [currentUserID, setCurrentUserID] = useState<null | string>(null);
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
+  const [infoModalIsOpen, setInfoModalIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [slidingErrorMessage, setSlidingErrorMessage] = useState<null | string>(
     null
@@ -98,6 +100,14 @@ const ComparifyPreview = ({
     setDeleteModalIsOpen(false);
   };
 
+  const openInfoModal = () => {
+    setInfoModalIsOpen(true);
+  };
+
+  const closeInfoModal = () => {
+    setInfoModalIsOpen(false);
+  };
+
   const handleCopyClick = () => {
     copyToClipboard(`https://www.comparify.io/${comparifyPage.id}`);
     setShowCopyAlert(true);
@@ -108,7 +118,6 @@ const ComparifyPreview = ({
       backgroundColor: "rgba(0,0,0,0.75)",
     },
     content: {
-      overflow: "hidden",
       top: "50%",
       left: "50%",
       right: "auto",
@@ -116,7 +125,7 @@ const ComparifyPreview = ({
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
       maxWidth: "90%",
-      backgroundColor: theme.colors.darkBodyOverlay,
+      backgroundColor: theme.colors.bodyBg,
       border: `1px solid ${theme.colors.darkBodyOverlayBorder}`,
     },
   };
@@ -228,22 +237,24 @@ const ComparifyPreview = ({
             {comparifyPage.data!.creator._id === currentUserID ? (
               <CurrentUserPageDisplay>
                 <h3>This is your Comparify page.</h3>
-                <AnimatedActionBtn onClick={handleCopyClick}>
-                  <span className="icon">
-                    <MdShare />
-                  </span>
-                  Share
-                </AnimatedActionBtn>
-                <DeletePageBtn onClick={openDeleteModal}>
-                  <span className="icon">
-                    <MdDelete />
-                  </span>
-                  Delete
-                </DeletePageBtn>
+                <UserProfileButtons>
+                  <AnimatedActionBtn onClick={handleCopyClick}>
+                    <span className="icon">
+                      <MdShare />
+                    </span>
+                    Share
+                  </AnimatedActionBtn>
+                  <DeletePageBtn onClick={openDeleteModal}>
+                    <span className="icon">
+                      <MdDelete />
+                    </span>
+                    Delete
+                  </DeletePageBtn>
+                </UserProfileButtons>
+                <InfoBtn onClick={openInfoModal}>How does this work?</InfoBtn>
                 <Modal
                   isOpen={deleteModalIsOpen}
                   onRequestClose={closeDeleteModal}
-                  contentLabel="Example Modal"
                   shouldCloseOnOverlayClick
                   style={modalStyles}
                 >
@@ -285,6 +296,17 @@ const ComparifyPreview = ({
                     <CancelBtn onClick={closeDeleteModal}>Cancel</CancelBtn>
                   </div>
                 </Modal>
+                <Modal
+                  isOpen={infoModalIsOpen}
+                  onRequestClose={closeInfoModal}
+                  shouldCloseOnOverlayClick
+                  style={modalStyles}
+                >
+                  <ModalCloseButton onClick={closeInfoModal}>
+                    <MdClose />
+                  </ModalCloseButton>
+                  <ComparifyInfo stepsOnly authenticated />
+                </Modal>
               </CurrentUserPageDisplay>
             ) : (
               <CompareBtnWrap>
@@ -314,6 +336,13 @@ const ComparifyPreview = ({
     </>
   );
 };
+
+const ModalCloseButton = styled.button`
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  font-size: 2rem;
+`;
 
 const DeletingSpinner = styled.div<{ isDeleting: boolean }>`
   position: absolute;
@@ -432,6 +461,23 @@ export const AnimatedActionBtn = styled.a`
   `};
 `;
 
+const InfoBtn = styled.button`
+  font-weight: 600;
+  margin-top: 2em;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const UserProfileButtons = styled.div`
+  display: flex;
+  align-items: center;
+  ${DeletePageBtn} {
+    margin-left: 1em;
+  }
+  margin-top: 2em;
+`;
+
 const CurrentUserPageDisplay = styled.div`
   display: flex;
   ${AnimatedActionBtn} {
@@ -447,7 +493,6 @@ const CurrentUserPageDisplay = styled.div`
   justify-content: center;
   flex-direction: column;
   h3 {
-    margin-bottom: 1.5em;
     font-family: "open sans", "sans-serif";
     color: ${({ theme }) => theme.colors.textSecondary};
     font-weight: 600;

@@ -13,6 +13,7 @@ type HeaderProps = {
   standardNav: boolean;
   logoOnlyNav?: boolean;
   loading?: boolean;
+  active?: string;
 };
 
 const Header = ({
@@ -20,6 +21,7 @@ const Header = ({
   standardNav,
   loading,
   logoOnlyNav,
+  active,
 }: HeaderProps) => {
   const { state: authState, setState: setAuthState } = useAuthState();
   const isAuthenticated = authState.status === RESPONSE_CODES.AUTHENTICATED;
@@ -43,31 +45,35 @@ const Header = ({
 
   const navLinksToDisplay = (
     <>
+      {isAuthenticated ? (
+        <li>
+          <a
+            className={`nav${active === `home` ? ` nav-active` : ``}`}
+            href="/home"
+          >
+            Home
+          </a>
+        </li>
+      ) : null}
       <li>
-        <a className="nav" href="/compare">
+        <a
+          className={`nav${active === `compare` ? ` nav-active` : ``}`}
+          href="/compare"
+        >
           Compare
         </a>
       </li>
       <li>
         {isAuthenticated ? (
-          <>
-            <a className="nav" href="/">
-              My Account
-            </a>
-          </>
+          <button className="nav" onClick={handleLogOut}>
+            Logout
+          </button>
         ) : (
           <a className="nav" href={`${DEV_URL}/api/auth/login`}>
             Login with Spotify
           </a>
         )}
       </li>
-      {isAuthenticated ? (
-        <li>
-          <button className="nav" onClick={handleLogOut}>
-            Logout
-          </button>
-        </li>
-      ) : null}
     </>
   );
 
@@ -132,8 +138,6 @@ export const StatefulPageTitle = styled(({ loading, ...props }) => (
 export const PageTitle = styled.div<{ loading?: boolean }>`
   flex: 1 1 auto;
   h1 {
-    /* color: ${({ loading, theme }) =>
-      loading ? theme.colors.textTertiary : theme.colors.textPrimary}; */
     font-size: 6rem;
     font-weight: 500;
     z-index: 3;
@@ -187,6 +191,9 @@ const MobileNavigation = styled.div<{ state: string }>`
     font-weight: 600;
     text-align: center;
     width: 100%;
+  }
+  .nav-active {
+    background: ${({ theme }) => theme.colors.mainAccent25p};
   }
   ${breakpoints.greaterThan("66")`
     display: none;
@@ -283,7 +290,7 @@ const Navigation = styled.div`
   align-items: center;
   ul {
     display: flex;
-    padding: 1em 1.5em 0.5em;
+    padding: 0 1.5em;
     border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlay};
     border-radius: 0.25em;
     background: ${({ theme }) => theme.colors.mainContentBg};
@@ -300,13 +307,21 @@ const Navigation = styled.div`
   }
   .nav {
     font-weight: 600;
+    margin: 0;
+    display: inline-block;
+    padding: 1em 0 calc(1em - 2px);
     transition: 0.2s ease all;
     color: ${({ theme }) => theme.colors.textTertiary};
-    padding-bottom: 0.25em;
     border-bottom: 2px solid transparent;
     &:hover {
-      opacity: 1;
       color: ${({ theme }) => theme.colors.textPrimary};
+      border-bottom: 2px solid ${({ theme }) => theme.colors.textPrimary};
+    }
+  }
+  .nav-active {
+    color: ${({ theme }) => theme.colors.textPrimary};
+    border-bottom: 2px solid ${({ theme }) => theme.colors.mainAccent};
+    &:hover {
       border-bottom: 2px solid ${({ theme }) => theme.colors.mainAccent};
     }
   }

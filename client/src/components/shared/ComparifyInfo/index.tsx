@@ -8,39 +8,43 @@ import { DEV_URL } from "../../../constants";
 
 type ComparifyInfoProps = {
   authenticated?: boolean;
+  stepsOnly?: boolean;
 };
 
-const ComparifyInfo = ({ authenticated }: ComparifyInfoProps) => {
+const ComparifyInfo = ({ authenticated, stepsOnly }: ComparifyInfoProps) => {
   return (
     <ComparifyInfoWrap>
-      <DescriptionBoxGrid>
-        <DescriptionBoxInner>
-          <div className="descriptionIcon">
-            <MdCompare />{" "}
-          </div>
-          <div className="descriptionText">
-            Compare your taste in music with your friends and people around the
-            world
-          </div>
-        </DescriptionBoxInner>
-        <DescriptionBoxInner>
-          <div className="descriptionIcon">
-            <MdPersonAdd />
-          </div>
-          <div className="descriptionText">
-            Create your own, unique, comparify.io page that can be shared with
-            anyone easily
-          </div>
-        </DescriptionBoxInner>
-        <DescriptionBoxInner>
-          <div className="descriptionIcon">
-            <ImMusic />
-          </div>
-          <div className="descriptionText">
-            Discover new music from personalized recommendations
-          </div>
-        </DescriptionBoxInner>
-      </DescriptionBoxGrid>
+      {!stepsOnly ? (
+        <DescriptionBoxGrid>
+          <DescriptionBoxInner>
+            <div className="descriptionIcon">
+              <MdCompare />{" "}
+            </div>
+            <div className="descriptionText">
+              Compare your taste in music with your friends and people around
+              the world
+            </div>
+          </DescriptionBoxInner>
+          <DescriptionBoxInner>
+            <div className="descriptionIcon">
+              <MdPersonAdd />
+            </div>
+            <div className="descriptionText">
+              Create your own, unique, comparify.io page that can be shared with
+              anyone easily
+            </div>
+          </DescriptionBoxInner>
+          <DescriptionBoxInner>
+            <div className="descriptionIcon">
+              <ImMusic />
+            </div>
+            <div className="descriptionText">
+              Discover new music from personalized recommendations
+            </div>
+          </DescriptionBoxInner>
+        </DescriptionBoxGrid>
+      ) : null}
+
       <h2>How it works</h2>
       <DescriptionSteps>
         <div className="descriptionContainer">
@@ -61,13 +65,13 @@ const ComparifyInfo = ({ authenticated }: ComparifyInfoProps) => {
           <div className="step">
             <div className="number">1</div>
             <div className="description">
-              Enter your friend's Comparify URL in your browser.
+              Enter a Comparify URL in your browser.
             </div>
           </div>
           <div className="step">
             <div className="number">2</div>
             <div className="description">
-              Press 'Comparify' and see how your Spotify libraries stack up!
+              Press <span className="brand">Comparify</span>!
             </div>
           </div>
         </div>
@@ -97,6 +101,10 @@ const DescriptionSteps = styled.div`
   grid-template-columns: 1fr 1fr;
   grid-gap: 2em;
   margin-top: 2em;
+  .brand {
+    color: ${({ theme }) => theme.colors.mainAccent};
+    font-weight: 800;
+  }
   .step {
     display: flex;
     font-size: 1.25rem;
@@ -144,7 +152,6 @@ const ComparifyInfoWrap = styled.div`
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 0.5em;
-    margin-top: 1em;
     text-align: center;
   }
   h3 {
@@ -171,6 +178,7 @@ const DescriptionBoxGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 2em;
+  margin-bottom: 1em;
   ${breakpoints.lessThan("66")`
     grid-template-columns: 1fr;
     grid-gap: 1em;

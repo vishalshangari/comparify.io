@@ -159,16 +159,13 @@ const TopArtistsWrapper = ({ artists }: TopArtistsProps) => {
               <>
                 <BsChevronDown />
                 <span>
-                  Show More{" "}
-                  <span className={"totalCount"}>
-                    {data.length - ARTISTS_SHORTENED_QUANTITY}
-                  </span>
+                  show {data.length - ARTISTS_SHORTENED_QUANTITY} more{" "}
                 </span>
               </>
             ) : (
               <>
                 <BsChevronUp />
-                <span>Show Fewer</span>
+                <span>show fewer</span>
               </>
             )}
           </DisplayQuantityToggleBtn>
@@ -236,8 +233,6 @@ const ArtistItemWrapper = ({
       </div>
       <div className="info">
         <div className="name">{name}</div>
-        {/* <div className="artists">{artists.join(", ")}</div>
-        <div className="album">{album === name ? "Single" : album}</div> */}
       </div>
     </ArtistItem>
   );
@@ -332,7 +327,7 @@ const ArtistsDisplay = styled(Element)`
   }
   grid-area: artists;
   min-height: 300px;
-  ${breakpoints.lessThan("85")`
+  ${breakpoints.lessThan("74")`
     .dataItemHeader {
       flex-wrap: wrap;
       h2 {

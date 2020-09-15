@@ -6,6 +6,7 @@ export default styled.button<{ show: boolean }>`
   display: ${({ show }) => (show ? `flex` : `none`)};
   align-items: center;
   border-radius: 0.5em;
+  font-weight: 600;
   border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlayBorder};
   box-shadow: 1px 2px 3px rgb(0, 0, 0, 0.3);
   padding: 1em;

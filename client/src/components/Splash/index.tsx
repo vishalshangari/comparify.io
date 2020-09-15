@@ -36,7 +36,7 @@ const Splash = () => {
   const coloredTickers: ColoredTicker[] = [
     {
       label: "happy",
-      color: "#F0A66C",
+      color: colors.orangeRed,
     },
     {
       label: "danceable",
@@ -47,8 +47,8 @@ const Splash = () => {
       color: colors.spanishViolet,
     },
     {
-      label: "mainstream",
-      color: colors.spotifyGreen,
+      label: "unique",
+      color: "#F964A7",
     },
   ];
   const [activeTickerItem, setActiveTickerItem] = useState(0);
@@ -100,7 +100,7 @@ const Splash = () => {
         <FrontSubtitleWrap>
           <Transition
             in={titleEntered}
-            timeout={1500}
+            timeout={150}
             onEntered={() => {
               setSubtitleEntered(true);
               setTimeout(() => {
@@ -152,14 +152,13 @@ const Splash = () => {
           {(state) => (
             <FrontActionButtonWrap state={state}>
               <ActionButton href={`${DEV_URL}/api/auth/login`}>
-                <span>Log-in with Spotify</span> <IoIosArrowDroprightCircle />
+                <span>Log in with Spotify</span> <IoIosArrowDroprightCircle />
               </ActionButton>
               <FrontActionButtonLabel>
-                Our{" "}
+                See our{" "}
                 <a href="/privacy">
                   <span>privacy policy</span>
                 </a>
-                .
               </FrontActionButtonLabel>
             </FrontActionButtonWrap>
           )}
@@ -171,7 +170,7 @@ const Splash = () => {
 
 const TextTicker = styled.div<{ tickerBorder: string }>`
   position: relative;
-  width: 8em;
+  width: 7.5em;
   background: ${({ tickerBorder }) => tickerBorder};
   transition: 0.2s cubic-bezier(0.165, 0.84, 0.44, 1) all;
   height: 1.75em;
@@ -197,14 +196,11 @@ const TextTickerItem = styled.span<{ state: string }>`
 const FrontActionButtonLabel = styled.div`
   margin-top: 1em;
   ${breakpoints.lessThan("38")`
-    margin-top: 0;
+    /* margin-top: 0; */
   `}
   font-size: 0.75em;
-  font-weight: 600;
   color: ${({ theme }) => theme.colors.textPrimary};
-  opacity: 0.7;
   width: 100%;
-  line-height: 2rem;
   a {
     border-bottom: 1px solid ${({ theme }) => theme.colors.mainAccent};
     background: ${({ theme }) => theme.colors.mainAccent10p};
@@ -232,9 +228,8 @@ const ActionButton = styled.a`
   line-height: 1;
   span {
     margin-right: 0.75em;
-    font-weight: 600;
+    font-weight: 700;
     ${breakpoints.greaterThan("38")`
-      text-transform: uppercase;  
       letter-spacing: 1px;
     `}
   }
@@ -264,7 +259,10 @@ const FrontSubtitle = styled.div<{ state: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  text-shadow: 2px 2px 2px rgb(0, 0, 0, 0.2);
+  text-shadow: 0.1em 0.1em 0.1em rgba(0, 0, 0, 0.2);
+  ${breakpoints.lessThan("38")`
+    text-shadow: 0.1em 0.1em 0.1em rgba(0, 0, 0, 0.1);
+  `}
   font-size: 1.75rem;
   transition: 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) all;
   margin-bottom: 3em;
@@ -280,11 +278,11 @@ const FrontSubtitleWrap = styled.div`
 `;
 
 const FrontTitle = styled.div<{ state: string }>`
-  margin-top: 30vh;
   transition: 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) all;
+  margin-bottom: 3em;
   h1 {
-    text-shadow: 2px 2px 8px rgb(0, 0, 0, 0.2);
-    font-weight: 700;
+    text-shadow: 0.025em 0.025em 0.1em rgb(0, 0, 0, 0.2);
+    font-weight: 800;
     color: ${({ theme }) => theme.colors.textPrimary};
     margin: 0;
     text-align: center;
@@ -295,15 +293,15 @@ const FrontTitle = styled.div<{ state: string }>`
   ${({ state }) =>
     state === "entered" || state === `entering`
       ? `opacity: 1; transform: translateY(0);`
-      : `opacity: 0; transform: translateY(100%);`}/* ${({ state }) =>
-    state === "entered" || state === `entering`
-      ? `opacity: 1; transform: translate(0, -50%);`
-      : `opacity: 0; transform: translate(0, -35%);`} */
+      : `opacity: 0; transform: translateY(100%);`}
 `;
 
 const SplashInner = styled.div`
   height: 100%;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `;
 
 const SplashBackgroundLabel = styled.div<{ state: string }>`
@@ -386,19 +384,12 @@ const SplashWrap = styled.div`
     ${FrontTitle} {
       display: block;
     }
-    ${FrontSubtitle} {
-      justify-content: flex-start;
-    }
     ${FrontSubtitleWrap} {
       margin-bottom: 1em;
     }
     ${TextTicker} {
       font-size: 1.25em;
       width: 7em;
-    }
-    h1 {
-      font-size: 4rem;
-      text-align: left;
     }
     ${FrontSubtitle} {
       font-size: 1.25rem;
@@ -407,8 +398,6 @@ const SplashWrap = styled.div`
       display: none;
     }
     ${FrontActionButtonWrap} {
-      text-align: left;
-      justify-content: flex-start;
       font-size: 1rem;
       a {
         margin: 0;

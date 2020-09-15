@@ -153,16 +153,13 @@ const TopTracksWrapper = ({ tracks }: TopTracksProps) => {
               <>
                 <BsChevronDown />
                 <span>
-                  Show More{" "}
-                  <span className={"totalCount"}>
-                    {data.length - TRACKS_SHORTENED_QUANTITY}
-                  </span>
+                  show {data.length - TRACKS_SHORTENED_QUANTITY} more{" "}
                 </span>
               </>
             ) : (
               <>
                 <BsChevronUp />
-                <span>Show Fewer</span>
+                <span>show fewer</span>
               </>
             )}
           </DisplayQuantityToggleBtn>

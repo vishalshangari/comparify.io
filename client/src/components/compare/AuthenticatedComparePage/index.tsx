@@ -57,7 +57,7 @@ const AuthenticatedComparePage = () => {
           content={`https://www.comparify.io/${comparifyPageID}`}
         /> */}
       </Helmet>
-      <Header standardNav={false} logoOnlyNav />
+      <Header active="compare" standardNav={false} logoOnlyNav />
       <StandardMainContentWrapper>
         <ComparePageWrapper>
           <Transition
@@ -80,13 +80,6 @@ const AuthenticatedComparePage = () => {
                     />
                   ) : (
                     <NoComparifyPage>
-                      <Helmet>
-                        <meta
-                          name="twitter:description"
-                          property="og:description"
-                          content="This Comparify page doesn't exist yet! Claim it now"
-                        />
-                      </Helmet>
                       <ComparePageBreadcrumb>
                         comparify.io/<span>{comparifyPageID}</span>
                       </ComparePageBreadcrumb>

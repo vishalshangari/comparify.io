@@ -185,7 +185,12 @@ const PersonalData = () => {
           <SlidingAlert state={state}>Link copied to clipboard</SlidingAlert>
         )}
       </Transition>
-      <Header standardNav={true} pageTitle={pageTitle} loading={loading} />
+      <Header
+        active="home"
+        standardNav={true}
+        pageTitle={pageTitle}
+        loading={loading}
+      />
       <PersonalDataWrapper>
         <ComponentWithLoadingState label={false} loading={loading}>
           <UserComparifyPagePreview>
@@ -341,7 +346,7 @@ const UserComparifyPagePreview = styled.div`
 
   .comparifyPageActions {
     display: flex;
-    margin-left: 1em;
+    margin-left: 2em;
     a {
       flex: 1;
       display: flex;

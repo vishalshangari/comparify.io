@@ -46,7 +46,7 @@ const UnauthenticatedComparePage = () => {
           content={`https://www.comparify.io/${comparifyPageID}`}
         />
       </Helmet>
-      <Header standardNav={false} logoOnlyNav />
+      <Header active="compare" standardNav={false} logoOnlyNav />
       <StandardMainContentWrapper>
         <UnauthenticatedComparePageInner>
           <ComponentWithLoadingState
