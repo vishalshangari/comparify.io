@@ -117,7 +117,7 @@ const Splash = () => {
                   {coloredTickers.map((ticker, index) => (
                     <Transition
                       in={activeTickerItem === index}
-                      timeout={1500}
+                      timeout={2000}
                       onEntered={() => setNextTickerItem()}
                     >
                       {(state) => (
@@ -184,14 +184,14 @@ const TextTicker = styled.div<{ tickerBorder: string }>`
 const TextTickerItem = styled.span<{ state: string }>`
   position: absolute;
   line-height: 1em;
-  transition: 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) all;
+  transition: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) all;
   font-weight: 800;
   ${({ state }) =>
     state === "entered" || state === `entering`
       ? `opacity: 1; transform: translateY(0);`
       : state === `exiting`
-      ? `opacity: 0; transform: scale(0.85) translate(-10%, -100%);`
-      : `opacity: 0; transform: scale(0.85) translate(-10%, 100%);`};
+      ? `opacity: 0; transform: translate(0, -50%);`
+      : `opacity: 0; transform: translate(0, 50%);`};
 `;
 
 const FrontActionButtonLabel = styled.div`
