@@ -88,7 +88,7 @@ const Splash = () => {
       <SplashInner>
         <Transition
           in={splashEntered}
-          timeout={1500}
+          timeout={150}
           onEntered={() => setTitleEntered(true)}
         >
           {(state) => (
@@ -100,7 +100,7 @@ const Splash = () => {
         <FrontSubtitleWrap>
           <Transition
             in={titleEntered}
-            timeout={300}
+            timeout={1500}
             onEntered={() => {
               setSubtitleEntered(true);
               setTimeout(() => {
@@ -137,7 +137,7 @@ const Splash = () => {
           </Transition>
           <Transition
             in={subtitleEntered}
-            timeout={300}
+            timeout={150}
             onEntered={() => setAllTitlesEntered(true)}
           >
             {(state) => (
@@ -184,7 +184,7 @@ const TextTicker = styled.div<{ tickerBorder: string }>`
 const TextTickerItem = styled.span<{ state: string }>`
   position: absolute;
   line-height: 1em;
-  transition: 0.2s cubic-bezier(0.165, 0.84, 0.44, 1) all;
+  transition: 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) all;
   font-weight: 800;
   ${({ state }) =>
     state === "entered" || state === `entering`
@@ -253,7 +253,7 @@ const FrontActionButtonWrap = styled.div<{ state: string }>`
   flex-wrap: wrap;
   display: flex;
   justify-content: center;
-  transition: 0.2s cubic-bezier(0.165, 0.84, 0.44, 1) all;
+  transition: 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) all;
   ${({ state }) =>
     state === "entered" || state === `entering`
       ? `opacity: 1; transform: translateY(0);`
@@ -266,7 +266,7 @@ const FrontSubtitle = styled.div<{ state: string }>`
   justify-content: center;
   text-shadow: 2px 2px 2px rgb(0, 0, 0, 0.2);
   font-size: 1.75rem;
-  transition: 0.2s cubic-bezier(0.165, 0.84, 0.44, 1) all;
+  transition: 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) all;
   margin-bottom: 3em;
   ${({ state }) =>
     state === "entered" || state === `entering`
@@ -281,7 +281,7 @@ const FrontSubtitleWrap = styled.div`
 
 const FrontTitle = styled.div<{ state: string }>`
   margin-top: 30vh;
-  transition: 1s ease opacity, 1s ease transform;
+  transition: 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) all;
   h1 {
     text-shadow: 2px 2px 8px rgb(0, 0, 0, 0.2);
     font-weight: 700;
@@ -294,8 +294,11 @@ const FrontTitle = styled.div<{ state: string }>`
   justify-content: center;
   ${({ state }) =>
     state === "entered" || state === `entering`
+      ? `opacity: 1; transform: translateY(0);`
+      : `opacity: 0; transform: translateY(100%);`}/* ${({ state }) =>
+    state === "entered" || state === `entering`
       ? `opacity: 1; transform: translate(0, -50%);`
-      : `opacity: 0; transform: translate(0, -35%);`}
+      : `opacity: 0; transform: translate(0, -35%);`} */
 `;
 
 const SplashInner = styled.div`
