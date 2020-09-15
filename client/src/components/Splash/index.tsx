@@ -116,6 +116,7 @@ const Splash = () => {
                 >
                   {coloredTickers.map((ticker, index) => (
                     <Transition
+                      key={index}
                       in={activeTickerItem === index}
                       timeout={2000}
                       onEntered={() => setNextTickerItem()}
@@ -357,6 +358,7 @@ const SplashWrap = styled.div`
     font-size: 9rem;
     letter-spacing: -2px;
   }
+
   ${breakpoints.lessThan("74")`
     h1 {
       font-size: 7rem;
@@ -378,11 +380,14 @@ const SplashWrap = styled.div`
     }
   `};
   ${breakpoints.lessThan("38")`
+    h1 {
+      font-size: 4rem;
+    }
     ${SplashInner} {
       padding: 0 3%;
     }
     ${FrontTitle} {
-      display: block;
+      margin-bottom: 2em;
     }
     ${FrontSubtitleWrap} {
       margin-bottom: 1em;
@@ -408,6 +413,9 @@ const SplashWrap = styled.div`
     }
   `};
   ${breakpoints.lessThan("26")`
+    h1 {
+      font-size: 3.5rem;
+    }
     ${FrontSubtitle} {
       font-size: 1rem;
     }
@@ -418,7 +426,6 @@ const SplashWrap = styled.div`
     }
     h1 {
       font-size: 2.75rem;
-      text-align: left;
     }
     ${TextTicker} {
       font-size: 1em;
