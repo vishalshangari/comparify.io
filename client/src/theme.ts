@@ -11,6 +11,7 @@ export const breakpoints = generateMedia({
   "38": "38em",
   "33": "33em",
   "30": "30em",
+  "26": "26em",
   "22": "22em",
 });
 
