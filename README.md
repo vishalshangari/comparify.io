@@ -1,1 +1,1 @@
-# spotify-mainstream
+# comparify.io

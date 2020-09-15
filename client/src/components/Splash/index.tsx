@@ -116,7 +116,7 @@ const Splash = () => {
           {(state) => (
             <FrontActionButtonWrap state={state}>
               <ActionButton href={`${DEV_URL}/api/auth/login`}>
-                <span>Log in with Spotify</span> <IoIosArrowDroprightCircle />
+                <span>Log-in with Spotify</span> <IoIosArrowDroprightCircle />
               </ActionButton>
               <FrontActionButtonLabel>
                 By clicking, you agree to our{" "}
