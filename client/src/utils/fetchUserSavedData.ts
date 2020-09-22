@@ -7,6 +7,7 @@ export default async () => {
       data: {
         topGenres,
         userInfo,
+        insufficientUserData,
         topTracks,
         topArtists,
         obscurityScore,
@@ -18,6 +19,7 @@ export default async () => {
     });
     return {
       userInfo: userInfo,
+      insufficientUserData: insufficientUserData,
       topGenres: topGenres,
       topTracks: topTracks,
       topArtists: topArtists,

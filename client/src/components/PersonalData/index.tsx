@@ -103,13 +103,8 @@ const PersonalData = () => {
     const getUserData = async () => {
       try {
         const userData = await fetchUserSavedData();
-        if (userData.userInfo._id === `3pt9kdatewl3mbg3m7y5mins8`) {
-          setApiError({
-            isError: true,
-            status: 403,
-            message: `Sorry your account has been banned`,
-          });
-          return;
+        if (userData.insufficientUserData) {
+          throw new Error("INSUFFICIENT_DATA");
         }
         const filteredTopGenres = {
           shortTerm: filterTopGenresForDisplay(userData.topGenres.shortTerm),
@@ -138,11 +133,22 @@ const PersonalData = () => {
         setTopArtists(userData.topArtists);
         setLoading(false);
       } catch (error) {
-        setApiError({
-          isError: true,
-          status: error.response.data.status,
-          message: error.response.data.message,
-        });
+        if (error.message === `INSUFFICIENT_DATA`) {
+          setApiError({
+            isError: true,
+            status: 404,
+            message:
+              "Looks like you don't have enough Spotify data to use Comparify yet. Keep listening and check back soon!",
+          });
+        } else {
+          setApiError({
+            isError: true,
+            status: error.response?.data?.status || 500,
+            message:
+              error.response?.data?.message ||
+              "Oops, something went wrong. Please try again later.",
+          });
+        }
       }
     };
 

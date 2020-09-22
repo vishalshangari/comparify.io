@@ -102,5 +102,15 @@ module.exports = async (authHeader, userInfo) => {
 
   console.log("done generating: " + (Date.now() - time) / 1000 + " seconds");
 
+  standardUserData._insufficientUserData = Object.entries(
+    standardUserData.spotifyData
+  ).some(
+    (dataItem) =>
+      dataItem.shortTerm === [] ||
+      dataItem.shortTerm === undefined ||
+      dataItem.shortTerm === {} ||
+      dataItem.shortTerm === defaultTopAristsAndGenresObj
+  );
+
   return standardUserData;
 };

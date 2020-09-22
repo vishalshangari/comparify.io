@@ -171,7 +171,7 @@ const Splash = () => {
 
 const TextTicker = styled.div<{ tickerBorder: string }>`
   position: relative;
-  width: 7.5em;
+  width: 6.5em;
   background: ${({ tickerBorder }) => tickerBorder};
   transition: 0.2s cubic-bezier(0.165, 0.84, 0.44, 1) all;
   height: 1.75em;

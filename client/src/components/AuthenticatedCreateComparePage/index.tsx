@@ -18,6 +18,7 @@ import { Transition } from "react-transition-group";
 import SlidingAlert from "../shared/SlidingAlert";
 import { BarLoader } from "react-spinners";
 import ComparifyInfo from "../shared/ComparifyInfo";
+import { APIError } from "../../models";
 
 type FormData = {
   comparify: string;
@@ -40,19 +41,34 @@ const CreateComparePage = () => {
   const [slidingErrorMessage, setSlidingErrorMessage] = useState<null | string>(
     null
   );
+  const [apiError, setApiError] = useState<null | APIError>(null);
+  const [insufficientUserData, setInsufficientUserData] = useState(false);
   const autoFillValue = QueryString.parse(location.search);
 
   useEffect(() => {
     const checkIfUserHasComparifyPage = async () => {
-      const userData = await fetchUserSavedData();
-      if (userData.comparifyPage.exists) {
-        history.push(`/${userData.comparifyPage.id}`);
-      } else {
-        setUserComparifyPage({
-          exists: false,
-          id: undefined,
+      try {
+        const userData = await fetchUserSavedData();
+        if (userData.insufficientUserData) {
+          setInsufficientUserData(true);
+        }
+        if (userData.comparifyPage.exists) {
+          history.push(`/${userData.comparifyPage.id}`);
+        } else {
+          setUserComparifyPage({
+            exists: false,
+            id: undefined,
+          });
+          setIsLoading(false);
+        }
+      } catch (error) {
+        setApiError({
+          isError: true,
+          status: error.response?.data?.status || 500,
+          message:
+            error.response?.data?.message ||
+            "Oops, something went wrong. Please try again later.",
         });
-        setIsLoading(false);
       }
     };
     checkIfUserHasComparifyPage();
@@ -129,71 +145,84 @@ const CreateComparePage = () => {
       <StandardMainContentWrapper>
         <ComponentWithLoadingState label={false} loading={isLoading}>
           <CreateWrap>
-            <CreateForm>
-              <form onSubmit={onSubmit} autoComplete={"off"}>
-                <CreateFormInputDisplay>
-                  <FormPrefix>comparify.io/</FormPrefix>
-                  <InputWrap>
-                    <Controller
-                      control={control}
-                      defaultValue={autoFill}
-                      name={"comparify"}
-                      rules={{
-                        required: true,
-                        validate: {
-                          minLength: (value) =>
-                            value.length > 1 ||
-                            "Name must be at least two characters long",
-                          chars: (value) => {
-                            return (
-                              checkAlphaNumeric(value) ||
-                              "Page name must only contain alphanumeric characters"
-                            );
+            {insufficientUserData ? (
+              <ListenMore>
+                <p>
+                  Looks like you don't have enough Spotify data to use Comparify
+                  yet{" "}
+                  <span role="img" aria-label="emoji">
+                    🥴
+                  </span>{" "}
+                </p>
+                <p>Keep listening and check back soon!</p>
+              </ListenMore>
+            ) : (
+              <CreateForm>
+                <form onSubmit={onSubmit} autoComplete={"off"}>
+                  <CreateFormInputDisplay>
+                    <FormPrefix>comparify.io/</FormPrefix>
+                    <InputWrap>
+                      <Controller
+                        control={control}
+                        defaultValue={autoFill}
+                        name={"comparify"}
+                        rules={{
+                          required: true,
+                          validate: {
+                            minLength: (value) =>
+                              value.length > 1 ||
+                              "Name must be at least two characters long",
+                            chars: (value) => {
+                              return (
+                                checkAlphaNumeric(value) ||
+                                "Page name must only contain alphanumeric characters"
+                              );
+                            },
+                            existence: AwesomeDebouncePromise(async (value) => {
+                              return (
+                                (await validateName(value)) ||
+                                "This name is already taken, please try a different one"
+                              );
+                            }, 750),
                           },
-                          existence: AwesomeDebouncePromise(async (value) => {
-                            return (
-                              (await validateName(value)) ||
-                              "This name is already taken, please try a different one"
-                            );
-                          }, 750),
-                        },
-                      }}
-                      render={({ onChange, value, onBlur, name }) => (
-                        <input
-                          name={name}
-                          placeholder={`enter a name...`}
-                          onBlur={onBlur}
-                          value={value ? value : ``}
-                          onChange={onChange}
-                          autoFocus
-                          autoCapitalize="off"
-                        />
-                      )}
-                    />
-                  </InputWrap>
-                </CreateFormInputDisplay>
-                <CreateBtnWrap isCreating={isCreating}>
-                  <div className="creatingLoader">
-                    <BarLoader color={theme.colors.mainAccent} />
-                  </div>
-                  <CreateBtn disabled={isCreateButtonDisabled} type="submit">
-                    Create
-                  </CreateBtn>
-                </CreateBtnWrap>
-                <FormError>
-                  {errors?.comparify?.message ? (
-                    <span>{errors.comparify.message}</span>
-                  ) : null}
-                  {errors.comparify?.type === "required" ? (
-                    <span>A page name is required</span>
-                  ) : null}
-                </FormError>
-              </form>
-              <CreateFormRequirements>
-                Name must be two or more alphanumeric characters
-                (lowercase/uppercase letters and/or numbers).
-              </CreateFormRequirements>
-            </CreateForm>
+                        }}
+                        render={({ onChange, value, onBlur, name }) => (
+                          <input
+                            name={name}
+                            placeholder={`enter a name...`}
+                            onBlur={onBlur}
+                            value={value ? value : ``}
+                            onChange={onChange}
+                            autoFocus
+                            autoCapitalize="off"
+                          />
+                        )}
+                      />
+                    </InputWrap>
+                  </CreateFormInputDisplay>
+                  <CreateBtnWrap isCreating={isCreating}>
+                    <div className="creatingLoader">
+                      <BarLoader color={theme.colors.mainAccent} />
+                    </div>
+                    <CreateBtn disabled={isCreateButtonDisabled} type="submit">
+                      Create
+                    </CreateBtn>
+                  </CreateBtnWrap>
+                  <FormError>
+                    {errors?.comparify?.message ? (
+                      <span>{errors.comparify.message}</span>
+                    ) : null}
+                    {errors.comparify?.type === "required" ? (
+                      <span>A page name is required</span>
+                    ) : null}
+                  </FormError>
+                </form>
+                <CreateFormRequirements>
+                  Name must be two or more alphanumeric characters
+                  (lowercase/uppercase letters and/or numbers).
+                </CreateFormRequirements>
+              </CreateForm>
+            )}
             <ComparifyInfo authenticated />
           </CreateWrap>
         </ComponentWithLoadingState>
@@ -202,6 +231,20 @@ const CreateComparePage = () => {
     </>
   );
 };
+
+const ListenMore = styled.div`
+  padding-bottom: 2em;
+  font-size: 1.25em;
+  text-align: center;
+  max-width: 36em;
+  margin: 0 auto;
+  p {
+    line-height: 1.5;
+  }
+  ${breakpoints.lessThan("48")`
+    font-size: 1em;
+  `}
+`;
 
 const CreateFormRequirements = styled.div`
   text-align: center;
