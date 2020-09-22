@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Header from "../shared/Header";
 import Footer from "../shared/Footer";
-import db from "../../db";
 import axios from "axios";
 import { DEV_URL, DB_COMPARIFYPAGE_COLLECTION } from "../../constants";
 import StandardMainContentWrapper from "../shared/StandardMainContentWrapper";
@@ -19,6 +18,8 @@ import SlidingAlert from "../shared/SlidingAlert";
 import { BarLoader } from "react-spinners";
 import ComparifyInfo from "../shared/ComparifyInfo";
 import { APIError } from "../../models";
+import ErrorComp from "../shared/ErrorComp";
+import db from "../../db";
 
 type FormData = {
   comparify: string;
@@ -114,10 +115,18 @@ const CreateComparePage = () => {
     if (comparifyPageDoc.exists) {
       setIsCreateButtonDisabled(true);
       return false;
-    } else {
+    }
+    setIsCreateButtonDisabled(false);
+    return true;
+  };
+
+  const checkLength = async (name: string) => {
+    if (name.length > 1) {
       setIsCreateButtonDisabled(false);
       return true;
     }
+    setIsCreateButtonDisabled(true);
+    return false;
   };
 
   const checkAlphaNumeric = (name: string) => {
@@ -126,6 +135,18 @@ const CreateComparePage = () => {
     }
     return false;
   };
+
+  if (apiError) {
+    return (
+      <StandardMainContentWrapper>
+        <CreateWrap>
+          <ErrorComp art>
+            <span>{apiError.message}</span>
+          </ErrorComp>
+        </CreateWrap>
+      </StandardMainContentWrapper>
+    );
+  }
 
   return (
     <>
@@ -169,15 +190,19 @@ const CreateComparePage = () => {
                         rules={{
                           required: true,
                           validate: {
-                            minLength: (value) =>
-                              value.length > 1 ||
-                              "Name must be at least two characters long",
+                            minLength: AwesomeDebouncePromise(async (value) => {
+                              return (
+                                (await checkLength(value)) ||
+                                "Name must be at least two characters long"
+                              );
+                            }, 750),
                             chars: (value) => {
                               return (
                                 checkAlphaNumeric(value) ||
                                 "Page name must only contain alphanumeric characters"
                               );
                             },
+                            // Debounced real-time page existence check
                             existence: AwesomeDebouncePromise(async (value) => {
                               return (
                                 (await validateName(value)) ||
@@ -280,6 +305,7 @@ const CreateFormInputDisplay = styled.div`
 
 const FormPrefix = styled.div`
   font-size: 3rem;
+  font-weight: 500;
   ${breakpoints.lessThan("48")`
     flex-basis: 100%;
     text-align: center;

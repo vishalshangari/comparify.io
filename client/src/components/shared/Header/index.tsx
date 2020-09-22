@@ -82,7 +82,7 @@ const Header = ({
       <Navigation>
         <ul>{navLinksToDisplay}</ul>
         {logoOnlyNav ? null : (
-          <ComparifyLogo color={theme.colors.textPrimary} size="1.5rem" />
+          <ComparifyLogo color={theme.colors.textPrimary} size="1.75rem" />
         )}
         <MobileNavExpandBtn
           onClick={() => setIsMobileNavExpanded((prev) => !prev)}
@@ -117,7 +117,7 @@ const Header = ({
 
         {logoOnlyNav ? (
           <LogoOnlyNavWrap>
-            <ComparifyLogo color={theme.colors.textPrimary} size="1.5rem" />
+            <ComparifyLogo color={theme.colors.textPrimary} size="1.75rem" />
             {responsiveNav}
           </LogoOnlyNavWrap>
         ) : null}

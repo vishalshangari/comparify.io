@@ -16,7 +16,8 @@ const jwt = require("jsonwebtoken");
 
 // Database
 const db = require("../db/firebase");
-const firebase = require("firebase");
+const firebase = require("firebase-admin");
+const FieldValue = firebase.firestore.FieldValue;
 
 // Utils
 const catchAsync = require("../utils/catchAsync");
@@ -46,7 +47,7 @@ router.post(
 
     if (comparifyPageDoc.exists) {
       throw new AppError(
-        "This page already exists. Please try a different name.",
+        "That URL is taken. Please try a different name.",
         500
       );
     }
@@ -73,7 +74,7 @@ router.post(
     await db
       .collection(STATS)
       .doc(DB_COMPARIFYPAGE_COLLECTION)
-      .update({ count: firebase.firestore.FieldValue.increment(1) });
+      .update({ count: FieldValue.increment(1) });
   })
 );
 

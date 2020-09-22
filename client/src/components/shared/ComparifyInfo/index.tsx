@@ -103,7 +103,7 @@ const DescriptionSteps = styled.div`
   margin-top: 2em;
   .brand {
     color: ${({ theme }) => theme.colors.mainAccent};
-    font-weight: 800;
+    font-weight: 700;
   }
   .step {
     display: flex;
