@@ -1,4 +1,4 @@
-// Wrapper to catch and propogate errors inside async route handlers
+// Wrapper to catch then propogate errors inside async route handlers
 
 module.exports = (fn) => {
   return (req, res, next) => {

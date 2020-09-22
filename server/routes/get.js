@@ -1,4 +1,4 @@
-// Fetch routes - Spotify API and DB data
+// Fetch routes - Spotify API and db data
 const express = require("express");
 const axios = require("axios");
 const retryable = require("async/retryable");

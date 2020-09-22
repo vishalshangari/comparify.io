@@ -1,4 +1,4 @@
-// Used to initialize client tokens for public API requests to Spotify
+// Initialize client tokens for public API requests to Spotify
 const express = require("express");
 const axios = require("axios");
 const queryString = require("query-string");

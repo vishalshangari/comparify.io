@@ -1,4 +1,4 @@
-// Firebase db config
+// Firebase DB config
 const firebase = require("firebase/app");
 
 require("firebase/firestore");

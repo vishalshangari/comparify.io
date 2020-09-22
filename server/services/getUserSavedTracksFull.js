@@ -1,4 +1,4 @@
-// Get user saved tracks - all info - not being used
+// Get active user saved tracks - all info - not being used
 
 const { GET_ACTIVE_USER_TRACKS_URL } = require("../constants");
 

@@ -1,4 +1,4 @@
-// Get active user's info
+// Get active user's information
 const axios = require("axios");
 const { GET_ACTIVE_USER_PROFILE_URL } = require("../constants");
 
