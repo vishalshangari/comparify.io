@@ -370,7 +370,7 @@ const CancelBtn = styled.a`
 `;
 
 const DeletePageBtn = styled.a`
-  margin-top: 1em;
+  margin-top: 0.5em;
   .icon {
     font-size: 1em;
     margin-right: 0.5em;
@@ -381,9 +381,9 @@ const DeletePageBtn = styled.a`
   border-radius: 0.25em;
   border: 0;
   font-family: "open sans", "sans-serif";
-  font-size: 1.25rem;
+  font-size: 1.75rem;
   ${breakpoints.lessThan("48")`
-    font-size: 1rem;
+    font-size: 1.25rem;
   `}
 
   font-weight: 700;
