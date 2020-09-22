@@ -58,8 +58,6 @@ module.exports = async (authHeader, time_range = "medium_term") => {
       headers: authHeader,
     });
 
-    console.log(`AUDIO FEATURES RESPONSE: `, audioFeaturesFull);
-
     for (let i = 0; i < audioFeaturesFull.length; i++) {
       for (let j = 0; j < FEATURES.length; j++) {
         if (audioFeaturesFull[i]) {
@@ -70,8 +68,6 @@ module.exports = async (authHeader, time_range = "medium_term") => {
         }
       }
     }
-
-    console.log(`final stats: `, stats);
 
     // for (let i = 0; i < audioFeaturesFull.length; i++) {
     //   // userTopTracks[i]["danceability"] = audioFeaturesFull[i]["danceability"];
