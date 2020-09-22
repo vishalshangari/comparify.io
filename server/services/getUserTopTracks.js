@@ -58,12 +58,20 @@ module.exports = async (authHeader, time_range = "medium_term") => {
       headers: authHeader,
     });
 
+    console.log(`AUDIO FEATURES RESPONSE: `, audioFeaturesFull);
+
     for (let i = 0; i < audioFeaturesFull.length; i++) {
       for (let j = 0; j < FEATURES.length; j++) {
-        stats[FEATURES[j]] +=
-          parseFloat(audioFeaturesFull[i][FEATURES[j]]) || 0;
+        if (audioFeaturesFull[i]) {
+          stats[FEATURES[j]] +=
+            parseFloat(audioFeaturesFull[i][FEATURES[j]]) || 0;
+        } else {
+          stats[FEATURES[j]] += 0;
+        }
       }
     }
+
+    console.log(`final stats: `, stats);
 
     // for (let i = 0; i < audioFeaturesFull.length; i++) {
     //   // userTopTracks[i]["danceability"] = audioFeaturesFull[i]["danceability"];
