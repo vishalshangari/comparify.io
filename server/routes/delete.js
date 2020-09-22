@@ -1,3 +1,4 @@
+// Comparify page deletion route
 const express = require("express");
 const {
   CLIENT_ID,

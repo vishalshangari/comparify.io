@@ -1,3 +1,4 @@
+// Authentication routes
 const express = require("express");
 const {
   SPOTIFY_AUTH_STATE_KEY,

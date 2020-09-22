@@ -1,3 +1,4 @@
+// Feedback collection route
 const express = require("express");
 const { DB_FEEDBACK_COLLECTION } = require("../constants");
 const router = express.Router();

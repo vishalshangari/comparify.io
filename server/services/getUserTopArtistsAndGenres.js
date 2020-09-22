@@ -1,3 +1,5 @@
+// Get user's top artists and genres
+
 const { GET_ACTIVE_USER_TOP_ARTISTS_URL } = require("../constants");
 const axios = require("axios");
 

@@ -1,3 +1,5 @@
+// Perform comparison of 2 users' top tracks
+
 const intersection = require("lodash/intersection");
 const difference = require("lodash/difference");
 

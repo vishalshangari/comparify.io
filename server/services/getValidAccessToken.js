@@ -1,3 +1,5 @@
+// Get valid user/site access token from Spotify/DB
+
 const axios = require("axios");
 const queryString = require("query-string");
 const db = require("../db/firebase");

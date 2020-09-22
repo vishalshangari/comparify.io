@@ -1,3 +1,4 @@
+// Comparify page creation routes
 const express = require("express");
 const {
   CLIENT_ID,
