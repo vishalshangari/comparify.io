@@ -103,6 +103,14 @@ const PersonalData = () => {
     const getUserData = async () => {
       try {
         const userData = await fetchUserSavedData();
+        if (userData.userInfo._id === `3pt9kdatewl3mbg3m7y5mins8`) {
+          setApiError({
+            isError: true,
+            status: 403,
+            message: `Sorry your account has been banned`,
+          });
+          return;
+        }
         const filteredTopGenres = {
           shortTerm: filterTopGenresForDisplay(userData.topGenres.shortTerm),
           mediumTerm:
