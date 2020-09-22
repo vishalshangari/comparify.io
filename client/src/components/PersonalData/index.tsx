@@ -302,6 +302,7 @@ const ScrollIndicator = styled.div<{ showScrollIndicator: boolean }>`
   left: 50%;
   transform: translateX(-50%);
   padding: 1em 2em;
+  font-size: 1.25em;
   ${breakpoints.lessThan("48")`
     padding: 1em 1.5em;
     font-size: 0.875em;
