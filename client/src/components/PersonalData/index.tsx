@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import { ChartData } from "chart.js";
 import ComponentWithLoadingState from "../shared/ComponentWithLoadingState";
 import TopGenres from "../TopGenres";
@@ -92,6 +92,7 @@ const PersonalData = () => {
   const [pageTitle, setPageTitle] = useState(`Loading...`);
   const [showCopyAlert, setShowCopyAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   const location = useLocation();
 
   const queryValue = QueryString.parse(location.search);
@@ -132,6 +133,7 @@ const PersonalData = () => {
         setTopTracks(userData.topTracks);
         setTopArtists(userData.topArtists);
         setLoading(false);
+        setShowScrollIndicator(true);
       } catch (error) {
         if (error.message === `INSUFFICIENT_DATA`) {
           setApiError({
@@ -153,6 +155,13 @@ const PersonalData = () => {
     };
 
     getUserData();
+    const handleScroll = () => {
+      setShowScrollIndicator(false);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, [queryValue.deleted]);
 
   const handleCopyClick = () => {
@@ -266,11 +275,54 @@ const PersonalData = () => {
             <TopTracks tracks={topTracks} />
             <TopArtists artists={topArtists} />
           </PersonalDataInner>
+          <ScrollIndicator showScrollIndicator={showScrollIndicator}>
+            More below!
+          </ScrollIndicator>
         </ComponentWithLoadingState>
       </PersonalDataWrapper>
     </>
   );
 };
+
+const ScrollIndicatorAnimation = keyframes`
+  0% {
+    bottom: 1em;
+  }
+  50% {
+    bottom: 2em;
+  }
+  100% {
+    bottom: 1em;
+  }
+`;
+
+const ScrollIndicator = styled.div<{ showScrollIndicator: boolean }>`
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1em 2em;
+  ${breakpoints.lessThan("48")`
+    padding: 1em 1.5em;
+    font-size: 0.875em;
+  `}
+  background: ${({ theme }) => theme.colors.mainAccent};
+  border-radius: 0.5em;
+  animation: ${ScrollIndicatorAnimation} 1.5s linear infinite;
+  display: ${({ showScrollIndicator }) =>
+    showScrollIndicator ? "block" : "none"};
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 0.5em solid transparent;
+    border-right: 0.5em solid transparent;
+    border-top: 0.5em solid ${({ theme }) => theme.colors.mainAccent};
+  }
+`;
 
 const ComparifyPagePreviewDisplay = styled.div`
   display: flex;

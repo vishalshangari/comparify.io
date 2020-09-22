@@ -188,10 +188,11 @@ const DescriptionBoxGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 2em;
-  margin-bottom: 1em;
+  margin-bottom: 4em;
   ${breakpoints.lessThan("66")`
     grid-template-columns: 1fr;
     grid-gap: 1em;
+    margin-bottom: 2em;
   `}
 `;
 

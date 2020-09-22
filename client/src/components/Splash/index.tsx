@@ -10,6 +10,7 @@ import {
 import styled, { createGlobalStyle } from "styled-components";
 import { Transition } from "react-transition-group";
 import { IoIosArrowDroprightCircle } from "react-icons/io";
+import { BsQuestionCircleFill } from "react-icons/bs";
 import { breakpoints, colors, Theme } from "../../theme";
 import { DEV_URL } from "../../constants";
 import useWindowSize from "../../hooks/useWindowSize";
@@ -156,9 +157,16 @@ const Splash = () => {
                 <span>Log in with Spotify</span> <IoIosArrowDroprightCircle />
               </ActionButton>
               <FrontActionButtonLabel>
-                See our{" "}
+                <a href="/compare">
+                  <span className="icon">
+                    <BsQuestionCircleFill />
+                  </span>
+                  <span>What is Comparify?</span>
+                </a>
+              </FrontActionButtonLabel>
+              <FrontActionButtonLabel>
                 <a href="/privacy">
-                  <span>privacy policy</span>
+                  <span>See our privacy policy</span>
                 </a>
               </FrontActionButtonLabel>
             </FrontActionButtonWrap>
@@ -203,12 +211,13 @@ const FrontActionButtonLabel = styled.div`
   color: ${({ theme }) => theme.colors.textPrimary};
   width: 100%;
   a {
-    border-bottom: 1px solid ${({ theme }) => theme.colors.mainAccent};
-    background: ${({ theme }) => theme.colors.mainAccent10p};
-    color: ${({ theme }) => theme.colors.textPrimary};
     &:hover {
-      background: ${({ theme }) => theme.colors.mainAccent};
+      border-bottom: 1px solid;
     }
+  }
+  span.icon {
+    font-size: 0.875em;
+    margin-right: 0.5em;
   }
 `;
 
