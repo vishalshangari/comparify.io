@@ -171,6 +171,16 @@ const ComparifyInfoWrap = styled.div`
     && .step {
       font-size: 1rem;
     }
+  `}${breakpoints.lessThan("38")`
+    h2 {
+      font-size: 1.5rem;
+    }
+    h3 {
+      font-size: 1.25rem;
+    }
+    && .step {
+      font-size: 0.875rem;
+    }
   `}
 `;
 

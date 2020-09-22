@@ -177,6 +177,7 @@ const MobileNavigation = styled.div<{ state: string }>`
     border: 1px solid ${({ theme }) => theme.colors.darkBodyOverlay};
     border-radius: 0.25em;
     background: ${({ theme }) => theme.colors.mainContentBg};
+    overflow: hidden;
   }
   li {
     border-bottom: 1px solid
@@ -193,7 +194,7 @@ const MobileNavigation = styled.div<{ state: string }>`
     width: 100%;
   }
   .nav-active {
-    background: ${({ theme }) => theme.colors.mainAccent25p};
+    background: ${({ theme }) => theme.colors.mainAccent};
   }
   ${breakpoints.greaterThan("66")`
     display: none;

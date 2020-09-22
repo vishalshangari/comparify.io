@@ -464,9 +464,18 @@ export const AnimatedActionBtn = styled.a`
 const InfoBtn = styled.button`
   font-weight: 600;
   margin-top: 2em;
-  &:hover {
-    text-decoration: underline;
-  }
+  padding: 0.25em 0.5em;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.mainAccent};
+  transition: 0.2s ease all;
+  ${breakpoints.greaterThan("48")`
+    &:hover {
+      background: ${({ theme }) => theme.colors.mainAccent};
+      color: ${({ theme }) => theme.colors.textPrimary};
+      border-bottom-color: transparent;
+      border-radius: 0.25em;
+      box-shadow: 1px 1px 2px rgba(0,0,0,1);
+    }
+  `}
 `;
 
 const UserProfileButtons = styled.div`
