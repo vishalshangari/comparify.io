@@ -22,7 +22,7 @@
 
 const firebase = require("firebase-admin");
 
-const serviceAccount = require("../config/spotify-compare-firebase-adminsdk-c7062-5ede2bba22.json");
+const serviceAccount = require("./spotify-compare-firebase-adminsdk-c7062-5ede2bba22.json");
 
 firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
