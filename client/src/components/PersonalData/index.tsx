@@ -347,7 +347,7 @@ const ComparifyPagePreviewDisplay = styled.div`
   .comparifyURLDisplay {
     overflow-wrap: anywhere;
     font-size: 2rem;
-    line-height: 1;
+    line-height: 1em;
     letter-spacing: 1px;
     font-weight: 500;
     font-family: "open sans", "sans-serif";
