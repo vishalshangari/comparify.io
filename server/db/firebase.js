@@ -22,7 +22,7 @@
 
 const firebase = require("firebase-admin");
 
-const serviceAccount = require("./config");
+const serviceAccount = require("./config.js");
 
 firebase.initializeApp({
   credential: firebase.credential.cert(serviceAccount),
