@@ -1,5 +1,4 @@
 node_modules/
-server/db/
 
 # dotenv environment variables file
 .env
