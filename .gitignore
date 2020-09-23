@@ -1,6 +1,5 @@
 node_modules/
-server/config
-spotify-compare-firebase-adminsdk-c7062-5ede2bba22.json
+server/db/
 
 # dotenv environment variables file
 .env
