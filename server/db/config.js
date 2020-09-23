@@ -2,7 +2,7 @@ module.exports = {
   type: "service_account",
   project_id: "spotify-compare",
   private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-  private_key: process.env.FIREBASE_PRIVATE_KEY,
+  private_key: JSON.parse(process.env.FIREBASE_PRIVATE_KEY),
   client_email:
     "firebase-adminsdk-c7062@spotify-compare.iam.gserviceaccount.com",
   client_id: process.env.FIREBASE_CLIENT_ID,
