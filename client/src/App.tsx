@@ -15,8 +15,6 @@ if (process.env.NODE_ENV === `development`) {
   DEV_URL = "http://localhost:3001";
 }
 
-firebaseApp.analytics();
-
 type AuthStateType = {
   status: "loading" | typeof RESPONSE_CODES;
   errorType: typeof ERROR_CODES | null;
