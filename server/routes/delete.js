@@ -16,7 +16,7 @@ const jwt = require("jsonwebtoken");
 
 // Database
 const db = require("../db/firebase");
-const firebase = require("firebase");
+const firebase = require("firebase-admin");
 const FieldValue = firebase.firestore.FieldValue;
 
 // Utils

@@ -146,6 +146,7 @@ router.get(
 
     const {
       info: userInfo,
+      _insufficientUserData: insufficientUserData = false,
       spotifyData: {
         topArtistsAndGenres,
         topTracks,
@@ -165,6 +166,7 @@ router.get(
         names: names,
         profileImageUrl: userInfo.profileImageUrl,
       },
+      insufficientUserData: insufficientUserData,
       obscurityScore: obscurityScore,
       topTracks: topTracks,
       featureScores: audioFeatures,

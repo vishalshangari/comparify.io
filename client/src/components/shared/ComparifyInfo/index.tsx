@@ -103,7 +103,7 @@ const DescriptionSteps = styled.div`
   margin-top: 2em;
   .brand {
     color: ${({ theme }) => theme.colors.mainAccent};
-    font-weight: 800;
+    font-weight: 700;
   }
   .step {
     display: flex;
@@ -171,6 +171,16 @@ const ComparifyInfoWrap = styled.div`
     && .step {
       font-size: 1rem;
     }
+  `}${breakpoints.lessThan("38")`
+    h2 {
+      font-size: 1.5rem;
+    }
+    h3 {
+      font-size: 1.25rem;
+    }
+    && .step {
+      font-size: 0.875rem;
+    }
   `}
 `;
 
@@ -178,10 +188,11 @@ const DescriptionBoxGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 2em;
-  margin-bottom: 1em;
+  margin-bottom: 4em;
   ${breakpoints.lessThan("66")`
     grid-template-columns: 1fr;
     grid-gap: 1em;
+    margin-bottom: 2em;
   `}
 `;
 

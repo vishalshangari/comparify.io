@@ -102,5 +102,14 @@ module.exports = async (authHeader, userInfo) => {
 
   console.log("done generating: " + (Date.now() - time) / 1000 + " seconds");
 
+  if (
+    standardUserData.spotifyData.topTracks.shortTerm.length === 0 ||
+    standardUserData.spotifyData.topArtistsAndGenres.shortTerm.length === 0
+  ) {
+    standardUserData._insufficientUserData = true;
+  } else {
+    standardUserData._insufficientUserData = false;
+  }
+
   return standardUserData;
 };

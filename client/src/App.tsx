@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { useAsync } from "react-use";
 import Router from "./components/Router";
-
 import { theme } from "./theme";
 import GlobalStyle from "./components/GlobalStyle";
 import styled, { ThemeProvider } from "styled-components";
 import Loader from "./components/Loader";
-
+import { firebaseApp } from "./db";
 import { ERROR_CODES, RESPONSE_CODES } from "./constants";
 
 import useWindowSize, { WindowSize } from "./hooks/useWindowSize";
@@ -98,25 +97,5 @@ const FullSiteWrap = styled.div`
   min-height: 200px;
   overflow: hidden;
 `;
-
-// const Create = () => {
-//   const handleCreateFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     e.persist();
-
-//   };
-
-//   return (
-//     <div style={{ textAlign: "center" }}>
-//       <h1>Hello this is Create</h1>
-//       <form onSubmit={handleCreateFormSubmit}>
-//         <input name="comparisonName" type="text" />
-//         <br />
-//         <br />
-//         <button type="submit">Create!</button>
-//       </form>
-//     </div>
-//   );
-// };
 
 export default App;

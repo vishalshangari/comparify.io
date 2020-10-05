@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import { ChartData } from "chart.js";
 import ComponentWithLoadingState from "../shared/ComponentWithLoadingState";
 import TopGenres from "../TopGenres";
@@ -92,6 +92,7 @@ const PersonalData = () => {
   const [pageTitle, setPageTitle] = useState(`Loading...`);
   const [showCopyAlert, setShowCopyAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
   const location = useLocation();
 
   const queryValue = QueryString.parse(location.search);
@@ -103,6 +104,9 @@ const PersonalData = () => {
     const getUserData = async () => {
       try {
         const userData = await fetchUserSavedData();
+        if (userData.insufficientUserData) {
+          throw new Error("INSUFFICIENT_DATA");
+        }
         const filteredTopGenres = {
           shortTerm: filterTopGenresForDisplay(userData.topGenres.shortTerm),
           mediumTerm:
@@ -129,16 +133,35 @@ const PersonalData = () => {
         setTopTracks(userData.topTracks);
         setTopArtists(userData.topArtists);
         setLoading(false);
+        setShowScrollIndicator(true);
       } catch (error) {
-        setApiError({
-          isError: true,
-          status: error.response.data.status,
-          message: error.response.data.message,
-        });
+        if (error.message === `INSUFFICIENT_DATA`) {
+          setApiError({
+            isError: true,
+            status: 404,
+            message:
+              "Looks like you don't have enough Spotify data to use Comparify yet. Keep listening and check back soon!",
+          });
+        } else {
+          setApiError({
+            isError: true,
+            status: error.response?.data?.status || 500,
+            message:
+              error.response?.data?.message ||
+              "Oops, something went wrong. Please try again later.",
+          });
+        }
       }
     };
 
     getUserData();
+    const handleScroll = () => {
+      setShowScrollIndicator(false);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, [queryValue.deleted]);
 
   const handleCopyClick = () => {
@@ -252,11 +275,55 @@ const PersonalData = () => {
             <TopTracks tracks={topTracks} />
             <TopArtists artists={topArtists} />
           </PersonalDataInner>
+          <ScrollIndicator showScrollIndicator={showScrollIndicator}>
+            More below!
+          </ScrollIndicator>
         </ComponentWithLoadingState>
       </PersonalDataWrapper>
     </>
   );
 };
+
+const ScrollIndicatorAnimation = keyframes`
+  0% {
+    bottom: 1em;
+  }
+  50% {
+    bottom: 2em;
+  }
+  100% {
+    bottom: 1em;
+  }
+`;
+
+const ScrollIndicator = styled.div<{ showScrollIndicator: boolean }>`
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1em 2em;
+  font-size: 1.25em;
+  ${breakpoints.lessThan("48")`
+    padding: 1em 1.5em;
+    font-size: 0.875em;
+  `}
+  background: ${({ theme }) => theme.colors.mainAccent};
+  border-radius: 0.5em;
+  animation: ${ScrollIndicatorAnimation} 1.5s linear infinite;
+  display: ${({ showScrollIndicator }) =>
+    showScrollIndicator ? "block" : "none"};
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 0.5em solid transparent;
+    border-right: 0.5em solid transparent;
+    border-top: 0.5em solid ${({ theme }) => theme.colors.mainAccent};
+  }
+`;
 
 const ComparifyPagePreviewDisplay = styled.div`
   display: flex;
@@ -280,7 +347,7 @@ const ComparifyPagePreviewDisplay = styled.div`
   .comparifyURLDisplay {
     overflow-wrap: anywhere;
     font-size: 2rem;
-    line-height: 1;
+    line-height: 1em;
     letter-spacing: 1px;
     font-weight: 500;
     font-family: "open sans", "sans-serif";

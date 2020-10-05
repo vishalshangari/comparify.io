@@ -52,11 +52,24 @@ router.get(
     const {
       info: creatorUserInfo,
       spotifyData: creatorSpotifyData,
+      _insufficientUserData: creatorInsufficientUserData = false,
     } = refResponse[0].data();
     const {
       info: visitorUserInfo,
       spotifyData: visitorSpotifyData,
+      _insufficientUserData: visitorInsufficientUserData = false,
     } = refResponse[1].data();
+
+    if (creatorInsufficientUserData || visitorInsufficientUserData) {
+      throw new AppError(
+        `Looks like ${
+          creatorInsufficientUserData
+            ? creatorUserInfo.displayName + ` doesn't `
+            : `you don't`
+        } have sufficient Spotify data to make comparisons yet. Keep listening and check back soon!`,
+        500
+      );
+    }
 
     // Analyze top genres
     const genresComparison = compareTopGenres(
