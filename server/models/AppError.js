@@ -1,4 +1,4 @@
-// Custom Error class
+// Custom error class
 module.exports = class AppError extends Error {
   constructor(message, statusCode) {
     super(message);

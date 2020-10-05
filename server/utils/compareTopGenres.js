@@ -1,4 +1,4 @@
-// Perform comparison of 2 users' top genres
+// Perform a comparison of 2 users' top genres
 
 const intersection = require("lodash/intersection");
 const difference = require("lodash/difference");

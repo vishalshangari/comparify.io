@@ -1,4 +1,4 @@
-// Comparify (comparison) routes
+// Comparify (comparison) route
 const express = require("express");
 const { DB_COMPARIFYPAGE_COLLECTION, USERS, STATS } = require("../constants");
 const router = express.Router();

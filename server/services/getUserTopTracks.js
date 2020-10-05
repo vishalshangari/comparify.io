@@ -1,4 +1,4 @@
-// Get user's top tracks
+// Get active user's top tracks
 
 const {
   GET_ACTIVE_USER_TOP_TRACKS_URL,

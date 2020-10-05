@@ -1,4 +1,4 @@
-// Generate random alphanumeric string for OAuth2 state
+// Generate random alphanumeric string for OAuth state
 
 const { ALPHANUMERIC } = require("../constants");
 

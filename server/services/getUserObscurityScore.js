@@ -1,4 +1,4 @@
-// Calculate obscurity score
+// Calculate user's obscurity score
 
 module.exports = (topArtistsAndGenres, topTracks) => {
   let averageArtistsPopularityScores = {};

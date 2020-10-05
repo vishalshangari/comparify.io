@@ -1,4 +1,4 @@
-// Generate user using other services
+// Generate standard user using other services
 const getUserTopArtistsAndGenres = require("./getUserTopArtistsAndGenres");
 const getUserSavedTrackIDs = require("./getUserSavedTrackIDs");
 const getUserTopTracks = require("./getUserTopTracks");
