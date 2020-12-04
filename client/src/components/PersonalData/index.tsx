@@ -8,7 +8,6 @@ import Obscurity from "../Obscurity";
 import TopTracks from "../TopTracks";
 import TopArtists from "../TopArtists";
 import AudioFeatures from "../AudioFeatures";
-
 import Header from "../shared/Header";
 import fetchUserSavedData from "../../utils/fetchUserSavedData";
 import { APIError } from "../../models";
@@ -22,6 +21,7 @@ import { Transition } from "react-transition-group";
 import * as QueryString from "query-string";
 import SlidingAlert from "../shared/SlidingAlert";
 import { useLocation } from "react-router-dom";
+import userMagenta from "../../assets/img/user-magenta.png";
 
 export type Genre = {
   name: string;
@@ -224,6 +224,10 @@ const PersonalData = () => {
                     <img
                       alt={userInfo?.names.join(" ") || ""}
                       src={userInfo?.profileImageUrl}
+                      onError={(e) => (
+                        (e.currentTarget.onerror = null),
+                        (e.currentTarget.src = userMagenta)
+                      )}
                     />
                   </div>
                   {userComparifyPage?.exists && userComparifyPage?.id ? (

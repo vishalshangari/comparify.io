@@ -19,8 +19,8 @@ import ObscurityComparison from "../ObscurityComparison";
 import ProfileSnippet from "../../shared/ProfileSnippet";
 import { APIError } from "../../../models";
 import DiscoverTogether from "../DiscoverTogether";
-import userLime from "../../../assets/user-lime.png";
-import userBlue from "../../../assets/user-blue.png";
+import userLime from "../../../assets/img/user-lime.png";
+import userBlue from "../../../assets/img/user-blue.png";
 
 function getPromiseResult<T>(result: PromiseSettledResult<T>) {
   if (result.status !== `fulfilled`) {

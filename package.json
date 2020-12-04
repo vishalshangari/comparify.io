@@ -23,27 +23,27 @@
   },
   "homepage": "https://www.comparify.io",
   "dependencies": {
-    "@types/lodash": "^4.14.160",
+    "@types/lodash": "^4.14.165",
     "async": "^3.2.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.0",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-winston": "^4.0.5",
-    "firebase": "^7.17.2",
-    "firebase-admin": "^9.2.0",
+    "firebase": "^8.1.2",
+    "firebase-admin": "^9.4.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
     "object-sizeof": "^1.6.1",
-    "query-string": "^6.13.1",
-    "react-icons": "^3.10.0",
+    "query-string": "^6.13.7",
+    "react-icons": "^4.1.0",
     "request": "^2.88.2",
     "winston": "^3.3.3"
   },
   "devDependencies": {
     "concurrently": "^5.2.0",
     "cors": "^2.8.5",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.6"
   }
 }
