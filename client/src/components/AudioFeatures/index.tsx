@@ -94,7 +94,7 @@ const AudioFeatures = ({ scores }: AudioFeatureProps) => {
               <strong>Recent:</strong> over the last 4 to 6 months
             </div>
             <div>
-              <strong>All-Time:</strong> over the last month
+              <strong>Recent:</strong> over the last month
             </div>
           </PeriodLabels>
         </FeaturesHeader>
