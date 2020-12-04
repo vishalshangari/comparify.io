@@ -19,6 +19,8 @@ import ObscurityComparison from "../ObscurityComparison";
 import ProfileSnippet from "../../shared/ProfileSnippet";
 import { APIError } from "../../../models";
 import DiscoverTogether from "../DiscoverTogether";
+import userLime from "../../../assets/user-lime.png";
+import userBlue from "../../../assets/user-blue.png";
 
 function getPromiseResult<T>(result: PromiseSettledResult<T>) {
   if (result.status !== `fulfilled`) {
@@ -202,7 +204,11 @@ const Comparify = ({ pageID }: ComparifyProps) => {
                   <div className="profileImage">
                     <img
                       alt={visitorUserInfo.displayName}
-                      src={visitorUserInfo.profileImageUrl}
+                      src={visitorUserInfo.profileImageUrl || ``}
+                      onError={(e) => (
+                        (e.currentTarget.onerror = null),
+                        (e.currentTarget.src = userBlue)
+                      )}
                     />
                   </div>
                 ) : null}
@@ -225,6 +231,10 @@ const Comparify = ({ pageID }: ComparifyProps) => {
                     <img
                       alt={creatorUserInfo.displayName}
                       src={creatorUserInfo.profileImageUrl || ``}
+                      onError={(e) => (
+                        (e.currentTarget.onerror = null),
+                        (e.currentTarget.src = userLime)
+                      )}
                     />
                   </div>
                 ) : null}
@@ -954,10 +964,8 @@ const UserGenres = styled.div`
   }
   &:first-child {
     /* .genresDisplayContainer {
-      background: ${({ theme }) =>
-      theme.colors.iris10p};
-      border: 1px solid ${({ theme }) =>
-      theme.colors.iris};
+      background: ${({ theme }) => theme.colors.iris10p};
+      border: 1px solid ${({ theme }) => theme.colors.iris};
     } */
     grid-area: visitor;
     .genreItem {
@@ -969,10 +977,8 @@ const UserGenres = styled.div`
   &:last-child {
     grid-area: creator;
     /* .genresDisplayContainer {
-      background: ${({ theme }) =>
-      theme.colors.neonGreen10p};
-      border: 1px solid ${({ theme }) =>
-      theme.colors.neonGreen};
+      background: ${({ theme }) => theme.colors.neonGreen10p};
+      border: 1px solid ${({ theme }) => theme.colors.neonGreen};
     } */
     .genreItem {
       border: none;
