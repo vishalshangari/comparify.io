@@ -152,11 +152,6 @@ router.get("/login/callback", async (req, res) => {
         userData.lastLogin = userInfo.createdAt;
         userData.lastUpdated = userInfo.createdAt;
 
-        // const userData = {
-        //   info: userInfo,
-        //   lastLogin: userInfo.createdAt,
-        // };
-
         // Add Spotify refresh token to user
         userData.tokens = {
           accessToken: accessToken,
@@ -255,11 +250,6 @@ router.get("/verifyToken", (req, res) => {
       .status(200)
       .json({ status: RESPONSE_CODES.NO_ACTIVE_SESSION, errorType: null });
   }
-});
-
-router.get("/clearSession", (req, res) => {
-  // TODO: on logout
-  console.log("clearing session...");
 });
 
 module.exports = router;

@@ -116,8 +116,6 @@ const themeColors: ThemeColors = {
   textTertiary: colors.grey5,
   spotifyGreen: colors.spotifyGreen,
   spotifyGreenDim: colors.spotifyGreenDim,
-
-  // Others
 };
 
 // Main theme object def

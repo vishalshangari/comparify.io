@@ -5,7 +5,6 @@ import { theme } from "./theme";
 import GlobalStyle from "./components/GlobalStyle";
 import styled, { ThemeProvider } from "styled-components";
 import Loader from "./components/Loader";
-import { firebaseApp } from "./db";
 import { ERROR_CODES, RESPONSE_CODES } from "./constants";
 
 import useWindowSize, { WindowSize } from "./hooks/useWindowSize";
@@ -75,7 +74,6 @@ const App = () => {
     <>
       <ThemeProvider theme={theme}>
         <GlobalStyle />
-        {/* <FullPageTest size={size}></FullPageTest> */}
         <AuthProvider>
           <FullSiteWrap style={{ minHeight: size?.height }}>
             <Router />

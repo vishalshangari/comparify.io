@@ -6,17 +6,10 @@ export type ComparifyPage = {
   exists: boolean;
   id?: string;
   data?: firebase.firestore.DocumentData;
-  // data?: {
-  //   creatdAt: number,
-  //   creator: {
-  //     _id: string,
-  //     ref: firebase.firestore.DocumentReference
-  //   }
   // }
 };
 
 export default (comparifyPageID: string) => {
-  // const [pageExists, setPageExists] = useState<null | boolean>(null);
   const [comparifyPage, setComparifyPage] = useState<null | ComparifyPage>(
     null
   );
@@ -26,7 +19,6 @@ export default (comparifyPageID: string) => {
         .collection(DB_COMPARIFYPAGE_COLLECTION)
         .doc(comparifyPageID);
       const pageDoc = await pageRef.get();
-      // setPageExists(pageDoc.exists);
       if (pageDoc.exists) {
         setComparifyPage({
           id: comparifyPageID,
